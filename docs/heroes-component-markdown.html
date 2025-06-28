@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>heroes.component.ts Content</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        pre {
+            background-color: #252526;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        .comment { color: #6A9955; }
+        .keyword { color: #569CD6; }
+        .string { color: #CE9178; }
+        .function { color: #DCDCAA; }
+        .variable { color: #9CDCFE; }
+        .type { color: #4EC9B0; }
+        .constant { color: #4FC1FF; }
+        .operator { color: #D4D4D4; }
+        .decorator { color: #C586C0; }
+    </style>
+</head>
+<body>
+    <h1>Content of heroes.component.ts</h1>
+    <pre><code><span class="keyword">import</span> &#123;<span class="variable">testIdMap</span>&#125; <span class="keyword">from</span> <span class="string">"./test-ids"</span>;
+<span class="keyword">import</span> &#123;<span class="variable">TestIdDirective</span>&#125; <span class="keyword">from</span> <span class="string">'ngx-testbox'</span>;
+
+<span class="decorator">&#64;Component</span>&#40;&#123;
+  <span class="variable">selector</span>: <span class="string">'app-heroes'</span>,
+  <span class="variable">templateUrl</span>: <span class="string">'./heroes.component.html'</span>,
+  <span class="variable">imports</span>: &#91;
+    <span class="variable">TestIdDirective</span>
+  &#93;,
+  <span class="variable">styleUrls</span>: &#91;<span class="string">'./heroes.component.css'</span>&#93;,
+  <span class="variable">changeDetection</span>: <span class="variable">ChangeDetectionStrategy</span>.<span class="variable">OnPush</span>
+&#125;&#41;
+<span class="keyword">export class</span> <span class="type">HeroesComponent</span> <span class="keyword">implements</span> <span class="type">OnInit</span> &#123;
+  <span class="keyword">readonly</span> <span class="variable">testIds</span> = <span class="variable">testIdMap</span>;
+&#125;</code></pre>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>heroes.component.spec.ts Content</title>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      font-family: 'Consolas', 'Courier New', monospace;
+      padding: 20px;
+      line-height: 1.5;
+    }
+    pre {
+      background-color: #252526;
+      border-radius: 5px;
+      padding: 15px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+    .comment { color: #6A9955; }
+    .keyword { color: #569CD6; }
+    .string { color: #CE9178; }
+    .function { color: #DCDCAA; }
+    .variable { color: #9CDCFE; }
+    .type { color: #4EC9B0; }
+    .constant { color: #4FC1FF; }
+    .operator { color: #D4D4D4; }
+    .decorator { color: #C586C0; }
+  </style>
+</head>
+<body>
+<h1>Content of heroes.component.spec.ts</h1>
+<pre><code><span class="keyword">import</span> &#123;<span class="type">ComponentFixture</span>, <span class="type">TestBed</span>&#125; <span class="keyword">from</span> <span class="string">'&#64;angular/core/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="type">HeroesComponent</span>&#125; <span class="keyword">from</span> <span class="string">'./heroes.component'</span>;
+<span class="keyword">import</span> &#123;<span class="type">HeroesHarness</span>&#125; <span class="keyword">from</span> <span class="string">'./heroes.harness'</span>;
+<span class="keyword">import</span> &#123;<span class="function">provideHttpClient</span>&#125; <span class="keyword">from</span> <span class="string">'&#64;angular/common/http'</span>;
+<span class="keyword">import</span> &#123;<span class="function">provideHttpClientTesting</span>&#125; <span class="keyword">from</span> <span class="string">'&#64;angular/common/http/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="type">HttpCallInstruction</span>, <span class="function">runTasksUntilStable</span>,&#125; <span class="keyword">from</span> <span class="string">'ngx-testbox/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="function">provideRouter</span>&#125; <span class="keyword">from</span> <span class="string">'&#64;angular/router'</span>;
+
+<span class="function">describe</span>(<span class="string">'HeroesComponent'</span>, () => &#123;
+  <span class="keyword">let</span> <span class="variable">fixture</span>: <span class="type">ComponentFixture</span>&lt;<span class="type">HeroesComponent</span>&gt;;
+  <span class="keyword">let</span> <span class="variable">harness</span>: <span class="type">HeroesHarness</span>;
+
+  <span class="function">beforeEach</span>(<span class="keyword">async</span> () => &#123;
+    <span class="keyword">await</span> <span class="variable">TestBed</span>.<span class="function">configureTestingModule</span>(&#123;
+      <span class="variable">imports</span>: [<span class="type">HeroesComponent</span>],
+      <span class="variable">providers</span>: [<span class="function">provideHttpClient</span>(), <span class="function">provideHttpClientTesting</span>(), <span class="function">provideRouter</span>([])],
+    &#125;).<span class="function">compileComponents</span>();
+  &#125;)
+
+  <span class="keyword">function</span> <span class="function">initComponent</span>(<span class="variable">httpCallInstructions</span>: <span class="type">HttpCallInstruction</span>[]) &#123;
+    <span class="variable">fixture</span> = <span class="variable">TestBed</span>.<span class="function">createComponent</span>(<span class="type">HeroesComponent</span>);
+    <span class="variable">harness</span> = <span class="keyword">new</span> <span class="type">HeroesHarness</span>(<span class="variable">fixture</span>.<span class="variable">debugElement</span>);
+
+    <span class="function">runTasksUntilStable</span>(<span class="variable">fixture</span>, &#123;
+      <span class="variable">httpCallInstructions</span>,
+    &#125;)
+  &#125;
+&#125;)</code></pre>
+</body>
+</html>

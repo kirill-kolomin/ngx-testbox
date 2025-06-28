@@ -1,0 +1,21 @@
+{
+  "name": "ngx-testbox",
+  "description": "Comprehensive testing utilities that simplifies writing and maintaining tests",
+  "version": "1.0.4",
+  "author": {
+    "email": "kkolomin.w@gmail.com",
+    "name": "Kirill Kolomin"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=9.0.0",
+    "@angular/core": ">=9.0.0"
+  },
+  "sideEffects": false,
+  "keywords": ["Angular testing", "Integration testing", "HTML attribute for testing", "Testing utilities"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kirill-kolomin/ngx-testbox.git"
+  },
+  "homepage": "https://github.com/kirill-kolomin/ngx-testbox/tree/main/projects/ngx-testbox#readme"
+}

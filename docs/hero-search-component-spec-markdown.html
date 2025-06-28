@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hero-search.component.spec.ts Content</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        pre {
+            background-color: #252526;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        .comment { color: #6A9955; }
+        .keyword { color: #569CD6; }
+        .string { color: #CE9178; }
+        .function { color: #DCDCAA; }
+        .variable { color: #9CDCFE; }
+        .type { color: #4EC9B0; }
+        .constant { color: #4FC1FF; }
+        .operator { color: #D4D4D4; }
+        .decorator { color: #C586C0; }
+    </style>
+</head>
+<body>
+    <h1>Content of hero-search.component.spec.ts</h1>
+    <pre><code><span class="keyword">const</span> <span class="function">getHeroesSearchSuccessHttpCallInstruction</span> = () =>
+  <span class="variable">predefinedHttpCallInstructions</span>.<span class="variable">get</span>.<span class="function">success</span>(<span class="keyword">new</span> <span class="type">RegExp</span>(<span class="string">`&#36;&#123;<span class="variable">HEROES_URL</span>&#125;/\\?name=\\w+`</span>), (<span class="variable">httpRequest</span>, <span class="variable">urlSearchParams</span>) => &#123;
+    <span class="keyword">const</span> <span class="variable">term</span> = <span class="variable">urlSearchParams</span>.<span class="function">get</span>(<span class="string">'name'</span>)!;
+    <span class="keyword">return</span> <span class="variable">HEROES</span>.<span class="function">filter</span>(<span class="variable">hero</span> => <span class="variable">hero</span>.<span class="variable">name</span>.<span class="function">toLowerCase</span>().<span class="function">includes</span>(<span class="variable">term</span>.<span class="function">toLowerCase</span>()))
+  &#125;);
+
+<span class="function">it</span>(<span class="string">'should show heroes when search term matches hero names'</span>, <span class="function">fakeAsync</span>(<span class="keyword">async</span> () => &#123;
+  <span class="keyword">const</span> <span class="variable">searchTerm</span> = <span class="string">'ma'</span>; <span class="comment">// Should match heroes with 'ma' in their name</span>
+  <span class="function">initComponent</span>();
+
+  <span class="variable">harness</span>.<span class="function">setSearchBoxValue</span>(<span class="variable">searchTerm</span>);
+  <span class="function">runTasksUntilStable</span>(<span class="variable">fixture</span>, &#123;
+    <span class="variable">httpCallInstructions</span>: [
+      <span class="function">getHeroesSearchSuccessHttpCallInstruction</span>()
+    ],
+  &#125;);
+
+  <span class="keyword">const</span> <span class="variable">heroElements</span> = <span class="variable">harness</span>.<span class="function">getHeroElements</span>();
+  <span class="function">expect</span>(<span class="variable">heroElements</span>.<span class="variable">length</span>).<span class="function">toBeGreaterThan</span>(0);
+
+  <span class="comment">// Verify each result contains the search term</span>
+  <span class="variable">heroElements</span>.<span class="function">forEach</span>(<span class="variable">heroElement</span> => &#123;
+    <span class="keyword">const</span> <span class="variable">heroName</span> = <span class="variable">harness</span>.<span class="variable">elements</span>.<span class="variable">heroLink</span>.<span class="function">query</span>(<span class="variable">heroElement</span>).<span class="variable">nativeElement</span>.<span class="variable">textContent</span>.<span class="function">trim</span>();
+    <span class="function">expect</span>(<span class="variable">heroName</span>.<span class="function">toLowerCase</span>()).<span class="function">toContain</span>(<span class="variable">searchTerm</span>.<span class="function">toLowerCase</span>());
+  &#125;);
+&#125;));</code></pre>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test-ids.ts Content</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        pre {
+            background-color: #252526;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        .comment { color: #6A9955; }
+        .keyword { color: #569CD6; }
+        .string { color: #CE9178; }
+        .function { color: #DCDCAA; }
+        .variable { color: #9CDCFE; }
+        .type { color: #4EC9B0; }
+        .constant { color: #4FC1FF; }
+        .operator { color: #D4D4D4; }
+    </style>
+</head>
+<body>
+    <h1>Content of test-ids.ts</h1>
+    <pre><code><span class="comment">// test-ids.ts</span>
+<span class="keyword">import</span> &#123;<span class="variable">TestIdDirective</span>&#125; <span class="keyword">from</span> <span class="string">'ngx-testbox'</span>;
+
+<span class="keyword">export const</span> <span class="variable">testIds</span> = [
+  <span class="string">'title'</span>,
+  <span class="string">'nameInput'</span>,
+  <span class="string">'addButton'</span>,
+  <span class="string">'heroesList'</span>,
+  <span class="string">'heroItem'</span>,
+  <span class="string">'heroLink'</span>,
+  <span class="string">'heroDeleteButton'</span>,
+  <span class="string">'heroId'</span>,
+  <span class="string">'heroName'</span>,
+] <span class="keyword">as const</span>;
+
+<span class="keyword">export const</span> <span class="variable">testIdMap</span> = <span class="variable">TestIdDirective</span>.<span class="function">idsToMap</span>(<span class="variable">testIds</span>);</code></pre>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>heroes.harness.ts Content</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        pre {
+            background-color: #252526;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        .comment { color: #6A9955; }
+        .keyword { color: #569CD6; }
+        .string { color: #CE9178; }
+        .function { color: #DCDCAA; }
+        .variable { color: #9CDCFE; }
+        .type { color: #4EC9B0; }
+        .constant { color: #4FC1FF; }
+        .operator { color: #D4D4D4; }
+    </style>
+</head>
+<body>
+    <h1>Content of heroes.harness.ts</h1>
+    <pre><code><span class="keyword">import</span> &#123;<span class="variable">DebugElementHarness</span>&#125; <span class="keyword">from</span> <span class="string">'ngx-testbox/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="variable">testIds</span>&#125; <span class="keyword">from</span> <span class="string">'./test-ids'</span>;
+<span class="keyword">import</span> &#123;<span class="variable">DebugElement</span>&#125; <span class="keyword">from</span> <span class="string">'&#64;angular/core'</span>;
+
+<span class="keyword">export class</span> <span class="type">HeroesHarness</span> <span class="keyword">extends</span> <span class="type">DebugElementHarness</span>&lt;<span class="keyword">typeof</span> <span class="variable">testIds</span>&gt; &#123;
+  <span class="keyword">constructor</span>(<span class="variable">debugElement</span>: <span class="type">DebugElement</span>) &#123;
+    <span class="keyword">super</span>(<span class="variable">debugElement</span>, <span class="variable">testIds</span>);
+  &#125;
+&#125;</code></pre>
+</body>
+</html>

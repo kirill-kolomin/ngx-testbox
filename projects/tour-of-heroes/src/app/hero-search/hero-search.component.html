@@ -1,0 +1,19 @@
+<div id="search-component" [testboxTestId]="testIds.searchComponent">
+  <label for="search-box" [testboxTestId]="testIds.searchLabel">Hero Search</label>
+  <input #searchBox id="search-box" [testboxTestId]="testIds.searchBox" (input)="search(searchBox.value)" />
+
+  <ul class="search-result" [testboxTestId]="testIds.searchResults">
+    <li *ngFor="let hero of heroes$ | async" [testboxTestId]="testIds.heroItem">
+      <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
+        {{hero.name}}
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+<!--
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at https://angular.io/license
+-->

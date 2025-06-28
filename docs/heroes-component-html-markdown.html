@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>heroes.component.html Content</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        pre {
+            background-color: #252526;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        .tag { color: #569CD6; }
+        .attribute { color: #9CDCFE; }
+        .string { color: #CE9178; }
+        .angular-binding { color: #C586C0; }
+        .angular-expression { color: #4FC1FF; }
+        .comment { color: #6A9955; }
+        .content { color: #D4D4D4; }
+    </style>
+</head>
+<body>
+    <h1>Content of heroes.component.html</h1>
+    <pre><code><span class="tag">&lt;h2</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.title"</span><span class="tag">&gt;</span><span class="content">My Heroes</span><span class="tag">&lt;/h2&gt;</span>
+
+<span class="tag">&lt;div&gt;</span>
+  <span class="tag">&lt;label</span> <span class="attribute">for</span>=<span class="string">"new-hero"</span><span class="tag">&gt;</span><span class="content">Hero name: </span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attribute">id</span>=<span class="string">"new-hero"</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.nameInput"</span> <span class="attribute">#heroName</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attribute">type</span>=<span class="string">"button"</span>
+          <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.addButton"</span>
+          <span class="angular-binding">(click)</span>=<span class="string">"add(heroName.value); heroName.value=''"</span><span class="tag">&gt;</span>
+    <span class="content">Add hero</span>
+  <span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;ul</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroesList"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;li</span> <span class="angular-binding">*ngFor</span>=<span class="string">"let hero of heroes"</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroItem"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;a</span> <span class="attribute">routerLink</span>=<span class="string">"/detail/&#123;&#123;hero.id&#125;&#125;"</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroLink"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;span</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroId"</span><span class="tag">&gt;</span><span class="angular-expression">&#123;&#123;hero.id&#125;&#125;</span><span class="tag">&lt;/span&gt;</span>
+      <span class="tag">&lt;span</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroName"</span><span class="tag">&gt;</span><span class="angular-expression">&#123;&#123;hero.name&#125;&#125;</span><span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attribute">type</span>=<span class="string">"button"</span>
+            <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroDeleteButton"</span>
+            <span class="angular-binding">(click)</span>=<span class="string">"delete(hero)"</span><span class="tag">&gt;</span>
+      <span class="content">x</span>
+    <span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span>
+
+
+<span class="comment">&lt;!--
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at https://angular.io/license
+--&gt;</span></code></pre>
+</body>
+</html>

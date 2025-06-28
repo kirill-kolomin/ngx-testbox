@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ngx-testbox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+  <style>
+    .code-background {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      font-family: 'Consolas', 'Courier New', monospace;
+      line-height: 1.5;
+    }
+
+    pre {
+      background-color: #252526;
+      border-radius: 5px;
+      padding: 15px;
+      overflow-x: auto;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+    .comment {
+      color: #6A9955;
+    }
+
+    .keyword {
+      color: #569CD6;
+    }
+
+    .string {
+      color: #CE9178;
+    }
+
+    .function {
+      color: #DCDCAA;
+    }
+
+    .variable {
+      color: #9CDCFE;
+    }
+
+    .type {
+      color: #4EC9B0;
+    }
+
+    .constant {
+      color: #4FC1FF;
+    }
+
+    .operator {
+      color: #D4D4D4;
+    }
+
+    .decorator {
+      color: #C586C0;
+    }
+
+    .tag {
+      color: #569CD6;
+    }
+
+    .attribute {
+      color: #9CDCFE;
+    }
+
+    .angular-binding {
+      color: #C586C0;
+    }
+
+    .angular-expression {
+      color: #4FC1FF;
+    }
+
+    .content {
+      color: #D4D4D4;
+    }
+  </style>
+</head>
+<body style="font-family: 'Inter', sans-serif; margin: 0; font-size: 20px; line-height: 1.618;">
+<img src="tools.jpg" alt="geometry tools" height="400" style="width: 100%; object-fit: cover; object-position: top">
+<div style="padding: 10px 20px; background-color: #f8f9fa;">
+  <div style="float: right;">
+    <span style="margin-right: 10px;">Language:</span>
+    <a href="index.html"
+       style="font-weight: bold; text-decoration: none; color: #007bff; padding: 5px 10px; background-color: #e9ecef; border-radius: 5px; margin-right: 5px;">English</a>
+    <a href="ru.html" style="text-decoration: none; color: #6c757d; padding: 5px 10px; border-radius: 5px;">Русский</a>
+  </div>
+  <div>
+    <p>
+      Author: Kirill Kolomin<br>
+      Email: <a href="mailto:kkolomin.w@gmail.com">kkolomin.w&#64;gmail.com</a><br>
+      Linkedin: <a href="https://www.linkedin.com/in/kirill-kolomin/" target="_blank">Kirill Kolomin</a><br>
+      Repository: <a href="https://github.com/kirill-kolomin/ngx-testbox" target="_blank">ngx-testbox</a>
+    </p>
+  </div>
+</div>
+
+<main style="margin: 0 auto; max-width: 900px;">
+  <article>
+    <h1 style="text-transform: uppercase; font-size: 42px; line-height: 1.618;">Testing Angular Components</h1>
+    <div style="margin-left: auto; width: 50%;">
+      <blockquote cite="https://github.com/kirill-kolomin/ngx-testbox">
+        <p>"A mistake was made trying to publish the first version of the library as quickly as possible. By covering
+          only the introductory project with integration tests, hoping it would be sufficient for the library itself,
+          but because of this, the most important function of the entire library, runTasksUntilStable, did not work as
+          it should have."</p>
+        <p>—Me, <cite>pre-release process for ngx-testbox</cite></p>
+      </blockquote>
+    </div>
+
+    <section id="table-of-contents" style="margin: 2em 0; padding: 1em; background-color: #f8f9fa; border-radius: 5px;">
+      <h2 style="text-transform: uppercase; margin-top: 0;">Table of Contents</h2>
+      <ul style="list-style-type: none; padding-left: 0;">
+        <li><a href="#description">Problem Description</a></li>
+        <li><a href="#requirements">Business and Technical Requirements</a></li>
+        <li><a href="#consequences">Consequences</a></li>
+        <li><a href="#positive-effects">Positive Effects</a></li>
+        <li><a href="#negative-effects">Negative Effects</a></li>
+        <li><a href="#theory">Theory</a></li>
+        <li><a href="#tour-of-heroes">Tour of Heroes</a>
+          <ul style="list-style-type: none; padding-left: 1.5em;">
+            <li><a href="#checklist">Checklist for Preparing the Test Environment</a></li>
+            <li><a href="#practice">Practice</a></li>
+            <li><a href="#tour-of-heroes-2">Tour of Heroes (Examples)</a></li>
+          </ul>
+        </li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </section>
+    <section id="description">
+      <h2 style="text-transform: uppercase;">Problem Description</h2>
+      <p>Nowadays, developers often forget or deliberately don't write tests to speed up product delivery to the
+        customer. This approach is definitely worth it, but only as long as development is at the MVP stage. Everything
+        that follows must be covered with tests if such an application will bring profit in the medium or long term.</p>
+      <p>Have you ever encountered a problem where you don't know how long to wait until the NG zone in the application
+        becomes stable, all OnPush components are rendered, all server requests receive a response, and all asynchronous
+        operations are completed, even those that will queue up as a result of previous asynchronous operations; and
+        then you can proceed to writing expect statements?</p>
+      <p>In this guide, I will outline an approach that has proven itself very well on complex components with complex
+        business logic. This article is intended for senior and mid-level developers, as I do not plan to consider the
+        pros or cons of most general statements in this article.</p>
+      <p>First of all, I want to define the framework in which we will exist for the most effective achievement of the
+        goal. I ask you to familiarize yourself with them, as they may not be suitable for all development teams, in
+        order not to waste your time if you do not want to work within the constraints I propose.</p>
+      <p>In the description, I will use a library that I wrote to speed up the process and ease the testing of
+        components, which takes responsibility for performing all asynchronous tasks to stabilize the NG Zone in the
+        test environment.</p>
+      <p>This approach does not cover unit testing of individual functions and services, or e2e application testing. You
+        can use any other direction for unit and e2e testing, they will not interfere with the operation of the proposed
+        approach.</p>
+      <p>So, let's get started.</p>
+    </section>
+
+    <section id="requirements">
+      <h2 style="text-transform: uppercase;">Business and Technical Requirements</h2>
+      <ul>
+        <li>The method of writing tests should be as similar as possible to user behavior.</li>
+        <li>Functional requirements are tested through the Acceptance Criteria of your user stories. In other words,
+          Acceptance Criteria = Written test case.
+        </li>
+        <li>The Angular application should have low dependence on the project infrastructure. With non-working
+          environments, the Angular application remains self-sufficient in terms of the functionality of written tests.
+        </li>
+        <li>Functional requirements are tested through the behavior of elements on the page and the interaction of the
+          Angular application with the server through the Angular HTTP Client.
+        </li>
+        <li>Side effects are not tested if they do not relate to functional requirements (use regular unit testing for
+          them). Side effects are overwritten with stubs.
+        </li>
+        <li>Errors in writing tests caused by human factors should be minimized.</li>
+        <li>Written tests are low coupled with code implementation.</li>
+        <li>Expect statements are written exclusively for NG Zone in stable status.</li>
+        <li>You should have a manageable organization of modules (options include: FSD; your own development; nested
+          modules reflecting your project's routing, somewhat similar to how next.js does it; etc.), which will allow
+          you to divide the code by responsibility, have manageable side effects, and avoid cyclic dependencies.
+        </li>
+        <li>An excellent understanding of what the Angular application expects in responses from the server is necessary
+          for writing a test that covers a specific Acceptance Criteria.
+        </li>
+        <li>Code execution in the browser is required, but not in memory, since not all test environments in memory have
+          a complete set of browser API. Additionally, running in the browser will be convenient for demonstrations and
+          debugging.
+        </li>
+      </ul>
+    </section>
+
+    <section id="consequences">
+      <h2 style="text-transform: uppercase;">Consequences</h2>
+      <ul>
+        <li>Fake functions exist to create stubs for side effects.</li>
+        <li>Only components are tested. Services and related classes are tested as part of component integration
+          testing.
+        </li>
+        <li>Components are tested using the black-box testing method. We do not test the code structure and variable
+          values, only input parameters and intermediate/output results.
+        </li>
+      </ul>
+    </section>
+
+    <section id="positive-effects">
+      <h2 style="text-transform: uppercase;">Positive Effects</h2>
+      <ul>
+        <li>High level of test coverage.</li>
+        <li>Written tests are not tied to implementation. When the code changes, the tests remain relevant.</li>
+        <li>Tests cover actual functional requirements, not just show a high percentage of coverage for the sake of
+          it.
+        </li>
+        <li>The human error factor is reduced when writing fake functions and describing the test case.</li>
+        <li>We can write components without a working backend, but if approximate contracts are already known.</li>
+        <li>Easier to transition to TDD.</li>
+        <li>Test execution speed is higher than with e2e.</li>
+        <li>Test reliability provides more guarantees than with unit testing.</li>
+      </ul>
+    </section>
+
+    <section id="negative-effects">
+      <h2 style="text-transform: uppercase;">Negative Effects</h2>
+      <ul>
+        <li>This approach can be a headache for beginner developers, as working with this approach requires an "A to Z"
+          understanding of functional requirements, and how they relate to server responses that they will have to
+          simulate. As a result, development speed can significantly decrease if the team mostly consists of beginner
+          developers.
+        </li>
+        <li>Development speed will decrease in the short term until the new approach is understood. Full adaptation
+          should take from one to two months for a mid-level developer with active work on tests.
+        </li>
+        <li>In reports, some code may be falsely shown as covered if you did not write a specific test case for that
+          code section.
+        </li>
+      </ul>
+    </section>
+
+    <section id="theory">
+      <h2 style="text-transform: uppercase;">Theory</h2>
+
+      <p>
+        In my understanding, unit testing of components/acceptance criteria is an extremely unjustified attempt to
+        achieve high coverage, as over time such a method is more of a hindrance and does not guarantee test coverage of
+        user stories.
+        E2e testing adds more dependencies to the functionality of tests, as a result of which, tests may not always and
+        everywhere be functional.
+        Therefore, here I will talk about integration black-box testing, using <a
+        href="https://github.com/kirill-kolomin/ngx-testbox" target="_blank">ngx-testbox library</a>, using the example
+        of an introductory project from Angular - Tour of Heroes.
+        The quote after the main title reflects that each type of testing is good at what it was designed for. Unit and
+        e2e testing are excellent for other needs, and for testing Acceptance Criteria, I consider integration testing
+        of components to be the ideal option.
+      </p>
+
+      <p>The first thing I'll start the theoretical part with is a description of the features of working with the
+        library:</p>
+      <ul>
+        <li>The library takes care of processing operations in the queue and responding to HTTP requests based on the
+          provided HTTP call instructions.
+        </li>
+        <li>All tests are performed in the fakeAsync zone. This gives the ability to flexibly manage time and tasks in
+          the queue.
+        </li>
+        <li>To start executing tasks in the zone, the runTasksUntilStable function is used.</li>
+        <li>Instructions for server responses are set through the HttpCallInstruction interface and then passed as an
+          argument to runTasksUntilStable.
+        </li>
+        <li>All instructions for HTTP calls are mandatory to call within a single call of the runTasksUntilStable
+          function.
+        </li>
+        <li>Any unprocessed HTTP request that gets into the Angular HTTP Client will cause an error. The exception to
+          the rule is canceled requests, they will be ignored.
+        </li>
+        <li>The library provides a base Harness class for working with DOM elements: queries, focus, click, and getting
+          text content.
+        </li>
+        <li>The Harness class works in conjunction with a test attribute, by default is data-test-id.</li>
+        <li>By example, you can generate test ids to assign them to DOM elements, which will be supported by your IDE
+          for ease of use.
+        </li>
+        <li>Works only through REST API (Websocket and RPC at the research stage).</li>
+      </ul>
+
+      <p>
+        There are several steps that help even more to get rid of uncertainty when working in a team on user stories.
+        They are optional, but I recommend them as a proven path to solving tasks in a team:
+      </p>
+
+      <ol>
+        <li>
+          Never start writing code as soon as you get a task. Read the task description. Take a breath. Go have some
+          tea.
+        </li>
+        <li>
+          While drinking tea, think about who is interested in the end result of your task and/or will accept the
+          completed result. This could be a team lead, product owner, business analyst, your colleague backend
+          developer, or someone else.
+          Create a chat and add these people to the chat, call it "3 Amigos. # and name of your task". Be sure to add
+          the QA engineer who will check your task before sending it for confirmation. It's desirable to add the
+          designer who worked on the mockups for your task.
+        </li>
+        <li>
+          First, ask a simple question in the chat: "Is the task ready for code to be written for it, or is additional
+          research needed?". And once again confirm the Acceptance Criteria that are written in the task. If you haven't
+          asked such questions before, you may notice how some part of the tasks will automatically be completed or
+          postponed until circumstances are clarified, which plays into your hands, as you don't want to do useless
+          work.
+        </li>
+        <li>
+          As a developer, gather your own observations, taking into account knowledge of your codebase. Based on them,
+          write your own Acceptance Criteria. If they differ, and most likely they will differ, from those written in
+          the task itself, send them for review to your Amigos. You, as an experienced specialist, will notice that the
+          task does not mention exception handling paths or the design mockups do not have a mockup for the loading
+          state, etc. And again confirm the Acceptance Criteria with your Amigos.
+        </li>
+        <li>
+          After communication with the team, you should have an approved list of Acceptance Criteria that you will cover
+          with tests.
+        </li>
+        <li>Congratulations, you are ready to write code!</li>
+      </ol>
+    </section>
+
+    <section id="tour-of-heroes">
+      <h2 style="text-transform: uppercase;">Tour of Heroes</h2>
+      <p>You can find all the source code in the repository at the link <a
+        href="https://github.com/kirill-kolomin/ngx-testbox" target="_blank">ngx-testbox</a></p>
+
+      <p>Now we will have to do reverse engineering and gather test cases from a ready-made project.
+        I see 4 components, each of which can be a separate user story:</p>
+
+      <ul>
+        <li>dashboard</li>
+        <li>hero-detail</li>
+        <li>hero-search</li>
+        <li>Heroes</li>
+      </ul>
+
+      <h3>Possible Acceptance Criteria for each story</h3>
+
+      <p>Dashboard:</p>
+
+      <ul>
+        <li>should display "Top Heroes" in the title</li>
+        <li>should show heroes when server responds with heroes</li>
+        <li>should not show any heroes if server responds with error</li>
+        <li>should display hero name for each hero</li>
+        <li>should create correct detail link for each hero</li>
+      </ul>
+
+      <p>Hero-detail:</p>
+
+      <ul>
+        <li>should display hero details when hero is loaded</li>
+        <li>should not display hero details when hero fails to load</li>
+        <li>should allow editing the hero name</li>
+        <li>should save hero and navigate back when save button is clicked</li>
+        <li>should not navigate back when save fails</li>
+        <li>should navigate back when go back button is clicked</li>
+      </ul>
+
+      <p>Hero-search:</p>
+
+      <ul>
+        <li>should have empty search box initially</li>
+        <li>should have no search results initially</li>
+        <li>should show heroes when search term matches hero names</li>
+        <li>should show no heroes when search term is an empty string or string of spaces</li>
+        <li>should not show any heroes if search term does not match any hero names</li>
+        <li>should not show any heroes if search returns an error</li>
+        <li>should create correct detail link for each hero in search results</li>
+      </ul>
+
+      <p>Heroes:</p>
+
+      <ul>
+        <li>should show all heroes when server responds with heroes</li>
+        <li>should not show any heroes if server responds with an error</li>
+        <li>should display hero id and name for each hero</li>
+        <li>should create correct detail link for each hero</li>
+        <li>should add new hero when valid name is entered</li>
+        <li>should not add hero when invalid name is provided</li>
+        <li>should not add hero when server responds with error</li>
+        <li>should clear input field after adding hero</li>
+        <li>should remove hero from list when delete button is clicked</li>
+        <li>should not remove hero from list if server responds with error</li>
+      </ul>
+    </section>
+
+    <section id="checklist">
+      <h3>Checklist for Preparing the Test Environment</h3>
+
+      <ol>
+        <li>Test identifiers are created</li>
+        <li>Test identifiers are applied to elements in the markup</li>
+        <li>A Harness class for the component is created, which inherits from the base Harness class</li>
+        <li>Test identifiers are passed as an argument to the base class</li>
+        <li>Algorithm execution starts from the NgOnInit stage.</li>
+      </ol>
+    </section>
+
+    <hr/>
+
+    <section id="practice">
+      <h3 style="text-transform: uppercase;">Practice</h3>
+
+      <p>Next, I will describe what the preparation looks like using examples with code.</p>
+
+      <strong>Step 1. Create test identifiers.</strong>
+      <p>I create a separate file for testIds. I assign an array of strings to a variable with an immutable type
+        designation using "<code>as const</code>", then create an object where both the key and value are the identifier
+        using the static method IdsToMap of the TestIdDirective class.</p>
+
+      <div class="code-background">
+        <pre><code><span class="comment">// test-ids.ts</span>
+<span class="keyword">import</span> &#123;<span class="variable">TestIdDirective</span>&#125; <span
+            class="keyword">from</span> <span class="string">'ngx-testbox'</span>;
+
+<span class="keyword">export const</span> <span class="variable">testIds</span> = [
+  <span class="string">'title'</span>,
+  <span class="string">'nameInput'</span>,
+  <span class="string">'addButton'</span>,
+  <span class="string">'heroesList'</span>,
+  <span class="string">'heroItem'</span>,
+  <span class="string">'heroLink'</span>,
+  <span class="string">'heroDeleteButton'</span>,
+  <span class="string">'heroId'</span>,
+  <span class="string">'heroName'</span>,
+] <span class="keyword">as const</span>;
+
+<span class="keyword">export const</span> <span class="variable">testIdMap</span> = <span class="variable">TestIdDirective</span>.<span
+            class="function">idsToMap</span>(<span class="variable">testIds</span>);</code></pre>
+      </div>
+
+      <strong>Step 2. Apply test identifiers to elements on the page.</strong>
+      <p>This stage is not complicated. We import the TestIdDirective directive and our testIdMap, go to the markup and
+        apply it to all elements.</p>
+
+      <div class="code-background">
+      <pre><code><span class="keyword">import</span> &#123;<span class="variable">testIdMap</span>&#125; <span
+        class="keyword">from</span> <span class="string">"./test-ids"</span>;
+<span class="keyword">import</span> &#123;<span class="variable">TestIdDirective</span>&#125; <span
+          class="keyword">from</span> <span class="string">'ngx-testbox'</span>;
+
+<span class="decorator">&#64;Component</span>&#40;&#123;
+  <span class="variable">selector</span>: <span class="string">'app-heroes'</span>,
+  <span class="variable">templateUrl</span>: <span class="string">'./heroes.component.html'</span>,
+  <span class="variable">imports</span>: &#91;
+    <span class="variable">TestIdDirective</span>
+  &#93;,
+  <span class="variable">styleUrls</span>: &#91;<span class="string">'./heroes.component.css'</span>&#93;,
+  <span class="variable">changeDetection</span>: <span class="variable">ChangeDetectionStrategy</span>.<span
+          class="variable">OnPush</span>
+&#125;&#41;
+<span class="keyword">export class</span> <span class="type">HeroesComponent</span> <span
+          class="keyword">implements</span> <span class="type">OnInit</span> &#123;
+  <span class="keyword">readonly</span> <span class="variable">testIds</span> = <span class="variable">testIdMap</span>;
+&#125;</code></pre>
+      </div>
+
+      <div class="code-background">
+        <pre><code><span class="tag">&lt;h2</span> <span class="angular-binding">[testboxTestId]</span>=<span
+          class="string">"testIds.title"</span><span class="tag">&gt;</span><span class="content">My Heroes</span><span
+          class="tag">&lt;/h2&gt;</span>
+
+<span class="tag">&lt;div&gt;</span>
+  <span class="tag">&lt;label</span> <span class="attribute">for</span>=<span class="string">"new-hero"</span><span
+            class="tag">&gt;</span><span class="content">Hero name: </span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attribute">id</span>=<span class="string">"new-hero"</span> <span
+            class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.nameInput"</span> <span
+            class="attribute">#heroName</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attribute">type</span>=<span class="string">"button"</span>
+          <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.addButton"</span>
+          <span class="angular-binding">(click)</span>=<span
+            class="string">"add(heroName.value); heroName.value=''"</span><span class="tag">&gt;</span>
+    <span class="content">Add hero</span>
+  <span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;ul</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroesList"</span><span
+            class="tag">&gt;</span>
+  <span class="tag">&lt;li</span> <span class="angular-binding">*ngFor</span>=<span
+            class="string">"let hero of heroes"</span> <span class="angular-binding">[testboxTestId]</span>=<span
+            class="string">"testIds.heroItem"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;a</span> <span class="attribute">routerLink</span>=<span class="string">"/detail/&#123;&#123;hero.id&#125;&#125;"</span> <span
+            class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroLink"</span><span
+            class="tag">&gt;</span>
+      <span class="tag">&lt;span</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroId"</span><span
+            class="tag">&gt;</span><span class="angular-expression">&#123;&#123;hero.id&#125;&#125;</span><span
+            class="tag">&lt;/span&gt;</span>
+      <span class="tag">&lt;span</span> <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroName"</span><span
+            class="tag">&gt;</span><span class="angular-expression">&#123;&#123;hero.name&#125;&#125;</span><span
+            class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attribute">type</span>=<span class="string">"button"</span>
+            <span class="angular-binding">[testboxTestId]</span>=<span class="string">"testIds.heroDeleteButton"</span>
+            <span class="angular-binding">(click)</span>=<span class="string">"delete(hero)"</span><span class="tag">&gt;</span>
+      <span class="content">x</span>
+    <span class="tag">&lt;/button&gt;</span>
+  <span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span></code></pre>
+      </div>
+
+      <strong>Steps 3 and 4. Create a Harness class for the component.</strong>
+      <p>At this step, we create a class that will make our lives easier as developers. With it, we can easily search
+        for elements on the page, click and focus on them, extract text content. And all this by calling one function,
+        which your IDE should help you find.</p>
+
+      <div class="code-background">
+        <pre><code><span class="keyword">import</span> &#123;<span
+          class="variable">DebugElementHarness</span>&#125; <span class="keyword">from</span> <span class="string">'ngx-testbox/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="variable">testIds</span>&#125; <span class="keyword">from</span> <span
+            class="string">'./test-ids'</span>;
+<span class="keyword">import</span> &#123;<span class="variable">DebugElement</span>&#125; <span
+            class="keyword">from</span> <span class="string">'&#64;angular/core'</span>;
+
+<span class="keyword">export class</span> <span class="type">HeroesHarness</span> <span
+            class="keyword">extends</span> <span class="type">DebugElementHarness</span>&lt;<span
+            class="keyword">typeof</span> <span class="variable">testIds</span>&gt; &#123;
+  <span class="keyword">constructor</span>(<span class="variable">debugElement</span>: <span
+            class="type">DebugElement</span>) &#123;
+    <span class="keyword">super</span>(<span class="variable">debugElement</span>, <span class="variable">testIds</span>);
+  &#125;
+&#125;</code></pre>
+      </div>
+
+      <strong>Step 5 (optional). Move all logic for launching algorithms to lifecycle hooks starting with
+        NgOnInit.</strong>
+      <p>This step is more of a recommendation than a call to action.</p>
+
+      <p>Algorithm execution starts from the NgOnInit stage.
+        Exceptions may include initializing lines of code in the constructor, such as assigning static (readonly) values
+        to class fields. This is necessary in case we have the opportunity to mock functions before running test cases,
+        otherwise if you run algorithms in the constructor, such an opportunity may not always be available later.</p>
+    </section>
+
+    <section id="tour-of-heroes-2">
+      <h3 style="text-transform: uppercase;">Tour of Heroes</h3>
+
+      <p>I warn that this introductory project may be heterogeneous. I added onPush strategies, placed test IDs, and
+        wrote spec files, the rest of the codebase is as is.</p>
+
+      <p>Let's look at the most interesting test cases. You can familiarize yourself with the entire project at the link
+        <a
+          href="https://github.com/kirill-kolomin/ngx-testbox" target="_blank">ngx-testbox</a>.</p>
+
+      <p>For the first test cases, let's take 2 simple examples from the Heroes component:</p>
+      <ul>
+        <li>should show all heroes when server responds with heroes</li>
+        <li>should not show any heroes if server responds with an error</li>
+      </ul>
+
+      <p>Let's open the heroes.spec.ts file.<br>
+        Initialize variables for the component's Fixture and Harness. <br>
+        Configure our test module through configureTestingModule. <br>
+        Write an initComponent function that we will call inside each test case. It will be responsible for:
+      </p>
+
+      <ol>
+        <li>Assigning values to these variables.</li>
+        <li>Getting instructions for http requests.</li>
+        <li>Executing asynchronous tasks from the queue.</li>
+      </ol>
+
+      <div class="code-background">
+        <pre><code><span class="keyword">import</span> &#123;<span class="type">ComponentFixture</span>, <span
+          class="type">TestBed</span>&#125; <span class="keyword">from</span> <span class="string">'&#64;angular/core/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="type">HeroesComponent</span>&#125; <span
+            class="keyword">from</span> <span class="string">'./heroes.component'</span>;
+<span class="keyword">import</span> &#123;<span class="type">HeroesHarness</span>&#125; <span
+            class="keyword">from</span> <span class="string">'./heroes.harness'</span>;
+<span class="keyword">import</span> &#123;<span class="function">provideHttpClient</span>&#125; <span class="keyword">from</span> <span
+            class="string">'&#64;angular/common/http'</span>;
+<span class="keyword">import</span> &#123;<span class="function">provideHttpClientTesting</span>&#125; <span
+            class="keyword">from</span> <span class="string">'&#64;angular/common/http/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="type">HttpCallInstruction</span>, <span class="function">runTasksUntilStable</span>,&#125; <span
+            class="keyword">from</span> <span class="string">'ngx-testbox/testing'</span>;
+<span class="keyword">import</span> &#123;<span class="function">provideRouter</span>&#125; <span
+            class="keyword">from</span> <span class="string">'&#64;angular/router'</span>;
+
+<span class="function">describe</span>(<span class="string">'HeroesComponent'</span>, () => &#123;
+  <span class="keyword">let</span> <span class="variable">fixture</span>: <span class="type">ComponentFixture</span>&lt;<span
+            class="type">HeroesComponent</span>&gt;;
+  <span class="keyword">let</span> <span class="variable">harness</span>: <span class="type">HeroesHarness</span>;
+
+  <span class="function">beforeEach</span>(<span class="keyword">async</span> () => &#123;
+    <span class="keyword">await</span> <span class="variable">TestBed</span>.<span class="function">configureTestingModule</span>(&#123;
+      <span class="variable">imports</span>: [<span class="type">HeroesComponent</span>],
+      <span class="variable">providers</span>: [<span class="function">provideHttpClient</span>(), <span
+            class="function">provideHttpClientTesting</span>(), <span class="function">provideRouter</span>([])],
+    &#125;).<span class="function">compileComponents</span>();
+  &#125;)
+
+  <span class="keyword">function</span> <span class="function">initComponent</span>(<span class="variable">httpCallInstructions</span>: <span
+            class="type">HttpCallInstruction</span>[]) &#123;
+    <span class="variable">fixture</span> = <span class="variable">TestBed</span>.<span
+            class="function">createComponent</span>(<span class="type">HeroesComponent</span>);
+    <span class="variable">harness</span> = <span class="keyword">new</span> <span
+            class="type">HeroesHarness</span>(<span class="variable">fixture</span>.<span
+            class="variable">debugElement</span>);
+
+    <span class="function">runTasksUntilStable</span>(<span class="variable">fixture</span>, &#123;
+      <span class="variable">httpCallInstructions</span>,
+    &#125;)
+  &#125;
+&#125;)</code></pre>
+      </div>
+
+      <p>The server can return errors. Let's write a couple of http instructions for a request that will be successful,
+        and for a request that will receive an error in response. Let's add an amount parameter to the function with a
+        successful response for convenience.</p>
+
+      <p>The library has a predefined set of functions that return one or another type of HttpCallInstruction. We will
+        use "<code>predefinedHttpCallInstructions.get.error</code>" and "<code>predefinedHttpCallInstructions.get.success</code>"
+        respectively to simulate responses from the server.</p>
+
+      <div class="code-background">
+        <pre><code><span class="keyword">import</span> &#123;<span class="variable">HEROES_URL</span>&#125; <span
+          class="keyword">from</span> <span class="string">'../hero.service'</span>;
+<span class="keyword">import</span> &#123;<span class="variable">HEROES</span>&#125; <span
+            class="keyword">from</span> <span class="string">'../mock-heroes'</span>;
+<span class="keyword">import</span> &#123;<span class="variable">predefinedHttpCallInstructions</span>&#125; <span
+            class="keyword">from</span> <span class="string">'ngx-testbox/testing'</span>;
+
+<span class="keyword">const</span> <span class="function">getHeroesSuccessHttpCallInstruction</span> = (<span
+            class="variable">amount</span>: <span class="type">number</span>) =>
+  <span class="variable">predefinedHttpCallInstructions</span>.<span class="variable">get</span>.<span class="function">success</span>(<span
+            class="variable">HEROES_URL</span>, () => <span class="variable">HEROES</span>.<span
+            class="function">slice</span>(0, <span class="variable">amount</span>));
+<span class="keyword">const</span> <span class="function">getHeroesFailHttpCallInstruction</span> = () =>
+  <span class="variable">predefinedHttpCallInstructions</span>.<span class="variable">get</span>.<span class="function">error</span>(<span
+            class="variable">HEROES_URL</span>, () => <span class="keyword">null</span>);</code></pre>
+      </div>
+
+      <p>Next, everything will be very easy. We don't need spy functions to check whether methods that send requests
+        were called or not, all this is very cumbersome and unreliable.</p>
+
+      <p>Let's write our first 2 tests. As you can see, a few simple lines of code cover 2 test cases.</p>
+
+      <div class="code-background">
+        <pre><code><span class="function">it</span>(<span class="string">'should show all heroes when server responds with heroes'</span>, <span
+          class="function">fakeAsync</span>(<span class="keyword">async</span> () => &#123;
+  <span class="keyword">const</span> <span class="variable">heroesLength</span> = <span
+            class="variable">HEROES</span>.<span class="variable">length</span>;
+
+  <span class="function">initComponent</span>([<span class="function">getHeroesSuccessHttpCallInstruction</span>(<span
+            class="variable">heroesLength</span>)]);
+  <span class="function">expect</span>(<span class="variable">harness</span>.<span
+            class="variable">elements</span>.<span class="variable">heroItem</span>.<span
+            class="function">queryAll</span>().<span class="variable">length</span>).<span class="function">toBe</span>(<span
+            class="variable">heroesLength</span>);
+&#125;))
+
+
+<span class="function">it</span>(<span
+            class="string">'should not show any heroes if server responds with an error'</span>, <span class="function">fakeAsync</span>(<span
+            class="keyword">async</span> () => &#123;
+  <span class="function">initComponent</span>([<span class="function">getHeroesFailHttpCallInstruction</span>()]);
+  <span class="function">expect</span>(<span class="variable">harness</span>.<span
+            class="variable">elements</span>.<span class="variable">heroItem</span>.<span
+            class="function">queryAll</span>().<span class="variable">length</span>).<span class="function">toBe</span>(0);
+&#125;))</code></pre>
+      </div>
+
+      <p>Here a question may arise: "how can I be sure that in the case of an error, my test case really worked from
+        start to finish, since not a single hero will be shown, even if the application does not send a request to get
+        heroes?". It is for such cases that I added a guarantee at the library code level that any HTTP request
+        instruction that you send to runTasksUntilStable will be called, otherwise it will throw an error before
+        completing the function execution.</p>
+
+      <p>In the following examples, we interact with data from the request to form an appropriate response.</p>
+
+      <div class="code-background">
+  <pre><code><span class="keyword">const</span> <span class="function">getPostHeroesSuccessHttpCallInstruction</span> = () =>
+  <span class="variable">predefinedHttpCallInstructions</span>.<span class="variable">post</span>.<span
+      class="function">success</span>(<span class="variable">HEROES_URL</span>, (<span
+      class="variable">httpRequest</span>) => (&#123;
+    <span class="variable">name</span>: (<span class="variable">httpRequest</span>.<span
+      class="variable">body</span> <span class="keyword">as</span> <span class="keyword">any</span>).<span
+      class="variable">name</span>,
+    <span class="variable">id</span>: <span class="variable">Math</span>.<span class="function">floor</span>(<span
+      class="variable">Math</span>.<span class="function">random</span>() * 1000000)
+  &#125;));
+
+<span class="function">it</span>(<span class="string">'should add new hero when valid name is entered'</span>, <span
+      class="function">fakeAsync</span>(<span class="keyword">async</span> () => &#123;
+  <span class="function">initComponent</span>([<span class="function">getHeroesSuccessHttpCallInstruction</span>(0)]);
+
+  <span class="function">expect</span>(<span class="variable">harness</span>.<span
+      class="variable">elements</span>.<span class="variable">heroItem</span>.<span
+      class="function">queryAll</span>().<span class="variable">length</span>).<span class="function">toBe</span>(0);
+
+  <span class="keyword">const</span> <span class="variable">name</span> = <span class="string">`Test Hero`</span>;
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> <span class="variable">i</span> = 1; <span
+      class="variable">i</span> <= 10; <span class="variable">i</span>++) &#123;
+    <span class="variable">harness</span>.<span class="function">setNameInputValue</span>(<span class="string">`&#36;&#123;<span
+      class="variable">name</span>&#125; &#36;&#123;<span class="variable">i</span>&#125;`</span>);
+    <span class="variable">harness</span>.<span class="variable">elements</span>.<span class="variable">addButton</span>.<span
+      class="function">click</span>();
+
+    <span class="function">runTasksUntilStable</span>(<span class="variable">fixture</span>, &#123;
+      <span class="variable">httpCallInstructions</span>: [
+        <span class="function">getPostHeroesSuccessHttpCallInstruction</span>(),
+      ],
+    &#125;)
+
+    <span class="keyword">const</span> <span class="variable">elements</span> = <span
+      class="variable">harness</span>.<span class="variable">elements</span>.<span
+      class="variable">heroItem</span>.<span class="function">queryAll</span>();
+    <span class="function">expect</span>(<span class="variable">elements</span>.<span
+      class="variable">length</span>).<span class="function">toBe</span>(<span class="variable">i</span>);
+
+    <span class="variable">elements</span>.<span class="function">forEach</span>((<span
+      class="variable">el</span>, <span class="variable">index</span>) => &#123;
+      <span class="function">expect</span>(<span class="variable">el</span>.<span class="variable">nativeElement</span>.<span
+      class="variable">textContent</span>.<span class="function">trim</span>().<span
+      class="function">includes</span>(<span class="string">`&#36;&#123;<span class="variable">name</span>&#125; &#36;&#123;<span
+      class="variable">index</span> + 1&#125;`</span>)).<span class="function">toBeTrue</span>();
+    &#125;)
+  &#125;
+&#125;))</code></pre>
+      </div>
+
+      <div class="code-background">
+        <pre><code><span class="keyword">const</span> <span
+          class="function">getHeroesSearchSuccessHttpCallInstruction</span> = () =>
+  <span class="variable">predefinedHttpCallInstructions</span>.<span class="variable">get</span>.<span class="function">success</span>(<span
+            class="keyword">new</span> <span class="type">RegExp</span>(<span class="string">`&#36;&#123;<span
+            class="variable">HEROES_URL</span>&#125;/\\?name=\\w+`</span>), (<span class="variable">httpRequest</span>, <span
+            class="variable">urlSearchParams</span>) => &#123;
+    <span class="keyword">const</span> <span class="variable">term</span> = <span
+            class="variable">urlSearchParams</span>.<span class="function">get</span>(<span class="string">'name'</span>)!;
+    <span class="keyword">return</span> <span class="variable">HEROES</span>.<span class="function">filter</span>(<span
+            class="variable">hero</span> => <span class="variable">hero</span>.<span class="variable">name</span>.<span
+            class="function">toLowerCase</span>().<span class="function">includes</span>(<span
+            class="variable">term</span>.<span class="function">toLowerCase</span>()))
+  &#125;);
+
+<span class="function">it</span>(<span
+            class="string">'should show heroes when search term matches hero names'</span>, <span class="function">fakeAsync</span>(<span
+            class="keyword">async</span> () => &#123;
+  <span class="keyword">const</span> <span class="variable">searchTerm</span> = <span class="string">'ma'</span>; <span
+            class="comment">// Should match heroes with 'ma' in their name</span>
+  <span class="function">initComponent</span>();
+
+  <span class="variable">harness</span>.<span class="function">setSearchBoxValue</span>(<span class="variable">searchTerm</span>);
+  <span class="function">runTasksUntilStable</span>(<span class="variable">fixture</span>, &#123;
+    <span class="variable">httpCallInstructions</span>: [
+      <span class="function">getHeroesSearchSuccessHttpCallInstruction</span>()
+    ],
+  &#125;);
+
+  <span class="keyword">const</span> <span class="variable">heroElements</span> = <span class="variable">harness</span>.<span
+            class="function">getHeroElements</span>();
+  <span class="function">expect</span>(<span class="variable">heroElements</span>.<span class="variable">length</span>).<span
+            class="function">toBeGreaterThan</span>(0);
+
+  <span class="comment">// Verify each result contains the search term</span>
+  <span class="variable">heroElements</span>.<span class="function">forEach</span>(<span
+            class="variable">heroElement</span> => &#123;
+    <span class="keyword">const</span> <span class="variable">heroName</span> = <span
+            class="variable">harness</span>.<span class="variable">elements</span>.<span
+            class="variable">heroLink</span>.<span class="function">query</span>(<span
+            class="variable">heroElement</span>).<span class="variable">nativeElement</span>.<span class="variable">textContent</span>.<span
+            class="function">trim</span>();
+    <span class="function">expect</span>(<span class="variable">heroName</span>.<span
+            class="function">toLowerCase</span>()).<span class="function">toContain</span>(<span class="variable">searchTerm</span>.<span
+            class="function">toLowerCase</span>());
+  &#125;);
+&#125;));</code></pre>
+      </div>
+
+      <p>If we know that no HTTP calls are expected in the process, then we can run runTasksUntilStable without an array
+        of HTTP instructions</p>
+
+      <div class="code-background">
+        <pre><code><span class="function">it</span>(<span class="string">'should not add hero when invalid name is provided'</span>, <span
+          class="function">fakeAsync</span>(() => &#123;
+  <span class="function">initComponent</span>();
+
+  <span class="function">expect</span>(<span class="variable">harness</span>.<span
+            class="variable">elements</span>.<span class="variable">heroItem</span>.<span
+            class="function">queryAll</span>().<span class="variable">length</span>).<span class="function">toBe</span>(0);
+
+  <span class="keyword">const</span> <span class="variable">name</span> = <span class="string">``</span>;
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> <span class="variable">i</span> = 1; <span
+            class="variable">i</span> <= 10; <span class="variable">i</span>++) &#123;
+    <span class="variable">harness</span>.<span class="function">setNameInputValue</span>(<span class="string">`&#36;&#123;<span
+            class="variable">name</span>&#125;`</span>);
+    <span class="variable">harness</span>.<span class="variable">elements</span>.<span class="variable">addButton</span>.<span
+            class="function">click</span>();
+    <span class="function">runTasksUntilStable</span>(<span class="variable">fixture</span>)
+
+    <span class="keyword">const</span> <span class="variable">elements</span> = <span
+            class="variable">harness</span>.<span class="variable">elements</span>.<span
+            class="variable">heroItem</span>.<span class="function">queryAll</span>();
+    <span class="function">expect</span>(<span class="variable">elements</span>.<span
+            class="variable">length</span>).<span class="function">toBe</span>(0);
+  &#125;
+&#125;));</code></pre>
+      </div>
+    </section>
+
+    <section id="conclusion">
+      <h2 style="text-transform: uppercase;">Conclusion</h2>
+
+      <p>This approach allows you to have a high percentage of test coverage, but what's more important is that you are
+        now testing full-fledged user stories.</p>
+
+      <img src="test-coverage.png" style="width: 100%;">
+
+      <p>
+        You have seen by example that writing integration tests is not difficult, but it is necessary to prepare the
+        project in advance (see the technical requirements above). <br>
+        You can find the repository with heroes, documentation, and the library at the link <a
+        href="https://github.com/kirill-kolomin/ngx-testbox" target="_blank">ngx-testbox</a>.
+      </p>
+
+      <p>I am open to suggestions and questions, or requests for assistance in transitioning your project to this
+        approach.
+        You can contact me via email <a href="mailto:kkolomin.w@gmail.com">kkolomin.w&#64;gmail.com</a> or on <a href="https://www.linkedin.com/in/kirill-kolomin/" target="_blank">Linkedin</a>.</p>
+    </section>
+  </article>
+</main>
+</body>
+</html>

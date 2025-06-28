@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>heroes.component.spec.ts New Test Content</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        pre {
+            background-color: #252526;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        .comment { color: #6A9955; }
+        .keyword { color: #569CD6; }
+        .string { color: #CE9178; }
+        .function { color: #DCDCAA; }
+        .variable { color: #9CDCFE; }
+        .type { color: #4EC9B0; }
+        .constant { color: #4FC1FF; }
+        .operator { color: #D4D4D4; }
+        .decorator { color: #C586C0; }
+    </style>
+</head>
+<body>
+    <h1>Content of heroes.component.spec.ts New Test</h1>
+    <pre><code><span class="keyword">const</span> <span class="function">getPostHeroesSuccessHttpCallInstruction</span> = () =>
+  <span class="variable">predefinedHttpCallInstructions</span>.<span class="variable">post</span>.<span class="function">success</span>(<span class="variable">HEROES_URL</span>, (<span class="variable">httpRequest</span>) => (&#123;
+    <span class="variable">name</span>: (<span class="variable">httpRequest</span>.<span class="variable">body</span> <span class="keyword">as</span> <span class="keyword">any</span>).<span class="variable">name</span>,
+    <span class="variable">id</span>: <span class="variable">Math</span>.<span class="function">floor</span>(<span class="variable">Math</span>.<span class="function">random</span>() * 1000000)
+  &#125;));
+
+<span class="function">it</span>(<span class="string">'should add new hero when valid name is entered'</span>, <span class="function">fakeAsync</span>(<span class="keyword">async</span> () => &#123;
+  <span class="function">initComponent</span>([<span class="function">getHeroesSuccessHttpCallInstruction</span>(0)]);
+
+  <span class="function">expect</span>(<span class="variable">harness</span>.<span class="variable">elements</span>.<span class="variable">heroItem</span>.<span class="function">queryAll</span>().<span class="variable">length</span>).<span class="function">toBe</span>(0);
+
+  <span class="keyword">const</span> <span class="variable">name</span> = <span class="string">`Test Hero`</span>;
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> <span class="variable">i</span> = 1; <span class="variable">i</span> <= 10; <span class="variable">i</span>++) &#123;
+    <span class="variable">harness</span>.<span class="function">setNameInputValue</span>(<span class="string">`&#36;&#123;<span class="variable">name</span>&#125; &#36;&#123;<span class="variable">i</span>&#125;`</span>);
+    <span class="variable">harness</span>.<span class="variable">elements</span>.<span class="variable">addButton</span>.<span class="function">click</span>();
+
+    <span class="function">runTasksUntilStable</span>(<span class="variable">fixture</span>, &#123;
+      <span class="variable">httpCallInstructions</span>: [
+        <span class="function">getPostHeroesSuccessHttpCallInstruction</span>(),
+      ],
+    &#125;)
+
+    <span class="keyword">const</span> <span class="variable">elements</span> = <span class="variable">harness</span>.<span class="variable">elements</span>.<span class="variable">heroItem</span>.<span class="function">queryAll</span>();
+    <span class="function">expect</span>(<span class="variable">elements</span>.<span class="variable">length</span>).<span class="function">toBe</span>(<span class="variable">i</span>);
+
+    <span class="variable">elements</span>.<span class="function">forEach</span>((<span class="variable">el</span>, <span class="variable">index</span>) => &#123;
+      <span class="function">expect</span>(<span class="variable">el</span>.<span class="variable">nativeElement</span>.<span class="variable">textContent</span>.<span class="function">trim</span>().<span class="function">includes</span>(<span class="string">`&#36;&#123;<span class="variable">name</span>&#125; &#36;&#123;<span class="variable">index</span> + 1&#125;`</span>)).<span class="function">toBeTrue</span>();
+    &#125;)
+  &#125;
+&#125;))</code></pre>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<h2 [testboxTestId]="testIds.title">My Heroes</h2>
+
+<div>
+  <label for="new-hero">Hero name: </label>
+  <input id="new-hero" [testboxTestId]="testIds.nameInput" #heroName />
+  <button type="button"
+          [testboxTestId]="testIds.addButton"
+          (click)="add(heroName.value); heroName.value=''">
+    Add hero
+  </button>
+</div>
+
+<ul [testboxTestId]="testIds.heroesList">
+  <li *ngFor="let hero of heroes" [testboxTestId]="testIds.heroItem">
+    <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
+      <span [testboxTestId]="testIds.heroId">{{hero.id}}</span>
+      <span [testboxTestId]="testIds.heroName">{{hero.name}}</span>
+    </a>
+    <button type="button"
+            [testboxTestId]="testIds.heroDeleteButton"
+            (click)="delete(hero)">
+      x
+    </button>
+  </li>
+</ul>
+
+
+<!--
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at https://angular.io/license
+-->
