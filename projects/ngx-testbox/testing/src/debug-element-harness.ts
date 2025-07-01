@@ -4,6 +4,7 @@ import {testAttribute} from './consts/test-attribute';
 
 /**
  * Interface defining the API for interacting with elements in tests.
+ * @type
  */
 type ElementApi = {
   /**
@@ -22,19 +23,22 @@ type ElementApi = {
 
   /**
    * Clicks the element.
+   * @param parentDebugElement - Optional parent debug element to search within.
    */
-  click: () => void;
+  click: (parentDebugElement?: DebugElement) => void;
 
   /**
    * Focuses the element.
+   * @param parentDebugElement - Optional parent debug element to search within.
    */
-  focus: () => void;
+  focus: (parentDebugElement?: DebugElement) => void;
 
   /**
    * Gets the text content of the element.
+   * @param parentDebugElement - Optional parent debug element to search within.
    * @returns The text content of the element.
    */
-  getTextContent: () => string;
+  getTextContent: (parentDebugElement?: DebugElement) => string;
 }
 
 /**
@@ -77,25 +81,96 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
    * @param testIds - An array of test IDs to create element APIs for.
    * @param testIdAttribute - The attribute name used for test IDs (default: 'data-test-id').
    */
-  constructor(private debugElement: DebugElement, testIds: TestIds, testIdAttribute = testAttribute) {
+  constructor(private debugElement: DebugElement, testIds: TestIds, private testIdAttribute = testAttribute) {
     this.elements = testIds.reduce((elements, testId) => {
       elements[testId as TestIds[number]] = {
-        query: (parentDebugElement?: DebugElement) => (parentDebugElement || this.debugElement).query(By.css(`[${testIdAttribute}="${testId}"]`)),
-        queryAll: (parentDebugElement?: DebugElement) => (parentDebugElement || this.debugElement).queryAll(By.css(`[${testIdAttribute}="${testId}"]`)),
-        click() {
-          // TODO throw human readable error, if an element is not found
-          this.query()!.nativeElement.click();
-        },
-        focus() {
-          // TODO throw human readable error, if an element is not found
-          this.query()!.nativeElement.focus();
-        },
-        getTextContent(): string {
-          return this.query()?.nativeElement.textContent;
-        }
+        query: (parentDebugElement?: DebugElement) => this.#query(testId, parentDebugElement),
+        queryAll: (parentDebugElement?: DebugElement) => this.#queryAll(testId, parentDebugElement),
+        click: (parentDebugElement?: DebugElement) => this.#clickOnElement(testId, parentDebugElement),
+        focus: (parentDebugElement?: DebugElement) => this.#focusOnElement(testId, parentDebugElement),
+        getTextContent: (parentDebugElement?: DebugElement) => this.#getTextContent(testId, parentDebugElement),
       } satisfies ElementApi;
 
       return elements
     }, {} as Record<TestIds[number], ElementApi>)
+  }
+
+  /**
+   * Queries for an element with the specified test ID.
+   *
+   * @param testId - The test ID to search for.
+   * @param parentDebugElement - Optional parent debug element to search within.
+   * @returns The found debug element.
+   * @private
+   */
+  #query(testId: TestIds[number], parentDebugElement?: DebugElement): DebugElement {
+    return (parentDebugElement || this.debugElement).query(By.css(`[${this.testIdAttribute}="${testId}"]`));
+  }
+
+  /**
+   * Queries for all elements with the specified test ID.
+   *
+   * @param testId - The test ID to search for.
+   * @param parentDebugElement - Optional parent debug element to search within.
+   * @returns An array of found debug elements.
+   * @private
+   */
+  #queryAll(testId: TestIds[number], parentDebugElement?: DebugElement): DebugElement[] {
+    return (parentDebugElement || this.debugElement).queryAll(By.css(`[${this.testIdAttribute}="${testId}"]`));
+  }
+
+  /**
+   * Clicks on an element with the specified test ID.
+   *
+   * @param testId - The test ID of the element to click.
+   * @param parentDebugElement - Optional parent debug element to search within.
+   * @throws Error if the element with the specified test ID is not found.
+   * @private
+   */
+  #clickOnElement(testId: TestIds[number], parentDebugElement?: DebugElement): void {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new Error(`Element with test ID "${testId}" not found`);
+    }
+
+    element.nativeElement.click();
+  }
+
+  /**
+   * Focuses on an element with the specified test ID.
+   *
+   * @param testId - The test ID of the element to focus.
+   * @param parentDebugElement - Optional parent debug element to search within.
+   * @throws Error if the element with the specified test ID is not found.
+   * @private
+   */
+  #focusOnElement(testId: TestIds[number], parentDebugElement?: DebugElement): void {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new Error(`Element with test ID "${testId}" not found`);
+    }
+
+    element.nativeElement.focus();
+  }
+
+  /**
+   * Gets the text content of an element with the specified test ID.
+   *
+   * @param testId - The test ID of the element to get text content from.
+   * @param parentDebugElement - Optional parent debug element to search within.
+   * @returns The text content of the element.
+   * @throws Error if the element with the specified test ID is not found.
+   * @private
+   */
+  #getTextContent(testId: TestIds[number], parentDebugElement?: DebugElement): string {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new Error(`Element with test ID "${testId}" not found`);
+    }
+
+    return element.nativeElement.textContent;
   }
 }
