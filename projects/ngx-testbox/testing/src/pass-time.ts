@@ -25,8 +25,18 @@ export const TIME_MS = 1000;
  * ```
  *
  * @param time - The amount of time in milliseconds to advance (defaults to TIME_MS)
+ * @throws Error if not called within a fakeAsync zone
  */
 export const passTime = (time = TIME_MS): void => {
-  tick(time);
-  flushMicrotasks();
+  try {
+    tick(time);
+    flushMicrotasks();
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('fakeAsync')) {
+      throw new Error(
+        'passTime() can only be called within a fakeAsync zone. Make sure your test is wrapped with fakeAsync().'
+      );
+    }
+    throw error;
+  }
 }
