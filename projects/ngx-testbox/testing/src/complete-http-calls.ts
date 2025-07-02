@@ -90,17 +90,24 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
     })
 
     if (instruction === undefined) {
-      throw new Error(`There is not a defined http instruction for request with url "${request.url}" and method "${request.method}"`)
+      throw new Error(`No matching HTTP instruction found for request with URL "${request.url}" and method "${request.method}". Please ensure you've provided the correct HTTP call instructions for all expected requests.`)
     }
 
     const [_, responseGetter] = instruction;
-    const urlSearchParams = extractSearchParams(request.urlWithParams)
-    const responsePayload = responseGetter(request, urlSearchParams);
+    const urlSearchParams = extractSearchParams(request.urlWithParams);
 
-    testRequest.flush(responsePayload.body as any, {
-      status: responsePayload.status,
-      statusText: responsePayload.statusText,
-      headers: responsePayload.headers,
+    let response: HttpResponse<any>;
+    try {
+      response = responseGetter(request, urlSearchParams);
+    } catch (error) {
+      console.error('Error in responseGetter function:', error);
+      throw new Error(`Failed to generate HTTP response: ${error instanceof Error ? error.message : 'Unknown error'}. Check your responseGetter function.`);
+    }
+
+    testRequest.flush(response.body as any, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
     });
   }
 }
@@ -112,7 +119,17 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
  * @returns A URLSearchParams object containing the parsed query parameters
  */
 function extractSearchParams(requestUrl: string): URLSearchParams {
-  const queryParams = requestUrl.split('?')[1];
+  if (!requestUrl) {
+    throw new Error('Cannot extract search parameters: Request URL is empty or undefined');
+  }
+
+  const parts = requestUrl.split('?');
+  if (parts.length < 2) {
+    // No query parameters in the URL, return empty URLSearchParams
+    return new URLSearchParams();
+  }
+
+  const queryParams = parts[1];
   const urlSearchParams = new URLSearchParams(queryParams);
 
   return urlSearchParams;
