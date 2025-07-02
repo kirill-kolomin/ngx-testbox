@@ -17,7 +17,14 @@ export const getPredefinedResponseGetter = (status: 'success' | 'error', respons
   const statusText = status === 'success' ? 'OK' : 'Internal Server Error';
 
   return (...args: Parameters<ResponseGetter>) => {
-    const originalResponse = responseGetter?.(...args);
+    let originalResponse: any;
+
+    try {
+      originalResponse = responseGetter?.(...args);
+    } catch (error) {
+      console.error('Error in responseGetter function:', error);
+      throw new Error(`Failed to generate HTTP response: ${error instanceof Error ? error.message : 'Unknown error'}. Check your responseGetter function.`);
+    }
 
     // Check if originalResponse is an HttpResponse
     if (originalResponse instanceof HttpResponse) {
