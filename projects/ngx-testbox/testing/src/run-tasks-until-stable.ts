@@ -92,7 +92,10 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
   while (!fixture.isStable()) {
     if (attempt++ > MAXIMUM_ATTEMPTS) {
-      throw new Error('Maximum attempts reached. Fixture is not stable.');
+      throw new Error(
+        `Maximum stabilization attempts (${MAXIMUM_ATTEMPTS}) reached. The fixture could not be stabilized. ` +
+        'This may be caused by continuous asynchronous operations like setInterval, or other ongoing processes. ' +
+        'Check for setInterval calls in your component and consider mocking them or running them outside Angular zone.');
     }
 
     fixture.detectChanges();
@@ -167,7 +170,14 @@ function throwIfThereIsHttpInstructionNotInvoked(callTrackers: CallTrackers) {
     const callTracker = callTrackers[index];
 
     if (!callTracker[0]()) {
-      throw new Error(`There was an http call instruction not called during draining of http requests. Index ${index}. The http instruction is -> ${callTracker[1]}`);
+      throw new Error(
+        `An HTTP call instruction was not executed during test stabilization at index ${index}. ` +
+        'This may indicate that the expected HTTP request was never made by your component, ' +
+        'or that the request was made with different parameters than expected. ' +
+        'Check that your component is correctly triggering this HTTP request and that ' +
+        'the URL and method in your test instructions match what your component is requesting. ' +
+        `The http instruction is -> ${callTracker[1]}`
+      );
     }
   }
 }
@@ -189,7 +199,15 @@ function patchSetInterval() {
   window.setInterval = function setInterval(handler: TimerHandler, timeout?: number, ...args: any[]) {
     const trace = (new Error().stack as string).replace('Error', 'Trace');
 
-    console.warn('Warn: The setInterval might be the potential problem for runTasksUntilStable. If you see the error that maximum attempts is reached, try to mock the place where interval is invoked or try to run the piece of code outside of angular zone using the NgZone.prototype.runOutsideAngular method', trace);
+    console.warn(
+      'Warning: setInterval detected during runTasksUntilStable execution. ' +
+      'This may prevent your component from stabilizing and cause "Maximum stabilization attempts reached" errors. ' +
+      'To fix this issue:\n' +
+      '1. Mock the code that uses setInterval in your tests\n' +
+      '2. Run the setInterval code outside Angular zone using NgZone.runOutsideAngular()\n' +
+      'Stack trace to help locate the setInterval call:',
+      trace
+    );
 
     return originalSetInterval(handler, timeout, ...args);
   }
