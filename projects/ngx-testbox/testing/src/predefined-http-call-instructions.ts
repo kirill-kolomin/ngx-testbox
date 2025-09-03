@@ -1,5 +1,6 @@
 import {EndpointPath, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
 import {HttpResponse} from '@angular/common/http';
+import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
 
 /**
  * Creates a response getter function that returns HTTP responses with predefined status codes.
@@ -22,8 +23,7 @@ export const getPredefinedResponseGetter = (status: 'success' | 'error', respons
     try {
       originalResponse = responseGetter?.(...args);
     } catch (error) {
-      console.error('Error in responseGetter function:', error);
-      throw new Error(`Failed to generate HTTP response: ${error instanceof Error ? error.message : 'Unknown error'}. Check your responseGetter function.`);
+      throw new FailedToGenerateHttpResponseError(error)
     }
 
     // Check if originalResponse is an HttpResponse

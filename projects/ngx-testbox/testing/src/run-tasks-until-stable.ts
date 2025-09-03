@@ -2,6 +2,15 @@ import {ComponentFixture} from '@angular/core/testing';
 import {passTime} from './pass-time';
 import {completeHttpCalls, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
 import {HttpErrorResponse} from '@angular/common/http';
+import {MaximumAttemptsToStabilizeFixtureReachedError} from './errors/MaximumAttemptsToStabilizeFixtureReachedError';
+import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from './errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
+
+export const setIntervalDetectedWarning = `Warning: setInterval detected during runTasksUntilStable execution.
+  This may prevent your component from stabilizing and cause "Maximum stabilization attempts reached" errors.
+  If the interval causes this kind of issue, to fix it you can:
+  1. Mock the code that uses setInterval in your tests
+  2. Run the setInterval code outside Angular zone using NgZone.runOutsideAngular()
+  Stack trace to help locate the setInterval call:`
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -92,10 +101,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
   while (!fixture.isStable()) {
     if (attempt++ > MAXIMUM_ATTEMPTS) {
-      throw new Error(
-        `Maximum stabilization attempts (${MAXIMUM_ATTEMPTS}) reached. The fixture could not be stabilized. ` +
-        'This may be caused by continuous asynchronous operations like setInterval, or other ongoing processes. ' +
-        'Check for setInterval calls in your component and consider mocking them or running them outside Angular zone.');
+      throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
     }
 
     fixture.detectChanges();
@@ -170,14 +176,7 @@ function throwIfThereIsHttpInstructionNotInvoked(callTrackers: CallTrackers) {
     const callTracker = callTrackers[index];
 
     if (!callTracker[0]()) {
-      throw new Error(
-        `An HTTP call instruction was not executed during test stabilization at index ${index}. ` +
-        'This may indicate that the expected HTTP request was never made by your component, ' +
-        'or that the request was made with different parameters than expected. ' +
-        'Check that your component is correctly triggering this HTTP request and that ' +
-        'the URL and method in your test instructions match what your component is requesting. ' +
-        `The http instruction is -> ${callTracker[1]}`
-      );
+      throw new HttpInstructionWasNotExecutedDuringFixtureStabilizationError(index, callTracker[1].toString());
     }
   }
 }

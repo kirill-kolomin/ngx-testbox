@@ -1,6 +1,8 @@
 import {TestBed} from '@angular/core/testing';
 import {HttpTestingController, TestRequest} from '@angular/common/http/testing';
 import {HttpRequest, HttpResponse} from '@angular/common/http';
+import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
+import {NoMatchingHttpInstructionForRequestFoundError} from './errors/NoMatchingHttpInstructionForRequestFoundError';
 
 /**
  * Represents an HTTP method (GET, POST, PUT, DELETE, etc.).
@@ -90,7 +92,7 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
     })
 
     if (instruction === undefined) {
-      throw new Error(`No matching HTTP instruction found for request with URL "${request.url}" and method "${request.method}". Please ensure you've provided the correct HTTP call instructions for all expected requests.`)
+      throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
     }
 
     const [_, responseGetter] = instruction;
@@ -100,8 +102,7 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
     try {
       response = responseGetter(request, urlSearchParams);
     } catch (error) {
-      console.error('Error in responseGetter function:', error);
-      throw new Error(`Failed to generate HTTP response: ${error instanceof Error ? error.message : 'Unknown error'}. Check your responseGetter function.`);
+      throw new FailedToGenerateHttpResponseError(error);
     }
 
     testRequest.flush(response.body as any, {

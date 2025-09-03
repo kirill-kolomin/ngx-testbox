@@ -1,6 +1,7 @@
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {testAttribute} from './consts/test-attribute';
+import {NoElementByTestIdFoundError} from './errors/NoElementByTestIdFoundError';
 
 /**
  * Interface defining the API for interacting with elements in tests.
@@ -106,7 +107,7 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
     const element = this.#query(testId, parentDebugElement);
 
     if (!element) {
-      throw new Error(`Element with test ID "${testId}" not found`);
+      throw new NoElementByTestIdFoundError(testId);
     }
 
     element.nativeElement.click();
@@ -116,7 +117,7 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
     const element = this.#query(testId, parentDebugElement);
 
     if (!element) {
-      throw new Error(`Element with test ID "${testId}" not found`);
+      throw new NoElementByTestIdFoundError(testId);
     }
 
     element.nativeElement.focus();
@@ -126,7 +127,7 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
     const element = this.#query(testId, parentDebugElement);
 
     if (!element) {
-      throw new Error(`Element with test ID "${testId}" not found`);
+      throw new NoElementByTestIdFoundError(testId);
     }
 
     return element.nativeElement.textContent;
