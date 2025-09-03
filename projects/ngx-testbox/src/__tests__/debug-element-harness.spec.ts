@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElementHarness } from '../../testing/src/debug-element-harness';
 import createSpy = jasmine.createSpy;
+import {NoElementByTestIdFoundError} from '../../testing/src/errors/NoElementByTestIdFoundError';
 
 @Component({
   template: `
@@ -128,6 +129,15 @@ describe('DebugElementHarness', () => {
 
       expect(spy).toHaveBeenCalled();
     });
+
+    it('should throw if element is not found', () => {
+      const nonExistentHarness = new DebugElementHarness(
+        debugElement,
+        ['nonexistent'] as const
+      );
+
+      expect(() => nonExistentHarness.elements.nonexistent.click()).toThrowError(NoElementByTestIdFoundError);
+    });
   });
 
   describe('focus', () => {
@@ -139,6 +149,15 @@ describe('DebugElementHarness', () => {
 
       expect(inputElement.nativeElement.focus).toHaveBeenCalled();
     });
+
+    it('should throw if element is not found', () => {
+      const nonExistentHarness = new DebugElementHarness(
+        debugElement,
+        ['nonexistent'] as const
+      );
+
+      expect(() => nonExistentHarness.elements.nonexistent.focus()).toThrowError(NoElementByTestIdFoundError);
+    });
   });
 
   describe('getTextContent', () => {
@@ -147,14 +166,13 @@ describe('DebugElementHarness', () => {
       expect(textContent).toBe('Some text content');
     });
 
-    it('should return undefined if element is not found', () => {
+    it('should throw if element is not found', () => {
       const nonExistentHarness = new DebugElementHarness(
         debugElement,
         ['nonexistent'] as const
       );
 
-      const textContent = nonExistentHarness.elements.nonexistent.getTextContent();
-      expect(textContent).toBeUndefined();
+      expect(() => nonExistentHarness.elements.nonexistent.getTextContent()).toThrowError(NoElementByTestIdFoundError);
     });
   });
 });

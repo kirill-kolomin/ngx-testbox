@@ -1,6 +1,8 @@
 import {TestBed} from '@angular/core/testing';
 import {HttpTestingController, TestRequest} from '@angular/common/http/testing';
 import {HttpRequest, HttpResponse} from '@angular/common/http';
+import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
+import {NoMatchingHttpInstructionForRequestFoundError} from './errors/NoMatchingHttpInstructionForRequestFoundError';
 
 /**
  * Represents an HTTP method (GET, POST, PUT, DELETE, etc.).
@@ -90,27 +92,27 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
     })
 
     if (instruction === undefined) {
-      throw new Error(`There is not a defined http instruction for request with url "${request.url}" and method "${request.method}"`)
+      throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
     }
 
     const [_, responseGetter] = instruction;
-    const urlSearchParams = extractSearchParams(request.urlWithParams)
-    const responsePayload = responseGetter(request, urlSearchParams);
+    const urlSearchParams = extractSearchParams(request.urlWithParams);
 
-    testRequest.flush(responsePayload.body as any, {
-      status: responsePayload.status,
-      statusText: responsePayload.statusText,
-      headers: responsePayload.headers,
+    let response: HttpResponse<any>;
+    try {
+      response = responseGetter(request, urlSearchParams);
+    } catch (error) {
+      throw new FailedToGenerateHttpResponseError(error);
+    }
+
+    testRequest.flush(response.body as any, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
     });
   }
 }
 
-/**
- * Extracts URL search parameters from a request URL.
- *
- * @param requestUrl - The full URL of the request, including query parameters
- * @returns A URLSearchParams object containing the parsed query parameters
- */
 function extractSearchParams(requestUrl: string): URLSearchParams {
   const queryParams = requestUrl.split('?')[1];
   const urlSearchParams = new URLSearchParams(queryParams);

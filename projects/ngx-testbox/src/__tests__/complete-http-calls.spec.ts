@@ -9,6 +9,9 @@ import {
   getRequestsFromQueue,
   HttpCallInstruction
 } from '../../testing/src/complete-http-calls';
+import {
+  NoMatchingHttpInstructionForRequestFoundError
+} from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 
 describe('completeHttpCalls', () => {
   let httpClient: HttpClient;
@@ -133,7 +136,7 @@ describe('completeHttpCalls', () => {
       ];
 
       expect(() => completeHttpCalls(instructions))
-        .toThrowError(/There is not a defined http instruction for request with url "\/api\/test" and method "GET"/);
+        .toThrowError(NoMatchingHttpInstructionForRequestFoundError);
     });
 
     it('should skip cancelled requests', () => {

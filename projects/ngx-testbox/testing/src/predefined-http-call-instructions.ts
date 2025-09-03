@@ -1,5 +1,6 @@
 import {EndpointPath, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
 import {HttpResponse} from '@angular/common/http';
+import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
 
 /**
  * Creates a response getter function that returns HTTP responses with predefined status codes.
@@ -12,12 +13,18 @@ import {HttpResponse} from '@angular/common/http';
  * @param responseGetter - Optional function to generate the response body or a complete HttpResponse
  * @returns A ResponseGetter function that generates HttpResponse objects with the appropriate status
  */
-export const getPredefinedResponseGetter = (status: 'success' | 'error', responseGetter?: (...args: Parameters<ResponseGetter>) => any): ResponseGetter => {
+export const getPredefinedResponseGetter = (status: 'success' | 'error', responseGetter?: (...args: Parameters<ResponseGetter>) => HttpResponse<any> | any): ResponseGetter => {
   const statusCode = status === 'success' ? 200 : 500;
   const statusText = status === 'success' ? 'OK' : 'Internal Server Error';
 
   return (...args: Parameters<ResponseGetter>) => {
-    const originalResponse = responseGetter?.(...args);
+    let originalResponse: any;
+
+    try {
+      originalResponse = responseGetter?.(...args);
+    } catch (error) {
+      throw new FailedToGenerateHttpResponseError(error)
+    }
 
     // Check if originalResponse is an HttpResponse
     if (originalResponse instanceof HttpResponse) {
@@ -38,14 +45,7 @@ export const getPredefinedResponseGetter = (status: 'success' | 'error', respons
   };
 }
 
-/**
- * Array of supported HTTP methods for predefined HTTP call instructions.
- */
 export const httpMethods = ['head', 'options', 'get', 'post', 'put', 'patch', 'delete'] as const;
-
-/**
- * Array of supported HTTP status types for predefined HTTP call instructions.
- */
 export const httpStatuses = ['success', 'error'] as const;
 
 /**

@@ -1,6 +1,7 @@
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {testAttribute} from './consts/test-attribute';
+import {NoElementByTestIdFoundError} from './errors/NoElementByTestIdFoundError';
 
 /**
  * Interface defining the API for interacting with elements in tests.
@@ -22,19 +23,22 @@ type ElementApi = {
 
   /**
    * Clicks the element.
+   * @param parentDebugElement - Optional parent debug element to search within.
    */
-  click: () => void;
+  click: (parentDebugElement?: DebugElement) => void;
 
   /**
    * Focuses the element.
+   * @param parentDebugElement - Optional parent debug element to search within.
    */
-  focus: () => void;
+  focus: (parentDebugElement?: DebugElement) => void;
 
   /**
    * Gets the text content of the element.
+   * @param parentDebugElement - Optional parent debug element to search within.
    * @returns The text content of the element.
    */
-  getTextContent: () => string;
+  getTextContent: (parentDebugElement?: DebugElement) => string;
 }
 
 /**
@@ -77,25 +81,55 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
    * @param testIds - An array of test IDs to create element APIs for.
    * @param testIdAttribute - The attribute name used for test IDs (default: 'data-test-id').
    */
-  constructor(private debugElement: DebugElement, testIds: TestIds, testIdAttribute = testAttribute) {
+  constructor(private debugElement: DebugElement, testIds: TestIds, private testIdAttribute = testAttribute) {
     this.elements = testIds.reduce((elements, testId) => {
       elements[testId as TestIds[number]] = {
-        query: (parentDebugElement?: DebugElement) => (parentDebugElement || this.debugElement).query(By.css(`[${testIdAttribute}="${testId}"]`)),
-        queryAll: (parentDebugElement?: DebugElement) => (parentDebugElement || this.debugElement).queryAll(By.css(`[${testIdAttribute}="${testId}"]`)),
-        click() {
-          // TODO throw human readable error, if an element is not found
-          this.query()!.nativeElement.click();
-        },
-        focus() {
-          // TODO throw human readable error, if an element is not found
-          this.query()!.nativeElement.focus();
-        },
-        getTextContent(): string {
-          return this.query()?.nativeElement.textContent;
-        }
+        query: (parentDebugElement?: DebugElement) => this.#query(testId, parentDebugElement),
+        queryAll: (parentDebugElement?: DebugElement) => this.#queryAll(testId, parentDebugElement),
+        click: (parentDebugElement?: DebugElement) => this.#clickOnElement(testId, parentDebugElement),
+        focus: (parentDebugElement?: DebugElement) => this.#focusOnElement(testId, parentDebugElement),
+        getTextContent: (parentDebugElement?: DebugElement) => this.#getTextContent(testId, parentDebugElement),
       } satisfies ElementApi;
 
       return elements
     }, {} as Record<TestIds[number], ElementApi>)
+  }
+
+  #query(testId: TestIds[number], parentDebugElement?: DebugElement): DebugElement {
+    return (parentDebugElement || this.debugElement).query(By.css(`[${this.testIdAttribute}="${testId}"]`));
+  }
+
+  #queryAll(testId: TestIds[number], parentDebugElement?: DebugElement): DebugElement[] {
+    return (parentDebugElement || this.debugElement).queryAll(By.css(`[${this.testIdAttribute}="${testId}"]`));
+  }
+
+  #clickOnElement(testId: TestIds[number], parentDebugElement?: DebugElement): void {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new NoElementByTestIdFoundError(testId);
+    }
+
+    element.nativeElement.click();
+  }
+
+  #focusOnElement(testId: TestIds[number], parentDebugElement?: DebugElement): void {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new NoElementByTestIdFoundError(testId);
+    }
+
+    element.nativeElement.focus();
+  }
+
+  #getTextContent(testId: TestIds[number], parentDebugElement?: DebugElement): string {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new NoElementByTestIdFoundError(testId);
+    }
+
+    return element.nativeElement.textContent;
   }
 }

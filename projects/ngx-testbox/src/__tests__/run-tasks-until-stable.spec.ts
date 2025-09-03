@@ -3,7 +3,17 @@ import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {runTasksUntilStable,} from '../../testing/src/run-tasks-until-stable';
-import {HttpCallInstruction} from 'ngx-testbox/testing';
+import {HttpCallInstruction} from '../../testing/src/complete-http-calls';
+import {
+  NoMatchingHttpInstructionForRequestFoundError
+} from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
+import {
+  HttpInstructionWasNotExecutedDuringFixtureStabilizationError
+} from '../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
+import {
+  MaximumAttemptsToStabilizeFixtureReachedError
+} from '../../testing/src/errors/MaximumAttemptsToStabilizeFixtureReachedError';
+import {FailedToGenerateHttpResponseError} from '../../testing/src/errors/FailedToGenerateHttpResponseError';
 
 @Component({
   template: '<div>Test Component</div>',
@@ -82,7 +92,7 @@ describe('runTasksUntilStable', () => {
       initComponent();
 
       expect(() => runTasksUntilStable(fixture, {httpCallInstructions}))
-        .toThrowError(/There was an http call instruction not called during draining of http requests/);
+        .toThrowError(HttpInstructionWasNotExecutedDuringFixtureStabilizationError);
     }));
 
     it('should throw an error if an HTTP request is not handled', fakeAsync(() => {
@@ -91,7 +101,7 @@ describe('runTasksUntilStable', () => {
       component.makeHttpRequest();
 
       expect(() => runTasksUntilStable(fixture))
-        .toThrowError('There is not a defined http instruction for request with url "/api/test" and method "GET"');
+        .toThrowError(NoMatchingHttpInstructionForRequestFoundError);
     }));
   });
 
@@ -102,20 +112,7 @@ describe('runTasksUntilStable', () => {
 
       fixture.componentRef.setInput('isTestingIntervalWithinZone', true);
 
-      expect(() => runTasksUntilStable(fixture)).toThrowError('Maximum attempts reached. Fixture is not stable.');
-    }));
-
-    it('should catch HttpErrorResponse errors', fakeAsync(() => {
-      const httpCallInstructions: HttpCallInstruction[] = [
-        [['/api/test', 'GET'], () => new HttpResponse({body: {}, status: 200})]
-      ];
-
-      initComponent();
-
-      component.makeHttpRequest();
-      runTasksUntilStable(fixture, {httpCallInstructions});
-
-      expect(() => runTasksUntilStable(fixture, {httpCallInstructions})).toThrowError();
+      expect(() => runTasksUntilStable(fixture)).toThrowError(MaximumAttemptsToStabilizeFixtureReachedError);
     }));
   });
 
@@ -135,7 +132,7 @@ describe('runTasksUntilStable', () => {
       } catch (error) {}
 
       expect(consoleWarnSpy).toHaveBeenCalled();
-      expect(consoleWarnSpy.calls.mostRecent().args[0]).toContain('setInterval might be the potential problem');
+      expect(consoleWarnSpy.calls.mostRecent().args[0]).toContain('setInterval detected during runTasksUntilStable execution');
 
       console.warn = originalConsoleWarn;
     }));
