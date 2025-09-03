@@ -198,15 +198,7 @@ function patchSetInterval() {
   window.setInterval = function setInterval(handler: TimerHandler, timeout?: number, ...args: any[]) {
     const trace = (new Error().stack as string).replace('Error', 'Trace');
 
-    console.warn(
-      'Warning: setInterval detected during runTasksUntilStable execution. ' +
-      'This may prevent your component from stabilizing and cause "Maximum stabilization attempts reached" errors. ' +
-      'If the interval causes this kind of issue, to fix it you can:\n' +
-      '1. Mock the code that uses setInterval in your tests\n' +
-      '2. Run the setInterval code outside Angular zone using NgZone.runOutsideAngular()\n' +
-      'Stack trace to help locate the setInterval call:',
-      trace
-    );
+    console.warn(setIntervalDetectedWarning,trace);
 
     return originalSetInterval(handler, timeout, ...args);
   }
