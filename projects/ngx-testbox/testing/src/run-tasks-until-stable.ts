@@ -5,7 +5,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {MaximumAttemptsToStabilizeFixtureReachedError} from './errors/MaximumAttemptsToStabilizeFixtureReachedError';
 import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from './errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
 
-export const setIntervalDetectedWarning = `Warning: setInterval detected during runTasksUntilStable execution.
+const setIntervalDetectedWarning = `Warning: setInterval detected during runTasksUntilStable execution.
   This may prevent your component from stabilizing and cause "Maximum stabilization attempts reached" errors.
   If the interval causes this kind of issue, to fix it you can:
   1. Mock the code that uses setInterval in your tests
