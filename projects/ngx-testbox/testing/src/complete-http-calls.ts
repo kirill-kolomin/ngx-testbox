@@ -112,24 +112,8 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
   }
 }
 
-/**
- * Extracts URL search parameters from a request URL.
- *
- * @param requestUrl - The full URL of the request, including query parameters
- * @returns A URLSearchParams object containing the parsed query parameters
- */
 function extractSearchParams(requestUrl: string): URLSearchParams {
-  if (!requestUrl) {
-    throw new Error('Cannot extract search parameters: Request URL is empty or undefined');
-  }
-
-  const parts = requestUrl.split('?');
-  if (parts.length < 2) {
-    // No query parameters in the URL, return empty URLSearchParams
-    return new URLSearchParams();
-  }
-
-  const queryParams = parts[1];
+  const queryParams = requestUrl.split('?')[1];
   const urlSearchParams = new URLSearchParams(queryParams);
 
   return urlSearchParams;
