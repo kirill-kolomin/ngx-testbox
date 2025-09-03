@@ -3,7 +3,7 @@ import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {runTasksUntilStable,} from '../../testing/src/run-tasks-until-stable';
-import {HttpCallInstruction} from 'ngx-testbox/testing';
+import {HttpCallInstruction} from '../../testing/src/complete-http-calls';
 
 @Component({
   template: '<div>Test Component</div>',
