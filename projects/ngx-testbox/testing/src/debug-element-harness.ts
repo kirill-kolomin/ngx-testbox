@@ -4,7 +4,6 @@ import {testAttribute} from './consts/test-attribute';
 
 /**
  * Interface defining the API for interacting with elements in tests.
- * @type
  */
 type ElementApi = {
   /**
@@ -95,38 +94,14 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
     }, {} as Record<TestIds[number], ElementApi>)
   }
 
-  /**
-   * Queries for an element with the specified test ID.
-   *
-   * @param testId - The test ID to search for.
-   * @param parentDebugElement - Optional parent debug element to search within.
-   * @returns The found debug element.
-   * @private
-   */
   #query(testId: TestIds[number], parentDebugElement?: DebugElement): DebugElement {
     return (parentDebugElement || this.debugElement).query(By.css(`[${this.testIdAttribute}="${testId}"]`));
   }
 
-  /**
-   * Queries for all elements with the specified test ID.
-   *
-   * @param testId - The test ID to search for.
-   * @param parentDebugElement - Optional parent debug element to search within.
-   * @returns An array of found debug elements.
-   * @private
-   */
   #queryAll(testId: TestIds[number], parentDebugElement?: DebugElement): DebugElement[] {
     return (parentDebugElement || this.debugElement).queryAll(By.css(`[${this.testIdAttribute}="${testId}"]`));
   }
 
-  /**
-   * Clicks on an element with the specified test ID.
-   *
-   * @param testId - The test ID of the element to click.
-   * @param parentDebugElement - Optional parent debug element to search within.
-   * @throws Error if the element with the specified test ID is not found.
-   * @private
-   */
   #clickOnElement(testId: TestIds[number], parentDebugElement?: DebugElement): void {
     const element = this.#query(testId, parentDebugElement);
 
@@ -137,14 +112,6 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
     element.nativeElement.click();
   }
 
-  /**
-   * Focuses on an element with the specified test ID.
-   *
-   * @param testId - The test ID of the element to focus.
-   * @param parentDebugElement - Optional parent debug element to search within.
-   * @throws Error if the element with the specified test ID is not found.
-   * @private
-   */
   #focusOnElement(testId: TestIds[number], parentDebugElement?: DebugElement): void {
     const element = this.#query(testId, parentDebugElement);
 
@@ -155,15 +122,6 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
     element.nativeElement.focus();
   }
 
-  /**
-   * Gets the text content of an element with the specified test ID.
-   *
-   * @param testId - The test ID of the element to get text content from.
-   * @param parentDebugElement - Optional parent debug element to search within.
-   * @returns The text content of the element.
-   * @throws Error if the element with the specified test ID is not found.
-   * @private
-   */
   #getTextContent(testId: TestIds[number], parentDebugElement?: DebugElement): string {
     const element = this.#query(testId, parentDebugElement);
 
