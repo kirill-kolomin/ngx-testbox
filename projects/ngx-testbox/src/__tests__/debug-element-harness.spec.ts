@@ -153,8 +153,8 @@ describe('DebugElementHarness', () => {
         ['nonexistent'] as const
       );
 
-      const textContent = nonExistentHarness.elements.nonexistent.getTextContent();
-      expect(textContent).toBeUndefined();
+      const cb = () => nonExistentHarness.elements.nonexistent.getTextContent();
+      expect(cb).toThrow();
     });
   });
 });
