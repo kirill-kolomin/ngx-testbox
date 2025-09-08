@@ -57,6 +57,12 @@ export const httpStatuses = ['success', 'error'] as const;
  *
  * Mainly you will use it with runTasksUntilStable.
  *
+ * @param path - EndpointPath
+ * @param responseGetter - A callback that generates the response body.
+ * As the first parameter, it receives the original HTTP request.
+ * As the second parameter, it receives the parsed URL search parameters from the request.
+ * It returns the body of the response.
+ *
  * @example
  * ```typescript
  * // Create a GET request with a success response
