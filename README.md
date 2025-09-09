@@ -12,8 +12,6 @@ Abstract away internal implementation details and focus on what actually matters
 
 📚 Full documentation: [ngx-testbox docs](https://kirill-kolomin.github.io/ngx-testbox-docs/)
 
----
-
 ## Key Benefits
 
 - **Black-box by design**  
@@ -27,8 +25,6 @@ Abstract away internal implementation details and focus on what actually matters
 
 - **Test-Driven Development friendly**  
   Write tests first using your REST API contract and UI expectations; implement logic later—boosts confidence and speed.
-
----
 
 ## Getting Started
 
