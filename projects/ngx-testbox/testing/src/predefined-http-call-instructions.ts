@@ -57,12 +57,15 @@ export const httpStatuses = ['success', 'error'] as const;
  *
  * Mainly you will use it with runTasksUntilStable.
  *
- * @param path - EndpointPath
- * @param responseGetter - A callback that generates the response body.
+ * Each method in the object is a function that takes next parameters:
+ * - path - EndpointPath
+ * - responseGetter - A callback that generates the response body.
  * As the first parameter, it receives the original HTTP request.
  * As the second parameter, it receives the parsed URL search parameters from the request.
  * It returns the body of the response.
  *
+ * Each method in the object returns HttpCallInstruction;
+ *
  * @example
  * ```typescript
  * // Create a GET request with a success response
@@ -72,23 +75,7 @@ export const httpStatuses = ['success', 'error'] as const;
  * const postError = predefinedHttpCallInstructions.post.error('api/users',
  *   () => ({ error: 'User already exists' }));
  *
- * // Use with runTasksUntilStable
  * runTasksUntilStable(fixture, {httpCallInstructions: [getSuccess, postError]});
- * ```
- *
- * In exception cases, when runTasksUntilStable is not enough, you can use completeHttpCalls.
- *
- * @example
- * ```typescript
- * // Create a GET request with a success response
- * const getSuccess = predefinedHttpCallInstructions.get.success('api/users');
- *
- * // Create a POST request with an error response and custom response body
- * const postError = predefinedHttpCallInstructions.post.error('api/users',
- *   () => ({ error: 'User already exists' }));
- *
- * // Use with completeHttpCalls
- * completeHttpCalls([getSuccess, postError]);
  * ```
  */
 export const predefinedHttpCallInstructions = {} as Record<
