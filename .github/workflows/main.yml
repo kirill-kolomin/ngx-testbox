@@ -30,7 +30,7 @@ jobs:
       run: ng test tour-of-heroes --watch=false --browsers=ChromeHeadless --code-coverage
 
     - name: Upload coverage reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-reports
         path: coverage/
