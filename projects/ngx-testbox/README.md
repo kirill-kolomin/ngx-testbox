@@ -30,7 +30,7 @@ Abstract away internal implementation details and focus on what actually matters
 
 ```bash
 
-npm install ngx-testbox --save-dev
+npm install ngx-testbox
 
 ```
 
@@ -38,7 +38,7 @@ Or using yarn
 
 ```bash
 
-yarn add ngx-testbox --dev
+yarn add ngx-testbox
 
 ```
 
