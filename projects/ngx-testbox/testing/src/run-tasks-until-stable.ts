@@ -45,11 +45,14 @@ export const MAXIMUM_ATTEMPTS = 30;
 
 /**
  * Runs Angular change detection and processes tasks until the component fixture is stable.
- * This function is designed to help with testing asynchronous operations in Angular components.
+ * This function is designed as the core functionality of the ngx-testbox library.
+ * It handles asynchronous operations in Angular components.
  *
- * The function repeatedly runs change detection and advances the virtual clock until the fixture
- * is stable. It also handles HTTP requests if instructions are provided. If the fixture cannot
- * be stabilized after a maximum number of attempts, an error is thrown.
+ * It does the following operations:
+ * 1. Runs change detection.
+ * 2. Responds to HTTP requests.
+ * 3. Pushes time forward. Executes until all asynchronous operations are resolved so that the fixture becomes stable.
+ * 4. Runs the cycle again.
  *
  * @example
  * ```typescript
