@@ -1,0 +1,37 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build library
+      run: npm run build:prod:lib
+
+    - name: Test ngx-testbox library with coverage
+      run: ng test ngx-testbox --watch=false --browsers=ChromeHeadless --code-coverage
+
+    - name: Test tour-of-heroes application with coverage
+      run: ng test tour-of-heroes --watch=false --browsers=ChromeHeadless --code-coverage
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-reports
+        path: coverage/
+        retention-days: 7
