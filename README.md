@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/ngx-testbox.svg)](https://www.npmjs.com/package/ngx-testbox)
 [![npm downloads](https://img.shields.io/npm/dm/ngx-testbox.svg)](https://www.npmjs.com/package/ngx-testbox)
-[![CI](https://github.com/kirill-kolomin/ngx-testbox/actions/workflows/ci.yml/badge.svg)](https://github.com/kirill-kolomin/ngx-testbox/actions/workflows/ci.yml)
+[![Main branch](https://github.com/kirill-kolomin/ngx-testbox/actions/workflows/main.yml/badge.svg)](https://github.com/kirill-kolomin/ngx-testbox/actions/workflows/main.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
 
 **Black-box integration testing for Angular made easy.**
@@ -81,16 +81,6 @@ describe('MyComponent', () => {
 - Concept overviews
 - Step-by-step tutorials
 - Full application examples (e.g., Todo flows)
-
-## Continuous Integration
-
-This project uses GitHub Actions for continuous integration. The workflow:
-- Runs on every push to main/master branches and pull requests
-- Builds the library
-- Runs tests for all projects with code coverage
-- Uploads coverage reports as artifacts
-
-You can see the workflow status in the Actions tab of the repository.
 
 ## Contributing & Support
 
