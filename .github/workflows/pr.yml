@@ -24,10 +24,10 @@ jobs:
       run: npm run build:prod:lib
 
     - name: Test ngx-testbox library with coverage
-      run: ng test ngx-testbox --watch=false --browsers=ChromeHeadless --code-coverage
+      run: npx ng test ngx-testbox --watch=false --browsers=ChromeHeadless --code-coverage
 
     - name: Test tour-of-heroes application with coverage
-      run: ng test tour-of-heroes --watch=false --browsers=ChromeHeadless --code-coverage
+      run: npx ng test tour-of-heroes --watch=false --browsers=ChromeHeadless --code-coverage
 
     - name: Upload coverage reports
       uses: actions/upload-artifact@v4
