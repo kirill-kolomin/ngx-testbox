@@ -1,9 +1,12 @@
-import {ComponentFixture} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {passTime} from './pass-time';
-import {completeHttpCalls, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
+import {completeHttpCalls, getRequestsFromQueue, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MaximumAttemptsToStabilizeFixtureReachedError} from './errors/MaximumAttemptsToStabilizeFixtureReachedError';
-import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from './errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
+import {
+  HttpInstructionWasNotExecutedDuringFixtureStabilizationError
+} from './errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
+import {HttpTestingController} from '@angular/common/http/testing';
 
 const setIntervalDetectedWarning = `Warning: setInterval detected during runTasksUntilStable execution.
   This may prevent your component from stabilizing and cause "Maximum stabilization attempts reached" errors.
@@ -95,14 +98,17 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   httpCallInstructions = []
 }: RunTasksUntilStableParams = {}) => {
   const rollbackOriginalSetInterval = patchSetInterval();
+  const httpTestingController = TestBed.inject(HttpTestingController)
 
   let attempt = 0;
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
+  let requests = getRequestsFromQueue(httpTestingController);
 
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
 
-  while (!fixture.isStable()) {
+  // By an unknown reason angular Zone is still stable despite having requests in the queue. So I need to look to make the check if there is requests in the queue.
+  while (!fixture.isStable() || requests.length > 0) {
     if (attempt++ > MAXIMUM_ATTEMPTS) {
       throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
     }
@@ -119,6 +125,8 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
         throw error;
       }
     }
+
+    requests = getRequestsFromQueue(httpTestingController);
   }
 
   throwIfThereIsHttpInstructionNotInvoked(callTrackers);
@@ -198,7 +206,7 @@ function patchSetInterval() {
   window.setInterval = function setInterval(handler: TimerHandler, timeout?: number, ...args: any[]) {
     const trace = (new Error().stack as string).replace('Error', 'Trace');
 
-    console.warn(setIntervalDetectedWarning,trace);
+    console.warn(setIntervalDetectedWarning, trace);
 
     return originalSetInterval(handler, timeout, ...args);
   }

@@ -62,11 +62,13 @@ export const getRequestsFromQueue = (httpTestingController = TestBed.inject(Http
  * @throws Error if no matching instruction is found for a request
  */
 export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
-  httpTestingController = TestBed.inject(HttpTestingController)
+  httpTestingController = TestBed.inject(HttpTestingController),
+  testRequests
 }: {
   httpTestingController?: HttpTestingController;
+  testRequests?: TestRequest[];
 } = {}) => {
-  const requests = getRequestsFromQueue(httpTestingController);
+  const requests = testRequests || getRequestsFromQueue(httpTestingController);
 
   for (let testRequest of requests) {
     if (testRequest.cancelled) {
