@@ -138,6 +138,7 @@ describe('runTasksUntilStable', () => {
     }));
 
     it('should restore original setInterval after completion', fakeAsync(() => {
+      fixture = TestBed.createComponent(TestComponent);
       const originalSetInterval = window.setInterval;
 
       runTasksUntilStable(fixture);
