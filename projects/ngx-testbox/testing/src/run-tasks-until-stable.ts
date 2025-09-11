@@ -92,7 +92,7 @@ export const MAXIMUM_ATTEMPTS = 30;
  */
 export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   iterationMs,
-  httpCallInstructions
+  httpCallInstructions = []
 }: RunTasksUntilStableParams = {}) => {
   const rollbackOriginalSetInterval = patchSetInterval();
 
@@ -109,17 +109,14 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
     fixture.detectChanges();
     passTime(iterationMs);
-
-    if (requiredHttpCallInstructions) {
-      completeHttpCalls(requiredHttpCallInstructions);
-      fixture.detectChanges();
-      try {
-        passTime(iterationMs);
-      } catch (error) {
-        // We need the catch in cases when http instruction responds with an error, and the error callback is not passed to the observer. Otherwise, the error will fail the runtime.
-        if (!(error instanceof HttpErrorResponse)) {
-          throw error;
-        }
+    completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+    fixture.detectChanges();
+    try {
+      passTime(iterationMs);
+    } catch (error) {
+      // We need the catch in cases when http instruction responds with an error, and the error callback is not passed to the observer. Otherwise, the error will fail the runtime.
+      if (!(error instanceof HttpErrorResponse)) {
+        throw error;
       }
     }
   }
