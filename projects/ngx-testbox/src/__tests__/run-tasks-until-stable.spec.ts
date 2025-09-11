@@ -27,9 +27,9 @@ class TestComponent implements OnInit {
 
   ngOnInit() {
     if (this.isTestingIntervalWithinZone) {
-      this.runIntervalInsideAngular()
+      this.runIntervalInsideAngular();
     } else {
-      this.runIntervalOutsideAngular()
+      this.runIntervalOutsideAngular();
     }
   }
 
@@ -129,7 +129,8 @@ describe('runTasksUntilStable', () => {
 
       try {
         runTasksUntilStable(fixture);
-      } catch (error) {}
+      } catch (error) {
+      }
 
       expect(consoleWarnSpy).toHaveBeenCalled();
       expect(consoleWarnSpy.calls.mostRecent().args[0]).toContain('setInterval detected during runTasksUntilStable execution');
