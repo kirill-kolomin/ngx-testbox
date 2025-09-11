@@ -21,9 +21,11 @@ describe('passTime', () => {
         timeoutExecuted = true;
       }, TIME_MS + 100);
 
-      passTime();
+      passTime(TIME_MS);
 
       expect(timeoutExecuted).toBe(false);
+
+      passTime(100)
     }));
 
     it('should advance time by custom amount when parameter is provided', fakeAsync(() => {
