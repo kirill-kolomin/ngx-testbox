@@ -33,8 +33,18 @@ class TestComponent implements OnInit {
     }
   }
 
-  makeHttpRequest(nextCb?: () => void) {
-    return this.httpClient.get('/api/test').subscribe(nextCb);
+  makeHttpRequest(nextCb?: (...args: any[]) => void, secondCb?: (...args: any[]) => void, thirdCb?: (...args: any[]) => {}) {
+    return this.httpClient.get('/api/test').subscribe((data) => {
+      nextCb?.(data);
+
+      this.httpClient.get('/api/second').subscribe((data2) => {
+        secondCb?.(data2);
+
+        this.httpClient.get('/api/third').subscribe((data3) => {
+          thirdCb?.(data3);
+        })
+      })
+    });
   }
 
   runIntervalOutsideAngular() {
@@ -69,19 +79,25 @@ describe('runTasksUntilStable', () => {
   });
 
   describe('HTTP handling', () => {
-    it('should complete HTTP calls with provided instructions', fakeAsync(() => {
+    it('should complete all subsequent HTTP calls with provided instructions', fakeAsync(() => {
       const httpCallInstructions: HttpCallInstruction[] = [
-        [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})]
+        [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
+        [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
+        [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})]
       ];
       const nextCbSpy = jasmine.createSpy().and.callThrough();
+      const nextCbSpy2 = jasmine.createSpy().and.callThrough();
+      const nextCbSpy3 = jasmine.createSpy().and.callThrough();
 
       initComponent();
 
-      component.makeHttpRequest(nextCbSpy);
+      component.makeHttpRequest(nextCbSpy, nextCbSpy2, nextCbSpy3);
 
       runTasksUntilStable(fixture, {httpCallInstructions});
 
       expect(nextCbSpy).toHaveBeenCalledWith({data: 'test'});
+      expect(nextCbSpy2).toHaveBeenCalledWith({data: 'test2'});
+      expect(nextCbSpy3).toHaveBeenCalledWith({data: 'test3'});
     }));
 
     it('should throw an error if an HTTP instruction is not invoked', fakeAsync(() => {
