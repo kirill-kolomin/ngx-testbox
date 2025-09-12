@@ -59,6 +59,7 @@ export const getRequestsFromQueue = (httpTestingController = TestBed.inject(Http
  * @param httpCallInstructions - An array of instructions defining how to handle specific HTTP requests
  * @param options - Optional configuration options
  * @param options.httpTestingController - The HTTP testing controller instance (defaults to the one from TestBed)
+ * @param options.testRequests - The HTTP requests to be handled. If not provided, it will use the queue from the testing controller.
  * @throws Error if no matching instruction is found for a request
  */
 export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
