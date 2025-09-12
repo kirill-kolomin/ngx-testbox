@@ -3,5 +3,6 @@
   "dest": "../../dist/ngx-testbox",
   "lib": {
     "entryFile": "src/lib/public_api.ts"
-  }
+  },
+  "assets": ["CHANGELOG.md"]
 }
