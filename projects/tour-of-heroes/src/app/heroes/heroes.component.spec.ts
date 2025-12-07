@@ -15,7 +15,9 @@ const getHeroesFailHttpCallInstruction = () =>
 const getPostHeroesSuccessHttpCallInstruction = () =>
   predefinedHttpCallInstructions.post.success(HEROES_URL, (httpRequest) => ({
     name: (httpRequest.body as any).name,
-    id: Math.floor(Math.random() * 1000000)
+    id: Math.floor(Math.random() * 1000000),
+    hp: 100,
+    attack: 10,
   }));
 const getPostHeroesFailHttpCallInstruction = () => predefinedHttpCallInstructions.post.error(HEROES_URL);
 const getDeleteHeroSuccessHttpCallInstruction = () => predefinedHttpCallInstructions.delete.success(HEROES_URL);
@@ -103,6 +105,27 @@ describe('HeroesComponent', () => {
           expect(el.nativeElement.textContent.trim().includes(`${name} ${index + 1}`)).toBeTrue();
         })
       }
+    }));
+
+    it('should store full hero model (hp and attack) when adding', fakeAsync(() => {
+      initComponent();
+
+      const name = 'Model Test Hero';
+      harness.setNameInputValue(name);
+      harness.elements.addButton.click();
+
+      runTasksUntilStable(fixture, {
+        httpCallInstructions: [
+          getPostHeroesSuccessHttpCallInstruction(),
+        ],
+      });
+
+      const component = fixture.componentInstance;
+      expect(component.heroes.length).toBe(1);
+      const added = component.heroes[0] as any;
+      expect(added.name).toBe(name);
+      expect(added.hp).toBe(100);
+      expect(added.attack).toBe(10);
     }));
 
     it('should not add hero when invalid name is provided', fakeAsync(() => {

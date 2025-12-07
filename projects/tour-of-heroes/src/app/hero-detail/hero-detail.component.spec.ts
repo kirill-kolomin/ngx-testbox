@@ -61,6 +61,35 @@ describe('HeroDetailComponent', () => {
     expect(harness.getHeroId()).toBe(testHero.id.toString());
     expect(harness.getHeroName()).toBe(testHero.name);
     expect(harness.getHeroTitle()).toBe(testHero.name.toUpperCase() + ' Details');
+    expect(harness.getHeroHp()).toBe(String(testHero.hp));
+    expect(harness.getHeroAttack()).toBe(String(testHero.attack));
+  }));
+
+  it('should allow editing hp and attack and send numeric values on save', fakeAsync(async () => {
+    initComponent();
+
+    const newHp = 150;
+    const newAttack = 25;
+
+    harness.setHeroHp(newHp);
+    harness.setHeroAttack(newAttack);
+
+    harness.clickSaveButton();
+
+    runTasksUntilStable(fixture, {
+      httpCallInstructions: [
+        predefinedHttpCallInstructions.put.success(HEROES_URL, (httpRequest) => {
+          const body: any = httpRequest.body;
+          expect(body.hp).toBe(newHp);
+          expect(typeof body.hp).toBe('number');
+          expect(body.attack).toBe(newAttack);
+          expect(typeof body.attack).toBe('number');
+          return {};
+        })
+      ],
+    });
+
+    expect(locationSpy.back).toHaveBeenCalled();
   }));
 
   it('should not display hero details when hero fails to load', fakeAsync(async () => {
@@ -70,13 +99,20 @@ describe('HeroDetailComponent', () => {
     expect(harness.elements.heroDetail.queryAll().length).toBe(0);
   }));
 
-  it('should allow editing the hero name', fakeAsync(async () => {
+  it('should allow editing the hero', fakeAsync(async () => {
     initComponent();
 
+    const newHp = 200;
+    const newAttack = 300;
     const newName = 'Updated Hero Name';
+
     harness.setHeroName(newName);
+    harness.setHeroHp(newHp);
+    harness.setHeroAttack(newAttack);
 
     expect(harness.getHeroName()).toBe(newName);
+    expect(harness.getHeroHp()).toBe(String(newHp));
+    expect(harness.getHeroAttack()).toBe(String(newAttack));
   }));
 
   it('should save hero and navigate back when save button is clicked', fakeAsync(async () => {

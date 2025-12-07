@@ -17,6 +17,26 @@ export class HeroDetailHarness extends DebugElementHarness<typeof testIds> {
     input.dispatchEvent(new Event('input'));
   }
 
+  getHeroHp(): string {
+    return this.elements.heroHpInput.query().nativeElement.value;
+  }
+
+  setHeroHp(hp: number | string): void {
+    const input = this.elements.heroHpInput.query().nativeElement;
+    input.value = String(hp);
+    input.dispatchEvent(new Event('input'));
+  }
+
+  getHeroAttack(): string {
+    return this.elements.heroAttackInput.query().nativeElement.value;
+  }
+
+  setHeroAttack(attack: number | string): void {
+    const input = this.elements.heroAttackInput.query().nativeElement;
+    input.value = String(attack);
+    input.dispatchEvent(new Event('input'));
+  }
+
   clickGoBackButton(): void {
     this.elements.goBackButton.click();
   }
