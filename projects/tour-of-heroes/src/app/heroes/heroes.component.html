@@ -12,17 +12,8 @@
 
 <ul [testboxTestId]="testIds.heroesList">
   @for (hero of heroes; track hero.id) {
-    <li [testboxTestId]="testIds.heroItem">
-      <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
-        <span [testboxTestId]="testIds.heroId">{{hero.id}}</span>
-        -
-        <span [testboxTestId]="testIds.heroName">{{hero.name}}</span>
-      </a>
-      <button type="button"
-              [testboxTestId]="testIds.heroDeleteButton"
-              (click)="delete(hero)">
-        x
-      </button>
+    <li>
+      <app-hero-card [hero]="hero" (delete)="delete(hero)" [testboxTestId]="testIds.heroItem" />
     </li>
   }
 </ul>

@@ -1,0 +1,12 @@
+<a class="hero-link" routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
+  <span class="id-badge" [testboxTestId]="testIds.heroId">{{hero.id}}</span>
+  <span class="separator" aria-hidden="true">-</span>
+  <span class="name" [testboxTestId]="testIds.heroName">{{hero.name}}</span>
+</a>
+<button type="button"
+        class="delete-btn"
+        [testboxTestId]="testIds.heroDeleteButton"
+        (click)="onDelete()"
+        aria-label="Delete hero">
+  ×
+</button>
