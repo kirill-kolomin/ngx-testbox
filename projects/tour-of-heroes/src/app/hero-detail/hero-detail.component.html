@@ -1,14 +1,15 @@
-<div *ngIf="hero" [testboxTestId]="testIds.heroDetail">
-  <h2 [testboxTestId]="testIds.heroTitle">{{hero.name | uppercase}} Details</h2>
-  <div [testboxTestId]="testIds.heroId"><span>id: </span>{{hero.id}}</div>
-  <div>
-    <label for="hero-name" [testboxTestId]="testIds.heroNameLabel">Hero name: </label>
-    <input id="hero-name" [(ngModel)]="hero.name" placeholder="Hero name" [testboxTestId]="testIds.heroNameInput"/>
+@if (hero) {
+  <div [testboxTestId]="testIds.heroDetail">
+    <h2 [testboxTestId]="testIds.heroTitle">{{hero.name | uppercase}} Details</h2>
+    <div [testboxTestId]="testIds.heroId"><span>id: </span>{{hero.id}}</div>
+    <div>
+      <label for="hero-name" [testboxTestId]="testIds.heroNameLabel">Hero name: </label>
+      <input id="hero-name" [(ngModel)]="hero.name" placeholder="Hero name" [testboxTestId]="testIds.heroNameInput"/>
+    </div>
+    <button type="button" (click)="goBack()" [testboxTestId]="testIds.goBackButton">go back</button>
+    <button type="button" (click)="save()" [testboxTestId]="testIds.saveButton">save</button>
   </div>
-  <button type="button" (click)="goBack()" [testboxTestId]="testIds.goBackButton">go back</button>
-  <button type="button" (click)="save()" [testboxTestId]="testIds.saveButton">save</button>
-</div>
-
+}
 
 <!--
 Copyright Google LLC. All Rights Reserved.

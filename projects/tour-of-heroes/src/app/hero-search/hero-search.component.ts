@@ -8,7 +8,7 @@ import {
 
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
-import {AsyncPipe, NgForOf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {TestIdDirective} from 'ngx-testbox';
 import {testIdMap} from './test-ids';
@@ -17,7 +17,6 @@ import {testIdMap} from './test-ids';
   selector: 'app-hero-search',
   templateUrl: './hero-search.component.html',
   imports: [
-    NgForOf,
     RouterLink,
     AsyncPipe,
     TestIdDirective

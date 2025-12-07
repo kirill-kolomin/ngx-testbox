@@ -11,17 +11,19 @@
 </div>
 
 <ul [testboxTestId]="testIds.heroesList">
-  <li *ngFor="let hero of heroes" [testboxTestId]="testIds.heroItem">
-    <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
-      <span [testboxTestId]="testIds.heroId">{{hero.id}}</span>
-      <span [testboxTestId]="testIds.heroName">{{hero.name}}</span>
-    </a>
-    <button type="button"
-            [testboxTestId]="testIds.heroDeleteButton"
-            (click)="delete(hero)">
-      x
-    </button>
-  </li>
+  @for (hero of heroes; track hero.id) {
+    <li [testboxTestId]="testIds.heroItem">
+      <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
+        <span [testboxTestId]="testIds.heroId">{{hero.id}}</span>
+        <span [testboxTestId]="testIds.heroName">{{hero.name}}</span>
+      </a>
+      <button type="button"
+              [testboxTestId]="testIds.heroDeleteButton"
+              (click)="delete(hero)">
+        x
+      </button>
+    </li>
+  }
 </ul>
 
 
