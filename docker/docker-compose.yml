@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: ../server
+      dockerfile: Dockerfile
+    container_name: ngx-testbox-api
+    environment:
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

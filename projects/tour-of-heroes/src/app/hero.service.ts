@@ -7,7 +7,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { Hero } from './hero';
 import { MessageService } from './message.service';
 
-export const HEROES_URL = 'api/heroes';
+export const HEROES_URL = '/api/heroes';
 
 @Injectable({ providedIn: 'root' })
 export class HeroService {
