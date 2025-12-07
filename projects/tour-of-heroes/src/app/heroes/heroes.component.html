@@ -15,6 +15,7 @@
     <li [testboxTestId]="testIds.heroItem">
       <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
         <span [testboxTestId]="testIds.heroId">{{hero.id}}</span>
+        -
         <span [testboxTestId]="testIds.heroName">{{hero.name}}</span>
       </a>
       <button type="button"
