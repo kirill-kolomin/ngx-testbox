@@ -1,16 +1,16 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Hero} from '../hero';
 import {HeroService} from '../hero.service';
-import {RouterLink} from '@angular/router';
 import {testIdMap} from "./test-ids";
 import {TestIdDirective} from 'ngx-testbox';
+import {HeroCardComponent} from './hero-card/hero-card.component';
 
 @Component({
   selector: 'app-heroes',
   templateUrl: './heroes.component.html',
   imports: [
-    RouterLink,
-    TestIdDirective
+    TestIdDirective,
+    HeroCardComponent
   ],
   styleUrls: ['./heroes.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
