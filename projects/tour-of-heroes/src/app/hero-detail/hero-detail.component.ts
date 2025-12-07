@@ -4,7 +4,7 @@ import {Location, UpperCasePipe} from '@angular/common';
 
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
-import {FormsModule} from '@angular/forms';
+import {ReactiveFormsModule, FormBuilder, FormGroup} from '@angular/forms';
 import {TestIdDirective} from 'ngx-testbox';
 import {testIdMap} from './test-ids';
 
@@ -13,7 +13,7 @@ import {testIdMap} from './test-ids';
   templateUrl: './hero-detail.component.html',
   imports: [
     UpperCasePipe,
-    FormsModule,
+    ReactiveFormsModule,
     TestIdDirective
   ],
   styleUrls: ['./hero-detail.component.css'],
@@ -22,13 +22,21 @@ import {testIdMap} from './test-ids';
 export class HeroDetailComponent implements OnInit {
   hero: Hero | undefined;
   readonly testIds = testIdMap;
+  form: FormGroup;
 
   constructor(
     private route: ActivatedRoute,
     private heroService: HeroService,
     private location: Location,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
+  ) {
+    this.form = this.fb.group({
+      name: [''],
+      hp: [null],
+      attack: [null]
+    });
+  }
 
   ngOnInit(): void {
     this.getHero();
@@ -39,6 +47,12 @@ export class HeroDetailComponent implements OnInit {
     this.heroService.getHero(id)
       .subscribe(hero => {
         this.hero = hero;
+        // Patch form values with the loaded hero
+        this.form.patchValue({
+          name: hero.name,
+          hp: hero.hp,
+          attack: hero.attack
+        });
         this.cdr.markForCheck();
       });
   }
@@ -49,7 +63,11 @@ export class HeroDetailComponent implements OnInit {
 
   save(): void {
     if (this.hero) {
-      this.heroService.updateHero(this.hero)
+      const updated: Hero = {
+        ...this.hero,
+        ...this.form.value
+      } as Hero;
+      this.heroService.updateHero(updated)
         .subscribe(() => this.goBack());
     }
   }
