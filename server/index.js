@@ -9,16 +9,16 @@ app.use(express.json());
 
 // In-memory data store for heroes
 let heroes = [
-  { id: 11, name: 'Dr Nice' },
-  { id: 12, name: 'Narco' },
-  { id: 13, name: 'Bombasto' },
-  { id: 14, name: 'Celeritas' },
-  { id: 15, name: 'Magneta' },
-  { id: 16, name: 'RubberMan' },
-  { id: 17, name: 'Dynama' },
-  { id: 18, name: 'Dr IQ' },
-  { id: 19, name: 'Magma' },
-  { id: 20, name: 'Tornado' }
+  { id: 11, name: 'Dr Nice', hp: 100, attack: 10 },
+  { id: 12, name: 'Narco', hp: 95, attack: 12 },
+  { id: 13, name: 'Bombasto', hp: 110, attack: 15 },
+  { id: 14, name: 'Celeritas', hp: 90, attack: 14 },
+  { id: 15, name: 'Magneta', hp: 105, attack: 13 },
+  { id: 16, name: 'RubberMan', hp: 120, attack: 8 },
+  { id: 17, name: 'Dynama', hp: 98, attack: 11 },
+  { id: 18, name: 'Dr IQ', hp: 85, attack: 9 },
+  { id: 19, name: 'Magma', hp: 130, attack: 16 },
+  { id: 20, name: 'Tornado', hp: 92, attack: 15 }
 ];
 
 // Helper to log with timestamp
@@ -48,13 +48,15 @@ app.get('/api/heroes/:id', (req, res) => {
 
 // POST /api/heroes
 app.post('/api/heroes', (req, res) => {
-  const { name } = req.body || {};
+  const { name, hp, attack } = req.body || {};
   if (!name || typeof name !== 'string' || name.trim() === '') {
     return res.status(400).json({ message: 'Name is required' });
   }
   const clean = name.trim();
   const id = heroes.length ? Math.max(...heroes.map(h => h.id)) + 1 : 11;
-  const newHero = { id, name: clean };
+  const hpNum = Number.isFinite(Number(hp)) ? Number(hp) : 100;
+  const attackNum = Number.isFinite(Number(attack)) ? Number(attack) : 10;
+  const newHero = { id, name: clean, hp: hpNum, attack: attackNum };
   heroes.push(newHero);
   log(`added hero w/ id=${id}`);
   res.status(201).json(newHero);
@@ -62,12 +64,18 @@ app.post('/api/heroes', (req, res) => {
 
 // PUT /api/heroes (Angular sample sends whole hero)
 app.put('/api/heroes', (req, res) => {
-  const { id, name } = req.body || {};
+  const { id, name, hp, attack } = req.body || {};
   if (typeof id !== 'number') return res.status(400).json({ message: 'id (number) is required' });
   const idx = heroes.findIndex(h => h.id === id);
   if (idx === -1) return res.status(404).json({ message: `Hero id=${id} not found` });
   if (typeof name === 'string' && name.trim() !== '') {
     heroes[idx].name = name.trim();
+  }
+  if (hp !== undefined && Number.isFinite(Number(hp))) {
+    heroes[idx].hp = Number(hp);
+  }
+  if (attack !== undefined && Number.isFinite(Number(attack))) {
+    heroes[idx].attack = Number(attack);
   }
   log(`updated hero id=${id}`);
   res.json(heroes[idx]);
@@ -90,4 +98,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   log(`Server listening on http://0.0.0.0:${PORT}`);
+  console.log(heroes)
 });
