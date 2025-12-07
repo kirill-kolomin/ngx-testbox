@@ -1,10 +1,11 @@
 <h2 [testboxTestId]="testIds.title">Top Heroes</h2>
 <div class="heroes-menu" [testboxTestId]="testIds.heroesMenu">
-  <a *ngFor="let hero of heroes"
-      routerLink="/detail/{{hero.id}}"
-      [testboxTestId]="testIds.heroLink">
-      {{hero.name}}
-  </a>
+  @for (hero of heroes; track hero.id) {
+    <a routerLink="/detail/{{hero.id}}"
+       [testboxTestId]="testIds.heroLink">
+      {{ hero.name }}
+    </a>
+  }
 </div>
 
 <app-hero-search [testboxTestId]="testIds.heroSearch"></app-hero-search>

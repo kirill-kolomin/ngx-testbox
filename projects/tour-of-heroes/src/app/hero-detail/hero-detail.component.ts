@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import {Location, NgIf, UpperCasePipe} from '@angular/common';
+import {Location, UpperCasePipe} from '@angular/common';
 
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
@@ -12,7 +12,6 @@ import {testIdMap} from './test-ids';
   selector: 'app-hero-detail',
   templateUrl: './hero-detail.component.html',
   imports: [
-    NgIf,
     UpperCasePipe,
     FormsModule,
     TestIdDirective
