@@ -90,6 +90,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "projects/tour-of-heroes/proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "tour-of-heroes:build:production"
