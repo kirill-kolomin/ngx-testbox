@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
-import {NgForOf} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {HeroSearchComponent} from '../hero-search/hero-search.component';
 import {TestIdDirective} from 'ngx-testbox';
@@ -11,7 +10,6 @@ import {testIdMap} from './test-ids';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   imports: [
-    NgForOf,
     RouterLink,
     HeroSearchComponent,
     TestIdDirective

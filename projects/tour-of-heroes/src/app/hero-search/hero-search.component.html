@@ -3,11 +3,13 @@
   <input #searchBox id="search-box" [testboxTestId]="testIds.searchBox" (input)="search(searchBox.value)" />
 
   <ul class="search-result" [testboxTestId]="testIds.searchResults">
-    <li *ngFor="let hero of heroes$ | async" [testboxTestId]="testIds.heroItem">
-      <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
-        {{hero.name}}
-      </a>
-    </li>
+    @for (hero of heroes$ | async; track hero.id) {
+      <li [testboxTestId]="testIds.heroItem">
+        <a routerLink="/detail/{{hero.id}}" [testboxTestId]="testIds.heroLink">
+          {{hero.name}}
+        </a>
+      </li>
+    }
   </ul>
 </div>
 

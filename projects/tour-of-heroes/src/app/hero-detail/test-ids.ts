@@ -6,6 +6,10 @@ export const testIds = [
   'heroId',
   'heroNameLabel',
   'heroNameInput',
+  'heroHpLabel',
+  'heroHpInput',
+  'heroAttackLabel',
+  'heroAttackInput',
   'goBackButton',
   'saveButton',
 ] as const;
