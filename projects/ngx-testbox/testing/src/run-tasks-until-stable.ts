@@ -93,44 +93,42 @@ export const MAXIMUM_ATTEMPTS = 30;
  * In this case you might need to mock the place where setInterval is invoked or run the piece of code outside the angular zone using the NgZone.prototype.runOutsideAngular method.
  * Additionally, you will receive warnings in the console log if setInterval is detected with stack trace pointing you to easier find the place where setInterval is invoked.
  */
-export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
+export const runTasksUntilStable = async (fixture: ComponentFixture<unknown>, {
   iterationMs,
   httpCallInstructions = []
 }: RunTasksUntilStableParams = {}) => {
-  const rollbackOriginalSetInterval = patchSetInterval();
-  const httpTestingController = TestBed.inject(HttpTestingController)
+  return new Promise((resolve) => {
+    const rollbackOriginalSetInterval = patchSetInterval();
+    const httpTestingController = TestBed.inject(HttpTestingController);
 
-  let attempt = 0;
-  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
-  let requests = getRequestsFromQueue(httpTestingController);
+    let attempt = 0;
+    const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
+    let requests = getRequestsFromQueue(httpTestingController);
 
-  // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
-  fixture.detectChanges();
-
-  // By an unknown reason angular Zone is still stable despite having requests in the queue. So I need to look to make the check if there is requests in the queue.
-  while (!fixture.isStable() || requests.length > 0) {
-    if (attempt++ > MAXIMUM_ATTEMPTS) {
-      throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
-    }
-
-    fixture.detectChanges();
-    passTime(iterationMs);
-    completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
-    fixture.detectChanges();
-    try {
-      passTime(iterationMs);
-    } catch (error) {
-      // We need the catch in cases when http instruction responds with an error, and the error callback is not passed to the observer. Otherwise, the error will fail the runtime.
-      if (!(error instanceof HttpErrorResponse)) {
-        throw error;
+    // By an unknown reason angular Zone is still stable despite having requests in the queue. So I need to look to make the check if there is requests in the queue.
+    while (!fixture.isStable() || requests.length > 0) {
+      if (attempt++ > MAXIMUM_ATTEMPTS) {
+        throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
       }
+
+      completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+      try {
+        passTime(iterationMs);
+      } catch (error) {
+        // We need the catch in cases when http instruction responds with an error, and the error callback is not passed to the observer. Otherwise, the error will fail the runtime.
+        if (!(error instanceof HttpErrorResponse)) {
+          throw error;
+        }
+      }
+
+      requests = getRequestsFromQueue(httpTestingController);
     }
 
-    requests = getRequestsFromQueue(httpTestingController);
-  }
+    throwIfThereIsHttpInstructionNotInvoked(callTrackers);
+    rollbackOriginalSetInterval();
 
-  throwIfThereIsHttpInstructionNotInvoked(callTrackers);
-  rollbackOriginalSetInterval();
+    resolve(undefined);
+  });
 }
 
 /**

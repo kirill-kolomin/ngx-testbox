@@ -66,6 +66,8 @@ describe('DashboardComponent', () => {
     fixture = TestBed.createComponent(DashboardComponent);
     harness = new DashboardHarness(fixture.debugElement);
 
+    fixture.autoDetectChanges();
+
     runTasksUntilStable(fixture, {
       httpCallInstructions,
     })
