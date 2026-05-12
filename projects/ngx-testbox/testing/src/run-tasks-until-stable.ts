@@ -7,31 +7,59 @@ import {
   HttpInstructionWasNotExecutedDuringFixtureStabilizationError
 } from './errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
 import {HttpTestingController} from '@angular/common/http/testing';
+import { LongRunningComponentError } from './errors/LongRunningComponentError';
 
-const setIntervalDetectedWarning = `Warning: setInterval detected during runTasksUntilStable execution.
-  This may prevent your component from stabilizing and cause "Maximum stabilization attempts reached" errors.
+const setIntervalDetectedWarning = `Debug: setInterval detected during fixture stabilization.
+  This may prevent your component from stabilizing and cause timeout or "Maximum stabilization attempts reached" errors.
   If the interval causes this kind of issue, to fix it you can:
   1. Mock the code that uses setInterval in your tests
   2. Run the setInterval code outside Angular zone using NgZone.runOutsideAngular()
   Stack trace to help locate the setInterval call:`
+
+interface CommonStabilizationParams {
+  /**
+   * Array of HTTP call instructions to process during stabilization.
+   * These instructions define how to handle specific HTTP requests.
+   */
+  httpCallInstructions?: HttpCallInstruction[];
+
+  /**
+   * When turned on (true) indicates places that invoke setInterval.
+   * Active setInterval is the reason why the fixture does not stabilize. 
+   * False by default.
+   */
+  debug?: boolean;
+}
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
  *
  * @interface RunTasksUntilStableParams
  */
-export interface RunTasksUntilStableParams {
+export interface RunTasksUntilStableAsyncParams extends CommonStabilizationParams {
+  /**
+   * Optional callback to advance fake timers (Jasmine, Vitest, etc.)
+   * during stabilization.
+   */
+  advanceTimers?: () => void | Promise<void>;
+  
+  /**
+   * The time when component is considered as too-long-running to finish the test. Measured in milliseconds.
+   */
+  componentLongRunTimeout?: number;
+}
+
+/**
+ * Configuration parameters for the runTasksUntilStable function.
+ *
+ * @interface RunTasksUntilStableParams
+ */
+export interface RunTasksUntilStableParams extends CommonStabilizationParams {
   /**
    * The amount of time in milliseconds to advance the virtual clock in each iteration.
    * This is passed to the passTime function.
    */
   iterationMs?: number;
-
-  /**
-   * Array of HTTP call instructions to process during stabilization.
-   * These instructions define how to handle specific HTTP requests.
-   */
-  httpCallInstructions?: HttpCallInstruction[];
 }
 
 /**
@@ -45,6 +73,11 @@ type CallTrackers = [() => boolean, HttpCallInstruction][];
  * This prevents infinite loops when a fixture cannot be stabilized.
  */
 export const MAXIMUM_ATTEMPTS = 30;
+
+/**
+ * The time when component is considered as too-long-running in order to finish the test.
+ */
+export const COMPONENT_LONG_RUN_TIMEOUT = 10_000;
 
 /**
  * Runs Angular change detection and processes tasks until the component fixture is stable.
@@ -78,7 +111,7 @@ export const MAXIMUM_ATTEMPTS = 30;
  *
  * @remarks
  *
- * - This function is designed to work only within fakeAsync zone.
+ * - This function is designed to work only within fakeAsync zone within the "zoneful" Angular app. Not for zoneless apps.
  * - When you created a component using the method createComponent of fixture, the fixture is marked as stable, if you don't run any asynchronous tasks within the component constructor or within its dependencies.
  * Make sure you set everything up (did overrides to methods, passed values to inputs, etc.), as you need to call this function to run the Angular component's life cycle.
  * Once you called it, the ngOnInit method will be invoked, and the fixture now is in status unstable.
@@ -92,12 +125,21 @@ export const MAXIMUM_ATTEMPTS = 30;
  * - When in your code you have used setInterval calls, potentially this may be a problem for stabilizing the fixture.
  * In this case you might need to mock the place where setInterval is invoked or run the piece of code outside the angular zone using the NgZone.prototype.runOutsideAngular method.
  * Additionally, you will receive warnings in the console log if setInterval is detected with stack trace pointing you to easier find the place where setInterval is invoked.
+ * 
+ * Note: Potentially will be deprecated if Angular team decides to deprecate fakeAsync and zone.js in their future releases.
+ * Use {@link RunTasksUntilStableParams#componentLongRunTimeout componentLongRunTimeout} for the new async/await approach instead.
  */
 export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   iterationMs,
-  httpCallInstructions = []
+  httpCallInstructions = [],
+  debug
 }: RunTasksUntilStableParams = {}) => {
-  const rollbackOriginalSetInterval = patchSetInterval();
+  let rollbackOriginalSetInterval = () => {};
+
+  if(debug) {
+    rollbackOriginalSetInterval = patchSetInterval();
+  }
+
   const httpTestingController = TestBed.inject(HttpTestingController)
 
   let attempt = 0;
@@ -129,6 +171,79 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
     requests = getRequestsFromQueue(httpTestingController);
   }
 
+  throwIfThereIsHttpInstructionNotInvoked(callTrackers);
+  rollbackOriginalSetInterval();
+}
+
+/**
+ * Runs Angular change detection and processes tasks until the component fixture is stable.
+ *
+ * Async variant intended for zoneless Angular applications.
+ */
+export async function runTasksUntilStableAsync(
+  fixture: ComponentFixture<unknown>,
+  {
+    httpCallInstructions = [],
+    advanceTimers,
+    componentLongRunTimeout,
+    debug
+  }: RunTasksUntilStableAsyncParams = {
+    componentLongRunTimeout: COMPONENT_LONG_RUN_TIMEOUT
+  }
+): Promise<void> {
+  let rollbackOriginalSetInterval = () => {};
+
+  if(debug) {
+    rollbackOriginalSetInterval = patchSetInterval();
+  }
+
+  const _componentLongRunTimeout = componentLongRunTimeout ?? COMPONENT_LONG_RUN_TIMEOUT;
+  const httpTestingController = TestBed.inject(HttpTestingController);
+  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
+
+  // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
+  fixture.detectChanges();
+
+  let requests = getRequestsFromQueue(httpTestingController);
+
+  let longRunTimeoutTimer: number | null = null;
+
+  await Promise.race([
+    new Promise((_, reject) => {
+      longRunTimeoutTimer = setTimeout(() => reject(new LongRunningComponentError(_componentLongRunTimeout)), _componentLongRunTimeout);
+    }),
+    (new Promise(async (resolve, reject) => {
+      (async function runTasks() {
+        if (requests.length > 0) {
+          try {
+            completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+          } catch (error) {
+            reject(error);
+          }
+
+          if (advanceTimers) {
+            await advanceTimers();
+          }
+
+          fixture.detectChanges();
+        } else {
+          // Nothing left in the HTTP queue; we're stabilized.
+          resolve(undefined);
+          return;
+        }
+
+        requests = getRequestsFromQueue(httpTestingController);
+        setTimeout(runTasks, 16);
+      })();
+    }))
+    .then(() => fixture.whenStable())
+  ]);
+
+  if(longRunTimeoutTimer) {
+    clearTimeout(longRunTimeoutTimer);
+  }
+
+  // Ensure all expected HTTP instructions were invoked.
   throwIfThereIsHttpInstructionNotInvoked(callTrackers);
   rollbackOriginalSetInterval();
 }

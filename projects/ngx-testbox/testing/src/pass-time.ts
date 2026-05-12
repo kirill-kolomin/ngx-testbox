@@ -27,10 +27,6 @@ export const TIME_MS = 1000;
  * ```
  *
  * @param time - The amount of time in milliseconds to advance (defaults to TIME_MS)
- *
- * @deprecated This function requires Zone.js (`tick`/`flushMicrotasks`).
- * It does not work in zoneless applications. Use your test runner's fake timers
- * (e.g., `jasmine.clock().tick()` or `vi.advanceTimersByTime()`) instead.
  */
 export const passTime = (time = TIME_MS): void => {
   tick(time);

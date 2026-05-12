@@ -13,7 +13,6 @@ import {
 import {
   MaximumAttemptsToStabilizeFixtureReachedError
 } from '../../testing/src/errors/MaximumAttemptsToStabilizeFixtureReachedError';
-import {FailedToGenerateHttpResponseError} from '../../testing/src/errors/FailedToGenerateHttpResponseError';
 
 @Component({
   template: '<div>Test Component</div>',
@@ -144,12 +143,12 @@ describe('runTasksUntilStable', () => {
       fixture.componentRef.setInput('isTestingIntervalWithinZone', true);
 
       try {
-        runTasksUntilStable(fixture);
+        runTasksUntilStable(fixture, {debug: true});
       } catch (error) {
       }
 
       expect(consoleWarnSpy).toHaveBeenCalled();
-      expect(consoleWarnSpy.calls.mostRecent().args[0]).toContain('setInterval detected during runTasksUntilStable execution');
+      expect(consoleWarnSpy.calls.mostRecent().args[0]).toContain('setInterval detected during fixture stabilization');
 
       console.warn = originalConsoleWarn;
     }));
