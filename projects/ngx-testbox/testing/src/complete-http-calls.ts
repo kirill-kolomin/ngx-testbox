@@ -23,7 +23,7 @@ export type EndpointPath = string | RegExp;
  * @param searchParams - The parsed URL search parameters from the request
  * @returns An HTTP response object to be returned for the request
  */
-export type ResponseGetter = (httpRequest: HttpRequest<unknown>, searchParams: URLSearchParams) => HttpResponse<unknown>;
+export type ResponseGetter = (httpRequest: HttpRequest<unknown>, searchParams: URLSearchParams) => Promise<HttpResponse<any>> | HttpResponse<any>;
 
 /**
  * A checker that determines if a specific HTTP request matches with a provided http call instruction for further handling.
@@ -62,7 +62,7 @@ export const getRequestsFromQueue = (httpTestingController = TestBed.inject(Http
  * @param options.testRequests - The HTTP requests to be handled. If not provided, it will use the queue from the testing controller.
  * @throws Error if no matching instruction is found for a request
  */
-export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
+export const completeHttpCalls = async (httpCallInstructions: HttpCallInstruction[], {
   httpTestingController = TestBed.inject(HttpTestingController),
   testRequests
 }: {
@@ -103,7 +103,7 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
 
     let response: HttpResponse<any>;
     try {
-      response = responseGetter(request, urlSearchParams);
+      response = await responseGetter(request, urlSearchParams);
     } catch (error) {
       throw new FailedToGenerateHttpResponseError(error);
     }
