@@ -19,12 +19,22 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class TestComponent implements OnInit {
+  cb1 = (data: any) => {};
+  cb2 = (data: any) => {};
+  cb3 = (data: any) => {};
+
   @Input() isTestingIntervalWithinZone = false;
+  @Input() isTestingRequestSequence = false;
 
   constructor(private httpClient: HttpClient, private ngZone: NgZone) {
   }
 
   ngOnInit() {
+      console.log(this.isTestingRequestSequence)
+    if(this.isTestingRequestSequence) {
+      this.makeHttpRequest();
+    }
+
     if (this.isTestingIntervalWithinZone) {
       this.runIntervalInsideAngular();
     } else {
@@ -32,15 +42,15 @@ class TestComponent implements OnInit {
     }
   }
 
-  makeHttpRequest(nextCb?: (...args: any[]) => void, secondCb?: (...args: any[]) => void, thirdCb?: (...args: any[]) => {}) {
+  makeHttpRequest() {
     return this.httpClient.get('/api/test').subscribe((data) => {
-      nextCb?.(data);
+      this.cb1(data);
 
       this.httpClient.get('/api/second').subscribe((data2) => {
-        secondCb?.(data2);
+        this.cb2(data2);
 
         this.httpClient.get('/api/third').subscribe((data3) => {
-          thirdCb?.(data3);
+          this.cb3(data3);
         })
       })
     });
@@ -84,19 +94,18 @@ describe('runTasksUntilStable', () => {
         [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
         [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})]
       ];
-      const nextCbSpy = jasmine.createSpy().and.callThrough();
-      const nextCbSpy2 = jasmine.createSpy().and.callThrough();
-      const nextCbSpy3 = jasmine.createSpy().and.callThrough();
 
-      initComponent();
+      initComponent(true, false);
 
-      component.makeHttpRequest(nextCbSpy, nextCbSpy2, nextCbSpy3);
+      component.cb1 = jasmine.createSpy().and.callThrough();
+      component.cb2 = jasmine.createSpy().and.callThrough();
+      component.cb3 = jasmine.createSpy().and.callThrough();
 
       await runTasksUntilStable(fixture, {httpCallInstructions});
 
-      expect(nextCbSpy).toHaveBeenCalledWith({data: 'test'});
-      expect(nextCbSpy2).toHaveBeenCalledWith({data: 'test2'});
-      expect(nextCbSpy3).toHaveBeenCalledWith({data: 'test3'});
+      expect(component.cb1).toHaveBeenCalledWith({data: 'test'});
+      expect(component.cb2).toHaveBeenCalledWith({data: 'test2'});
+      expect(component.cb3).toHaveBeenCalledWith({data: 'test3'});
     }));
 
     it('should throw an error if an HTTP instruction is not invoked', fakeAsync(async () => {
@@ -104,30 +113,21 @@ describe('runTasksUntilStable', () => {
         [['/api/unused', 'GET'], () => new HttpResponse({body: {}, status: 200})]
       ];
 
-      await initComponent();
+      await initComponent(false, false);
 
-      expectAsync(runTasksUntilStable(fixture, {httpCallInstructions}))
+      await expectAsync(runTasksUntilStable(fixture, {httpCallInstructions}))
         .toBeRejectedWithError(HttpInstructionWasNotExecutedDuringFixtureStabilizationError);
     }));
 
     it('should throw an error if an HTTP request is not handled', fakeAsync(async () => {
-      await initComponent();
-
-      component.makeHttpRequest();
-
-      expectAsync(runTasksUntilStable(fixture))
+      await expectAsync(initComponent(true, false))
         .toBeRejectedWithError(NoMatchingHttpInstructionForRequestFoundError);
     }));
   });
 
   describe('error handling', () => {
-    it('should throw an error if maximum attempts are reached', fakeAsync(() => {
-      fixture = TestBed.createComponent(TestComponent);
-      component = fixture.componentInstance;
-
-      fixture.componentRef.setInput('isTestingIntervalWithinZone', true);
-
-      expectAsync(runTasksUntilStable(fixture)).toBeRejectedWithError(MaximumAttemptsToStabilizeFixtureReachedError);
+    it('should throw an error if maximum attempts are reached', fakeAsync(async () => {
+      await expectAsync(initComponent(false, true)).toBeRejectedWithError(MaximumAttemptsToStabilizeFixtureReachedError);
     }));
   });
 
@@ -163,9 +163,12 @@ describe('runTasksUntilStable', () => {
     }));
   });
 
-  async function initComponent(httpCallInstructions: HttpCallInstruction[] = []) {
+  async function initComponent(testingSequence: boolean, testingInterval: boolean, httpCallInstructions: HttpCallInstruction[] = []) {
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('isTestingRequestSequence', testingSequence);
+    fixture.componentRef.setInput('isTestingIntervalWithinZone', testingInterval);
 
     await runTasksUntilStable(fixture, {httpCallInstructions});
   }
