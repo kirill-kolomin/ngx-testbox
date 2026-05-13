@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
-import {runTasksUntilStableAsync,} from '../../testing/src/run-tasks-until-stable';
+import {runTasksUntilStableAsync,} from '../../testing/src/run-tasks-until-stable-async';
 import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from '../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
 import {NoMatchingHttpInstructionForRequestFoundError} from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import {HttpCallInstruction} from '../../testing/src/complete-http-calls';
