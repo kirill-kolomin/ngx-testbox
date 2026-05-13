@@ -1,53 +1,13 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {passTime} from './pass-time';
-import {completeHttpCalls, getRequestsFromQueue, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
+import {completeHttpCalls, getRequestsFromQueue} from './complete-http-calls';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MaximumAttemptsToStabilizeFixtureReachedError} from './errors/MaximumAttemptsToStabilizeFixtureReachedError';
-import {
-  HttpInstructionWasNotExecutedDuringFixtureStabilizationError
-} from './errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
 import {HttpTestingController} from '@angular/common/http/testing';
-import { LongRunningComponentError } from './errors/LongRunningComponentError';
-
-const setIntervalDetectedWarning = `Debug: setInterval detected during fixture stabilization.
-  This may prevent your component from stabilizing and cause timeout or "Maximum stabilization attempts reached" errors.
-  If the interval causes this kind of issue, to fix it you can:
-  1. Mock the code that uses setInterval in your tests
-  2. Run the setInterval code outside Angular zone using NgZone.runOutsideAngular()
-  Stack trace to help locate the setInterval call:`
-
-interface CommonStabilizationParams {
-  /**
-   * Array of HTTP call instructions to process during stabilization.
-   * These instructions define how to handle specific HTTP requests.
-   */
-  httpCallInstructions?: HttpCallInstruction[];
-
-  /**
-   * When turned on (true) indicates places that invoke setInterval.
-   * Active setInterval is the reason why the fixture does not stabilize. 
-   * False by default.
-   */
-  debug?: boolean;
-}
-
-/**
- * Configuration parameters for the runTasksUntilStable function.
- *
- * @interface RunTasksUntilStableParams
- */
-export interface RunTasksUntilStableAsyncParams extends CommonStabilizationParams {
-  /**
-   * Optional callback to advance fake timers (Jasmine, Vitest, etc.)
-   * during stabilization.
-   */
-  advanceTimers?: () => void | Promise<void>;
-  
-  /**
-   * The time when component is considered as too-long-running to finish the test. Measured in milliseconds.
-   */
-  componentLongRunTimeout?: number;
-}
+import { CommonStabilizationParams } from './interfaces/common-stabilization-params';
+import { trackRequiredHttpInstructionsToInvoke } from './internals/track-required-http-instructions-to-invoke';
+import { throwIfThereIsHttpInstructionNotInvoked } from './internals/throw-if-there-is-http-instrcution-not-invoked';
+import { patchSetInterval } from './internals/patch-set-interval';
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -63,21 +23,10 @@ export interface RunTasksUntilStableParams extends CommonStabilizationParams {
 }
 
 /**
- * Internal type used to track which HTTP call instructions have been invoked.
- * Each entry is a tuple containing a function to check if the call was made and the original instruction.
- */
-type CallTrackers = [() => boolean, HttpCallInstruction][];
-
-/**
  * Maximum number of attempts to stabilize the fixture before throwing an error.
  * This prevents infinite loops when a fixture cannot be stabilized.
  */
 export const MAXIMUM_ATTEMPTS = 30;
-
-/**
- * The time when component is considered as too-long-running in order to finish the test.
- */
-export const COMPONENT_LONG_RUN_TIMEOUT = 10_000;
 
 /**
  * Runs Angular change detection and processes tasks until the component fixture is stable.
@@ -129,7 +78,7 @@ export const COMPONENT_LONG_RUN_TIMEOUT = 10_000;
  * Note: Potentially will be deprecated if Angular team decides to deprecate fakeAsync and zone.js in their future releases.
  * Use {@link RunTasksUntilStableParams#componentLongRunTimeout componentLongRunTimeout} for the new async/await approach instead.
  */
-export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
+export const runTasksUntilStable = async (fixture: ComponentFixture<unknown>, {
   iterationMs,
   httpCallInstructions = [],
   debug
@@ -157,7 +106,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
     fixture.detectChanges();
     passTime(iterationMs);
-    completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+    await completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
     fixture.detectChanges();
     try {
       passTime(iterationMs);
@@ -175,158 +124,3 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   rollbackOriginalSetInterval();
 }
 
-/**
- * Runs Angular change detection and processes tasks until the component fixture is stable.
- *
- * Async variant intended for zoneless Angular applications.
- */
-export async function runTasksUntilStableAsync(
-  fixture: ComponentFixture<unknown>,
-  {
-    httpCallInstructions = [],
-    advanceTimers,
-    componentLongRunTimeout,
-    debug
-  }: RunTasksUntilStableAsyncParams = {
-    componentLongRunTimeout: COMPONENT_LONG_RUN_TIMEOUT
-  }
-): Promise<void> {
-  let rollbackOriginalSetInterval = () => {};
-
-  if(debug) {
-    rollbackOriginalSetInterval = patchSetInterval();
-  }
-
-  const _componentLongRunTimeout = componentLongRunTimeout ?? COMPONENT_LONG_RUN_TIMEOUT;
-  const httpTestingController = TestBed.inject(HttpTestingController);
-  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
-
-  // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
-  fixture.detectChanges();
-
-  let requests = getRequestsFromQueue(httpTestingController);
-
-  let longRunTimeoutTimer: number | null = null;
-
-  await Promise.race([
-    new Promise((_, reject) => {
-      longRunTimeoutTimer = setTimeout(() => reject(new LongRunningComponentError(_componentLongRunTimeout)), _componentLongRunTimeout);
-    }),
-    (new Promise(async (resolve, reject) => {
-      (async function runTasks() {
-        if (requests.length > 0) {
-          try {
-            completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
-          } catch (error) {
-            reject(error);
-          }
-
-          if (advanceTimers) {
-            await advanceTimers();
-          }
-
-          fixture.detectChanges();
-        } else {
-          // Nothing left in the HTTP queue; we're stabilized.
-          resolve(undefined);
-          return;
-        }
-
-        requests = getRequestsFromQueue(httpTestingController);
-        setTimeout(runTasks, 16);
-      })();
-    }))
-    .then(() => fixture.whenStable())
-  ]);
-
-  if(longRunTimeoutTimer) {
-    clearTimeout(longRunTimeoutTimer);
-  }
-
-  // Ensure all expected HTTP instructions were invoked.
-  throwIfThereIsHttpInstructionNotInvoked(callTrackers);
-  rollbackOriginalSetInterval();
-}
-
-/**
- * Creates trackers for HTTP call instructions to monitor which ones are invoked.
- *
- * This function wraps each response getter in the HTTP call instructions with a tracker
- * that records when the instruction is invoked.
- *
- * @param httpCallInstructions - Array of HTTP call instructions to track
- * @returns An object containing the modified HTTP call instructions and an array of call trackers
- * @returns.requiredHttpCallInstructions - The modified HTTP call instructions with tracking wrappers
- * @returns.callTrackers - Array of call trackers, each containing a function to check if the call was made
- * @internal
- */
-function trackRequiredHttpInstructionsToInvoke(_httpCallInstructions: HttpCallInstruction[] = []): {
-  requiredHttpCallInstructions: HttpCallInstruction[],
-  callTrackers: CallTrackers
-} {
-  const callTrackers: CallTrackers = [];
-  const httpCallInstructions = _httpCallInstructions.slice()
-
-  for (let httpCallInstruction of httpCallInstructions) {
-    let wasCalled = false;
-    const responseGetter = httpCallInstruction[1];
-
-    const tracker: ResponseGetter = function (...args: Parameters<ResponseGetter>) {
-      wasCalled = true;
-      return responseGetter(...args);
-    }
-    const checkWasCalled = () => wasCalled;
-
-    callTrackers.push([checkWasCalled, [httpCallInstruction[0], responseGetter]])
-    httpCallInstruction[1] = tracker;
-  }
-
-  return {requiredHttpCallInstructions: httpCallInstructions, callTrackers};
-}
-
-/**
- * Checks if all HTTP call instructions were invoked and throws an error if any were not.
- *
- * This function is called after stabilization to ensure that all expected HTTP calls
- * were actually made during the process.
- *
- * @param callTrackers - Array of call trackers to check
- * @throws Error if any HTTP call instruction was not invoked
- * @internal
- */
-function throwIfThereIsHttpInstructionNotInvoked(callTrackers: CallTrackers) {
-  for (let index = 0; index < callTrackers.length; index++) {
-    const callTracker = callTrackers[index];
-
-    if (!callTracker[0]()) {
-      throw new HttpInstructionWasNotExecutedDuringFixtureStabilizationError(index, callTracker[1].toString());
-    }
-  }
-}
-
-/**
- * Temporarily patches the global setInterval function to provide warnings about potential issues.
- *
- * This function replaces the standard setInterval with a version that logs warnings when called,
- * as setInterval can cause problems with the runTasksUntilStable function by preventing
- * stabilization. It returns a function that can be called to restore the original setInterval.
- *
- * @returns A function that restores the original setInterval when called
- * @internal
- */
-function patchSetInterval() {
-  const originalSetInterval = window.setInterval;
-
-  // @ts-ignore Missing property __promisify__
-  window.setInterval = function setInterval(handler: TimerHandler, timeout?: number, ...args: any[]) {
-    const trace = (new Error().stack as string).replace('Error', 'Trace');
-
-    console.warn(setIntervalDetectedWarning, trace);
-
-    return originalSetInterval(handler, timeout, ...args);
-  }
-
-  return function rollbackOriginalSetInterval() {
-    window.setInterval = originalSetInterval
-  }
-}
