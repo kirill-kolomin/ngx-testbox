@@ -57,7 +57,7 @@ describe('completeHttpCalls', () => {
   });
 
   describe('completeHttpCalls', () => {
-    it('should complete HTTP calls with matching instructions', () => {
+    it('should complete HTTP calls with matching instructions', async () => {
       const responseSpy = jasmine.createSpy('responseSpy');
 
       httpClient.get('/api/test').subscribe(responseSpy);
@@ -67,12 +67,12 @@ describe('completeHttpCalls', () => {
         [['/api/test', 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
       ];
 
-      completeHttpCalls(instructions);
+      await completeHttpCalls(instructions);
 
       expect(responseSpy).toHaveBeenCalledWith(mockBody);
     });
 
-    it('should handle instructions with function checkers', () => {
+    it('should handle instructions with function checkers', async () => {
       const responseSpy = jasmine.createSpy('responseSpy');
 
       httpClient.get('/api/test?param=value').subscribe(responseSpy);
@@ -86,12 +86,12 @@ describe('completeHttpCalls', () => {
         ]
       ];
 
-      completeHttpCalls(instructions);
+      await completeHttpCalls(instructions);
 
       expect(responseSpy).toHaveBeenCalledWith(mockBody);
     });
 
-    it('should handle instructions with RegExp path matchers', () => {
+    it('should handle instructions with RegExp path matchers', async () => {
       const responseSpy = jasmine.createSpy('responseSpy');
 
       httpClient.get('/api/users/123').subscribe(responseSpy);
@@ -101,12 +101,12 @@ describe('completeHttpCalls', () => {
         [[/\/api\/users\/\d+/, 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
       ];
 
-      completeHttpCalls(instructions);
+      await completeHttpCalls(instructions);
 
       expect(responseSpy).toHaveBeenCalledWith(mockBody);
     });
 
-    it('should pass request and search params to the response getter', () => {
+    it('should pass request and search params to the response getter', async () => {
       const responseGetterSpy = jasmine.createSpy('responseGetter').and.returnValue(
         new HttpResponse({ body: {}, status: 200 })
       );
@@ -117,7 +117,7 @@ describe('completeHttpCalls', () => {
         [['/api/test', 'GET'], responseGetterSpy]
       ];
 
-      completeHttpCalls(instructions);
+      await completeHttpCalls(instructions);
 
       expect(responseGetterSpy).toHaveBeenCalled();
 
@@ -128,21 +128,22 @@ describe('completeHttpCalls', () => {
       expect(searchParams.get('param2')).toBe('value2');
     });
 
-    it('should throw an error if no matching instruction is found for a request', () => {
+    it('should throw an error if no matching instruction is found for a request', async () => {
       httpClient.get('/api/test').subscribe();
 
       const instructions: HttpCallInstruction[] = [
         [['/api/other', 'GET'], () => new HttpResponse({ body: {}, status: 200 })]
       ];
 
-      expect(() => completeHttpCalls(instructions))
-        .toThrowError(NoMatchingHttpInstructionForRequestFoundError);
+      await expectAsync(completeHttpCalls(instructions)).toBeRejectedWithError(
+        NoMatchingHttpInstructionForRequestFoundError,
+      );
     });
 
-    it('should skip cancelled requests', () => {
+    it('should skip cancelled requests', async () => {
       httpClient.get('/api/test').subscribe().unsubscribe();
 
-      completeHttpCalls([]);
+      await completeHttpCalls([]);
 
       httpTestingController.verify();
     });

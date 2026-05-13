@@ -27,24 +27,24 @@ describe('DashboardComponent', () => {
   })
 
   it('should display "Top Heroes" in the title', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
     expect(harness.elements.title.getTextContent()).toBe('Top Heroes');
   }));
 
   describe('heroes menu', () => {
     it('should show heroes when server responds with heroes', fakeAsync(async () => {
-      initComponent([getHeroesSuccessHttpCallInstruction(5)]);
+      await initComponent([getHeroesSuccessHttpCallInstruction(5)]);
 
       expect(harness.elements.heroLink.queryAll().length).toBe(4);
     }))
 
     it('should not show any heroes if server responds with error', fakeAsync(async () => {
-      initComponent([getHeroesFailHttpCallInstruction()]);
+      await initComponent([getHeroesFailHttpCallInstruction()]);
       expect(harness.elements.heroLink.queryAll().length).toBe(0);
     }))
 
-    it('should display hero name for each hero', fakeAsync(() => {
-      initComponent([getHeroesSuccessHttpCallInstruction(5)]);
+    it('should display hero name for each hero', fakeAsync(async () => {
+      await initComponent([getHeroesSuccessHttpCallInstruction(5)]);
 
       const heroLinks = harness.elements.heroLink.queryAll();
       for(let i = 0; i < heroLinks.length; i++) {
@@ -52,8 +52,8 @@ describe('DashboardComponent', () => {
       }
     }));
 
-    it('should create correct detail link for each hero', fakeAsync(() => {
-      initComponent([getHeroesSuccessHttpCallInstruction(5)]);
+    it('should create correct detail link for each hero', fakeAsync(async () => {
+      await initComponent([getHeroesSuccessHttpCallInstruction(5)]);
 
       const heroLinks = harness.elements.heroLink.queryAll();
       for(let i = 0; i < heroLinks.length; i++) {
@@ -62,11 +62,11 @@ describe('DashboardComponent', () => {
     }));
   })
 
-  function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
+  async function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
     fixture = TestBed.createComponent(DashboardComponent);
     harness = new DashboardHarness(fixture.debugElement);
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStable(fixture, {
       httpCallInstructions,
     })
   }

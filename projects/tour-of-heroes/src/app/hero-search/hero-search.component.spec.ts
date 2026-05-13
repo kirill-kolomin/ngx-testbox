@@ -38,22 +38,22 @@ describe('HeroSearchComponent', () => {
   })
 
   it('should have empty search box initially', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
     expect(harness.getSearchBoxValue()).toBe('');
   }));
 
   it('should have no search results initially', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
     expect(harness.getHeroElements().length).toBe(0);
   }));
 
   describe('search functionality', () => {
     it('should show heroes when search term matches hero names', fakeAsync(async () => {
       const searchTerm = 'ma'; // Should match heroes with 'ma' in their name
-      initComponent();
+      await initComponent();
 
       harness.setSearchBoxValue(searchTerm);
-      runTasksUntilStable(fixture, {
+      await runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchSuccessHttpCallInstruction()
         ],
@@ -71,10 +71,10 @@ describe('HeroSearchComponent', () => {
 
     it('should show no heroes when search term is an empty string or string of spaces', fakeAsync(async () => {
       const searchTerm = '     ';
-      initComponent();
+      await initComponent();
 
       harness.setSearchBoxValue(searchTerm);
-      runTasksUntilStable(fixture);
+      await runTasksUntilStable(fixture);
 
       const results = harness.getHeroElements();
       expect(results.length).toBe(0);
@@ -82,10 +82,10 @@ describe('HeroSearchComponent', () => {
 
     it('should not show any heroes if search term does not match any hero names', fakeAsync(async () => {
       const searchTerm = 'xyz'; // Should not match any hero names
-      initComponent();
+      await initComponent();
 
       harness.setSearchBoxValue(searchTerm);
-      runTasksUntilStable(fixture, {
+      await runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchEmptyHttpCallInstruction(searchTerm)
         ],
@@ -96,10 +96,10 @@ describe('HeroSearchComponent', () => {
 
     it('should not show any heroes if search returns an error', fakeAsync(async () => {
       const searchTerm = 'error'; // Will trigger an error response
-      initComponent();
+      await initComponent();
 
       harness.setSearchBoxValue(searchTerm);
-      runTasksUntilStable(fixture, {
+      await runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchErrorHttpCallInstruction(searchTerm)
         ],
@@ -108,12 +108,12 @@ describe('HeroSearchComponent', () => {
       expect(harness.getHeroElements().length).toBe(0);
     }));
 
-    it('should create correct detail link for each hero in search results', fakeAsync(() => {
+    it('should create correct detail link for each hero in search results', fakeAsync(async () => {
       const searchTerm = 'ma'; // Should match heroes with 'ma' in their name
-      initComponent();
+      await initComponent();
 
       harness.setSearchBoxValue(searchTerm);
-      runTasksUntilStable(fixture, {
+      await runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchSuccessHttpCallInstruction()
         ],
@@ -134,11 +134,11 @@ describe('HeroSearchComponent', () => {
     }));
   });
 
-  function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
+  async function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
     fixture = TestBed.createComponent(HeroSearchComponent);
     harness = new HeroSearchHarness(fixture.debugElement);
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStable(fixture, {
       httpCallInstructions,
     })
   }

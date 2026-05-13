@@ -78,7 +78,7 @@ describe('runTasksUntilStable', () => {
   });
 
   describe('HTTP handling', () => {
-    it('should complete all subsequent HTTP calls with provided instructions', fakeAsync(() => {
+    it('should complete all subsequent HTTP calls with provided instructions', fakeAsync(async () => {
       const httpCallInstructions: HttpCallInstruction[] = [
         [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
         [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
@@ -92,31 +92,31 @@ describe('runTasksUntilStable', () => {
 
       component.makeHttpRequest(nextCbSpy, nextCbSpy2, nextCbSpy3);
 
-      runTasksUntilStable(fixture, {httpCallInstructions});
+      await runTasksUntilStable(fixture, {httpCallInstructions});
 
       expect(nextCbSpy).toHaveBeenCalledWith({data: 'test'});
       expect(nextCbSpy2).toHaveBeenCalledWith({data: 'test2'});
       expect(nextCbSpy3).toHaveBeenCalledWith({data: 'test3'});
     }));
 
-    it('should throw an error if an HTTP instruction is not invoked', fakeAsync(() => {
+    it('should throw an error if an HTTP instruction is not invoked', fakeAsync(async () => {
       const httpCallInstructions: HttpCallInstruction[] = [
         [['/api/unused', 'GET'], () => new HttpResponse({body: {}, status: 200})]
       ];
 
-      initComponent();
+      await initComponent();
 
-      expect(() => runTasksUntilStable(fixture, {httpCallInstructions}))
-        .toThrowError(HttpInstructionWasNotExecutedDuringFixtureStabilizationError);
+      expectAsync(runTasksUntilStable(fixture, {httpCallInstructions}))
+        .toBeRejectedWithError(HttpInstructionWasNotExecutedDuringFixtureStabilizationError);
     }));
 
-    it('should throw an error if an HTTP request is not handled', fakeAsync(() => {
-      initComponent();
+    it('should throw an error if an HTTP request is not handled', fakeAsync(async () => {
+      await initComponent();
 
       component.makeHttpRequest();
 
-      expect(() => runTasksUntilStable(fixture))
-        .toThrowError(NoMatchingHttpInstructionForRequestFoundError);
+      expectAsync(runTasksUntilStable(fixture))
+        .toBeRejectedWithError(NoMatchingHttpInstructionForRequestFoundError);
     }));
   });
 
@@ -127,12 +127,12 @@ describe('runTasksUntilStable', () => {
 
       fixture.componentRef.setInput('isTestingIntervalWithinZone', true);
 
-      expect(() => runTasksUntilStable(fixture)).toThrowError(MaximumAttemptsToStabilizeFixtureReachedError);
+      expectAsync(runTasksUntilStable(fixture)).toBeRejectedWithError(MaximumAttemptsToStabilizeFixtureReachedError);
     }));
   });
 
   describe('setInterval handling', () => {
-    it('should warn when setInterval is used inside Angular zone', fakeAsync(() => {
+    it('should warn when setInterval is used inside Angular zone', fakeAsync(async () => {
       let originalConsoleWarn = console.warn;
       let consoleWarnSpy = jasmine.createSpy('console.warn');
       console.warn = consoleWarnSpy;
@@ -143,7 +143,7 @@ describe('runTasksUntilStable', () => {
       fixture.componentRef.setInput('isTestingIntervalWithinZone', true);
 
       try {
-        runTasksUntilStable(fixture, {debug: true});
+        await runTasksUntilStable(fixture, {debug: true});
       } catch (error) {
       }
 
@@ -153,20 +153,20 @@ describe('runTasksUntilStable', () => {
       console.warn = originalConsoleWarn;
     }));
 
-    it('should restore original setInterval after completion', fakeAsync(() => {
+    it('should restore original setInterval after completion', fakeAsync(async () => {
       fixture = TestBed.createComponent(TestComponent);
       const originalSetInterval = window.setInterval;
 
-      runTasksUntilStable(fixture);
+      await runTasksUntilStable(fixture);
 
       expect(window.setInterval).toBe(originalSetInterval);
     }));
   });
 
-  function initComponent(httpCallInstructions: HttpCallInstruction[] = []) {
+  async function initComponent(httpCallInstructions: HttpCallInstruction[] = []) {
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
 
-    runTasksUntilStable(fixture, {httpCallInstructions});
+    await runTasksUntilStable(fixture, {httpCallInstructions});
   }
 });

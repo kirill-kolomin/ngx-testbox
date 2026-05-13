@@ -56,7 +56,7 @@ describe('HeroDetailComponent', () => {
   });
 
   it('should display hero details when hero is loaded', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
 
     expect(harness.getHeroId()).toBe(testHero.id.toString());
     expect(harness.getHeroName()).toBe(testHero.name);
@@ -66,7 +66,7 @@ describe('HeroDetailComponent', () => {
   }));
 
   it('should allow editing hp and attack and send numeric values on save', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
 
     const newHp = 150;
     const newAttack = 25;
@@ -76,7 +76,7 @@ describe('HeroDetailComponent', () => {
 
     harness.clickSaveButton();
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStable(fixture, {
       httpCallInstructions: [
         predefinedHttpCallInstructions.put.success(HEROES_URL, (httpRequest) => {
           const body: any = httpRequest.body;
@@ -93,14 +93,14 @@ describe('HeroDetailComponent', () => {
   }));
 
   it('should not display hero details when hero fails to load', fakeAsync(async () => {
-    initComponent([getHeroErrorHttpCallInstruction()]);
+    await initComponent([getHeroErrorHttpCallInstruction()]);
 
     // The hero detail container should not be present
     expect(harness.elements.heroDetail.queryAll().length).toBe(0);
   }));
 
   it('should allow editing the hero', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
 
     const newHp = 200;
     const newAttack = 300;
@@ -116,14 +116,14 @@ describe('HeroDetailComponent', () => {
   }));
 
   it('should save hero and navigate back when save button is clicked', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
 
     const newName = 'Updated Hero Name';
     harness.setHeroName(newName);
 
     harness.clickSaveButton();
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStable(fixture, {
       httpCallInstructions: [updateHeroSuccessHttpCallInstruction()],
     });
 
@@ -131,14 +131,14 @@ describe('HeroDetailComponent', () => {
   }));
 
   it('should not navigate back when save fails', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
 
     const newName = 'Updated Hero Name';
     harness.setHeroName(newName);
 
     harness.clickSaveButton();
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStable(fixture, {
       httpCallInstructions: [updateHeroErrorHttpCallInstruction()],
     });
 
@@ -146,18 +146,18 @@ describe('HeroDetailComponent', () => {
   }));
 
   it('should navigate back when go back button is clicked', fakeAsync(async () => {
-    initComponent();
+    await initComponent();
 
     harness.clickGoBackButton();
 
     expect(locationSpy.back).toHaveBeenCalled();
   }));
 
-  function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
+  async function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
     fixture = TestBed.createComponent(HeroDetailComponent);
     harness = new HeroDetailHarness(fixture.debugElement);
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStable(fixture, {
       httpCallInstructions,
     });
   }

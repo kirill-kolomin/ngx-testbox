@@ -17,9 +17,9 @@ describe('predefinedHttpCallInstructions', () => {
     });
 
     describe('success response', () => {
-      it('should create a response getter that returns a success response with status 200', () => {
+      it('should create a response getter that returns a success response with status 200', async () => {
         const responseGetter = getPredefinedResponseGetter('success');
-        const response = responseGetter(mockRequest, mockSearchParams);
+        const response = await responseGetter(mockRequest, mockSearchParams);
 
         expect(response).toBeInstanceOf(HttpResponse);
         expect(response.status).toBe(200);
@@ -27,11 +27,11 @@ describe('predefinedHttpCallInstructions', () => {
         expect(response.body).toBeNull();
       });
 
-      it('should include the body from the original response getter', () => {
+      it('should include the body from the original response getter', async () => {
         const mockBody = { data: 'test data' };
         const originalResponseGetter = () => mockBody;
         const responseGetter = getPredefinedResponseGetter('success', originalResponseGetter);
-        const response = responseGetter(mockRequest, mockSearchParams);
+        const response = await responseGetter(mockRequest, mockSearchParams);
 
         expect(response).toBeInstanceOf(HttpResponse);
         expect(response.status).toBe(200);
@@ -39,7 +39,7 @@ describe('predefinedHttpCallInstructions', () => {
         expect(response.body).toEqual(mockBody);
       });
 
-      it('should handle an HttpResponse from the original response getter', () => {
+      it('should handle an HttpResponse from the original response getter', async () => {
         const mockBody = { data: 'test data' };
         const mockHeaders = { 'Content-Type': 'application/json' };
         const originalResponseGetter = () => new HttpResponse({
@@ -47,7 +47,7 @@ describe('predefinedHttpCallInstructions', () => {
           headers: new HttpHeaders(mockHeaders)
         });
         const responseGetter = getPredefinedResponseGetter('success', originalResponseGetter);
-        const response = responseGetter(mockRequest, mockSearchParams);
+        const response = await responseGetter(mockRequest, mockSearchParams);
 
         expect(response).toBeInstanceOf(HttpResponse);
         expect(response.status).toBe(200);
@@ -58,9 +58,9 @@ describe('predefinedHttpCallInstructions', () => {
     });
 
     describe('error response', () => {
-      it('should create a response getter that returns an error response with status 500', () => {
+      it('should create a response getter that returns an error response with status 500', async () => {
         const responseGetter = getPredefinedResponseGetter('error');
-        const response = responseGetter(mockRequest, mockSearchParams);
+        const response = await responseGetter(mockRequest, mockSearchParams);
 
         expect(response).toBeInstanceOf(HttpResponse);
         expect(response.status).toBe(500);
@@ -68,11 +68,11 @@ describe('predefinedHttpCallInstructions', () => {
         expect(response.body).toBeNull();
       });
 
-      it('should include the body from the original response getter', () => {
+      it('should include the body from the original response getter', async () => {
         const mockBody = { error: 'test error' };
         const originalResponseGetter = () => mockBody;
         const responseGetter = getPredefinedResponseGetter('error', originalResponseGetter);
-        const response = responseGetter(mockRequest, mockSearchParams);
+        const response = await responseGetter(mockRequest, mockSearchParams);
 
         expect(response).toBeInstanceOf(HttpResponse);
         expect(response.status).toBe(500);
@@ -100,7 +100,7 @@ describe('predefinedHttpCallInstructions', () => {
       }
     });
 
-    it('should create valid HttpCallInstructions for GET success', () => {
+    it('should create valid HttpCallInstructions for GET success', async () => {
       const instruction: HttpCallInstruction = predefinedHttpCallInstructions.get.success(testEndpoint);
 
       // Check the structure of the instruction
@@ -120,14 +120,14 @@ describe('predefinedHttpCallInstructions', () => {
       // Test the response getter
       const mockRequest = new HttpRequest('GET', testEndpoint);
       const mockSearchParams = new URLSearchParams();
-      const response = responseGetter(mockRequest, mockSearchParams);
+      const response = await responseGetter(mockRequest, mockSearchParams);
 
       expect(response).toBeInstanceOf(HttpResponse);
       expect(response.status).toBe(200);
       expect(response.statusText).toBe('OK');
     });
 
-    it('should create valid HttpCallInstructions for POST error', () => {
+    it('should create valid HttpCallInstructions for POST error', async () => {
       const mockErrorBody = { error: 'Test error' };
       const instruction: HttpCallInstruction = predefinedHttpCallInstructions.post.error(
         testEndpoint,
@@ -153,7 +153,7 @@ describe('predefinedHttpCallInstructions', () => {
       // Test the response getter
       const mockRequest = new HttpRequest('POST', testEndpoint, null);
       const mockSearchParams = new URLSearchParams();
-      const response = responseGetter(mockRequest, mockSearchParams);
+      const response = await responseGetter(mockRequest, mockSearchParams);
 
       expect(response).toBeInstanceOf(HttpResponse);
       expect(response.status).toBe(500);
@@ -161,7 +161,7 @@ describe('predefinedHttpCallInstructions', () => {
       expect(response.body).toEqual(mockErrorBody);
     });
 
-    it('should pass request and search params to the custom response getter', () => {
+    it('should pass request and search params to the custom response getter', async () => {
       const spy = jasmine.createSpy('responseGetter').and.returnValue({ custom: 'data' });
       const instruction: HttpCallInstruction = predefinedHttpCallInstructions.get.success(testEndpoint, spy);
 
@@ -169,7 +169,7 @@ describe('predefinedHttpCallInstructions', () => {
       const mockSearchParams = new URLSearchParams('param=value');
       const responseGetter = instruction[1];
 
-      responseGetter(mockRequest, mockSearchParams);
+      await responseGetter(mockRequest, mockSearchParams);
 
       expect(spy).toHaveBeenCalledWith(mockRequest, mockSearchParams);
     });
