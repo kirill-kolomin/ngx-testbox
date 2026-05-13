@@ -111,16 +111,16 @@ export const runTasksUntilStable = async (fixture: ComponentFixture<unknown>, {
     try {
       passTime(iterationMs);
     } catch (error) {
-      // We need the catch in cases when http instruction responds with an error, and the error callback is not passed to the observer. Otherwise, the error will fail the runtime.
+      // We need both the catch in cases when http instruction responds with an error and the error callback is not passed to the observer.
       if (!(error instanceof HttpErrorResponse)) {
         throw error;
       }
     }
 
+    // Refresh queue for the next stabilization pass.
     requests = getRequestsFromQueue(httpTestingController);
   }
 
   throwIfThereIsHttpInstructionNotInvoked(callTrackers);
   rollbackOriginalSetInterval();
 }
-

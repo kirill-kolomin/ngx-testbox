@@ -88,7 +88,7 @@ export async function runTasksUntilStableAsync(
     }
 
     try {
-      completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+      await completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
       requests = [];
     } catch (error) {
       reject(error);
@@ -99,14 +99,10 @@ export async function runTasksUntilStableAsync(
     }
 
     await fixture.whenStable();
-    console.log(11111)
     fixture.detectChanges();
-    console.log(22222)
     await fixture.whenStable();
-    console.log(33333)
 
     requests = getRequestsFromQueue(httpTestingController);
-    console.log(requests.length, 'requests.length')
 
     if(requests.length === 0) {
       // Nothing left in the HTTP queue; we're stabilized.
