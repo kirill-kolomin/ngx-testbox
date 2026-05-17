@@ -47,7 +47,7 @@ class CountriesApi {
 
       <div class="message" [testboxTestId]="testIdMap.successMessage">{{ message }}</div>
     </form>
-  `,
+  `
 })
 class ResourceSelectFormComponent {
   private fb = inject(FormBuilder);
@@ -82,12 +82,14 @@ class ResourceSelectFormComponent {
 }
 
 describe('runTasksUntilStable (fakeAsync) - resource + form', () => {
-  it('should load countries, render select options, submit, and show success message', fakeAsync(async () => {
+  beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ResourceSelectFormComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
+  })
 
+  it('should load countries, render select options, submit, and show success message', fakeAsync(() => {
     const fixture: ComponentFixture<ResourceSelectFormComponent> = TestBed.createComponent(
       ResourceSelectFormComponent
     );
