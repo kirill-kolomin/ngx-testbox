@@ -3,7 +3,7 @@ import {passTime} from './pass-time';
 import {completeHttpCalls, getRequestsFromQueue} from './complete-http-calls';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MaximumAttemptsToStabilizeFixtureReachedError} from './errors/MaximumAttemptsToStabilizeFixtureReachedError';
-import {HttpTestingController} from '@angular/common/http/testing';
+import {HttpTestingController, TestRequest} from '@angular/common/http/testing';
 import { CommonStabilizationParams } from './interfaces/common-stabilization-params';
 import { trackRequiredHttpInstructionsToInvoke } from './internals/track-required-http-instructions-to-invoke';
 import { throwIfThereIsHttpInstructionNotInvoked } from './internals/throw-if-there-is-http-instrcution-not-invoked';
@@ -20,12 +20,15 @@ export interface RunTasksUntilStableParams extends CommonStabilizationParams {
    * This is passed to the passTime function.
    */
   iterationMs?: number;
+
+  /**
+   * Maximum number of attempts to stabilize the fixture before throwing an error.
+   * This prevents infinite loops when a fixture cannot be stabilized.
+  */
+  maxAttempts?: number;
 }
 
-/**
- * Maximum number of attempts to stabilize the fixture before throwing an error.
- * This prevents infinite loops when a fixture cannot be stabilized.
- */
+
 export const MAXIMUM_ATTEMPTS = 30;
 
 /**
@@ -80,10 +83,12 @@ export const MAXIMUM_ATTEMPTS = 30;
  */
 export const runTasksUntilStable = async (fixture: ComponentFixture<unknown>, {
   iterationMs,
+  maxAttempts,
   httpCallInstructions = [],
   debug
 }: RunTasksUntilStableParams = {}) => {
   let rollbackOriginalSetInterval = () => {};
+  const _maxAttempts = maxAttempts ?? MAXIMUM_ATTEMPTS;
 
   if(debug) {
     rollbackOriginalSetInterval = patchSetInterval();
@@ -91,23 +96,39 @@ export const runTasksUntilStable = async (fixture: ComponentFixture<unknown>, {
 
   const httpTestingController = TestBed.inject(HttpTestingController)
 
+  let requests: TestRequest[] = [];
   let attempt = 0;
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
-  let requests = getRequestsFromQueue(httpTestingController);
 
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
 
-  // By an unknown reason angular Zone is still stable despite having requests in the queue. So I need to look to make the check if there is requests in the queue.
-  while (!fixture.isStable() || requests.length > 0) {
-    if (attempt++ > MAXIMUM_ATTEMPTS) {
-      throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
+  await new Promise((resolve, reject) => runTasks(resolve, reject))
+
+  throwIfThereIsHttpInstructionNotInvoked(callTrackers);
+  rollbackOriginalSetInterval();
+
+  async function runTasks(resolve: (value: any) => void, reject: (error: any) => void, _requests: TestRequest[] = []) {
+    if (attempt++ > _maxAttempts) {
+      throw new MaximumAttemptsToStabilizeFixtureReachedError(_maxAttempts)
+    }
+
+    requests = [..._requests, ...getRequestsFromQueue(httpTestingController)];
+
+    if(requests.length === 0 && fixture.isStable()) {
+      // Nothing left in the HTTP queue; we're stabilized.
+      resolve(undefined);
+      return;
+    }
+
+    try {
+      await completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests, fakeAsync: true});
+    } catch (error) {
+      reject(error);
     }
 
     fixture.detectChanges();
-    passTime(iterationMs);
-    await completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
-    fixture.detectChanges();
+
     try {
       passTime(iterationMs);
     } catch (error) {
@@ -117,10 +138,13 @@ export const runTasksUntilStable = async (fixture: ComponentFixture<unknown>, {
       }
     }
 
-    // Refresh queue for the next stabilization pass.
     requests = getRequestsFromQueue(httpTestingController);
-  }
 
-  throwIfThereIsHttpInstructionNotInvoked(callTrackers);
-  rollbackOriginalSetInterval();
+    if(requests.length === 0 && fixture.isStable()) {
+      // Nothing left in the HTTP queue; we're stabilized.
+      resolve(undefined);
+    } else {
+      runTasks(resolve, reject, requests)
+    }
+  }
 }
