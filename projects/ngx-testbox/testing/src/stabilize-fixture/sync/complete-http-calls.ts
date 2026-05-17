@@ -1,53 +1,11 @@
 import {TestBed} from '@angular/core/testing';
 import {HttpTestingController, TestRequest} from '@angular/common/http/testing';
-import {HttpRequest, HttpResponse} from '@angular/common/http';
-import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
-import {NoMatchingHttpInstructionForRequestFoundError} from './errors/NoMatchingHttpInstructionForRequestFoundError';
-
-/**
- * Represents an HTTP method (GET, POST, PUT, DELETE, etc.).
- */
-export type HttpMethod = string;
-
-/**
- * Represents an endpoint path that can be either a string or a regular expression.
- * - String: Exact or partial match for the URL
- * - RegExp: Pattern match for the URL
- */
-export type EndpointPath = string | RegExp;
-
-/**
- * A function that generates an HTTP response based on the request and URL search parameters.
- *
- * @param httpRequest - The original HTTP request
- * @param searchParams - The parsed URL search parameters from the request
- * @returns An HTTP response object to be returned for the request
- */
-export type ResponseGetter = (httpRequest: HttpRequest<unknown>, searchParams: URLSearchParams) => Promise<HttpResponse<any>> | HttpResponse<any>;
-
-/**
- * A checker that determines if a specific HTTP request matches with a provided http call instruction for further handling.
- * Can be either:
- * - A function that takes an HTTP request and returns a boolean
- * - A tuple containing an endpoint path and HTTP method
- */
-export type HttpCallChecker = ((httpRequest: HttpRequest<unknown>) => boolean) | [EndpointPath, HttpMethod];
-
-/**
- * A tuple containing an HTTP call checker and a response getter function.
- * Used to define how to handle specific HTTP requests during testing.
- */
-export type HttpCallInstruction = [HttpCallChecker, ResponseGetter];
-
-/**
- * Retrieves all pending HTTP requests from the testing controller queue.
- *
- * @param httpTestingController - The HTTP testing controller instance (defaults to the one from TestBed)
- * @returns An array of TestRequest objects representing pending HTTP requests
- */
-export const getRequestsFromQueue = (httpTestingController = TestBed.inject(HttpTestingController)): TestRequest[] => {
-  return httpTestingController.match(() => true);
-}
+import {HttpResponse} from '@angular/common/http';
+import {FailedToGenerateHttpResponseError} from '../../errors/FailedToGenerateHttpResponseError';
+import {NoMatchingHttpInstructionForRequestFoundError} from '../../errors/NoMatchingHttpInstructionForRequestFoundError';
+import { HttpCallInstruction } from '../../interfaces/http-call';
+import { getRequestsFromQueue } from '../../get-requests-from-queue';
+import { CannotUsePromiseResponseWithinFakeAsync } from '../../errors/CannotUsePromiseResponseWithinFakeAsync';
 
 /**
  * Completes all HTTP calls that are in the queue and processes all subsequent tasks.
@@ -62,7 +20,7 @@ export const getRequestsFromQueue = (httpTestingController = TestBed.inject(Http
  * @param options.testRequests - The HTTP requests to be handled. If not provided, it will use the queue from the testing controller.
  * @throws Error if no matching instruction is found for a request
  */
-export const completeHttpCalls = async (httpCallInstructions: HttpCallInstruction[], {
+export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
   httpTestingController = TestBed.inject(HttpTestingController),
   testRequests
 }: {
@@ -103,7 +61,13 @@ export const completeHttpCalls = async (httpCallInstructions: HttpCallInstructio
 
     let response: HttpResponse<any>;
     try {
-      response = await responseGetter(request, urlSearchParams);
+      const rawResponse = responseGetter(request, urlSearchParams);
+
+      if(rawResponse instanceof Promise) {
+        throw new CannotUsePromiseResponseWithinFakeAsync();
+      }
+
+      response = rawResponse;
     } catch (error) {
       throw new FailedToGenerateHttpResponseError(error);
     }

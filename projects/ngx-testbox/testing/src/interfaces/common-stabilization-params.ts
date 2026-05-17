@@ -1,4 +1,4 @@
-import { HttpCallInstruction } from "../complete-http-calls";
+import { HttpCallInstruction } from "./http-call";
 
 export interface CommonStabilizationParams {
   /**

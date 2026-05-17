@@ -3,8 +3,8 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, provideHttpClient} from '@angular/common/http';
 import {HttpResponse} from '@angular/common/http';
-import {runTasksUntilStable} from '../../testing/src/run-tasks-until-stable';
-import {HttpCallInstruction} from '../../testing/src/complete-http-calls';
+import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { runTasksUntilStable } from '../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 70_000;
 

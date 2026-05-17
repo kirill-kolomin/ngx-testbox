@@ -19,7 +19,7 @@ import {
   Validators,
 } from '@angular/forms';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {runTasksUntilStableAsync} from '../../testing/src/run-tasks-until-stable-async';
+import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 @Component({
   standalone: true,

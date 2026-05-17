@@ -1,6 +1,6 @@
-import {EndpointPath, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
 import {HttpResponse} from '@angular/common/http';
 import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
+import { EndpointPath, HttpCallInstruction, ResponseGetter } from './interfaces/http-call';
 
 /**
  * Creates a response getter function that returns HTTP responses with predefined status codes.

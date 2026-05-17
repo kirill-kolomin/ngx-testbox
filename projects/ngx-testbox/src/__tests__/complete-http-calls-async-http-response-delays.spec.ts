@@ -3,11 +3,11 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import {HttpClient, HttpRequest, HttpResponse, provideHttpClient} from '@angular/common/http';
+import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {
-  completeHttpCalls,
-  HttpCallInstruction,
-} from '../../testing/src/complete-http-calls';
+  completeHttpCallsAsync,
+} from '../../testing/src/stabilize-fixture/async/complete-http-calls-async';
+import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
@@ -57,7 +57,7 @@ describe('completeHttpCalls - HTTP response delays', () => {
     });
 
     while(index < TOTAL_CALLS) {
-      await completeHttpCalls(instructions);
+      await completeHttpCallsAsync(instructions);
       await new Promise(resolve => setTimeout(() => resolve(undefined), 16))
     }
 

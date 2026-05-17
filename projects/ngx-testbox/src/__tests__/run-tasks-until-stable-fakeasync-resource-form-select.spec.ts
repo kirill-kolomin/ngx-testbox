@@ -1,15 +1,15 @@
-import {Component, DebugElement, Injectable, inject} from '@angular/core';
+import {Component, Injectable, inject} from '@angular/core';
 import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {FormsModule, ReactiveFormsModule, FormBuilder, Validators} from '@angular/forms';
 import {HttpClient, provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpResponse} from '@angular/common/http';
-import {runTasksUntilStable} from '../../testing/src/run-tasks-until-stable';
 import {DebugElementHarness} from '../../testing/src/debug-element-harness';
-import {HttpCallInstruction} from '../../testing/src/complete-http-calls';
 import {TestIdDirective} from '../lib/directives/test-id.directive';
 import {firstValueFrom} from 'rxjs';
 import {By} from '@angular/platform-browser';
+import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { runTasksUntilStable } from '../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
 
 type Country = {code: string; name: string};
 

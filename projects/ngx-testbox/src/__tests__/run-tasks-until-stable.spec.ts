@@ -2,8 +2,6 @@ import {ChangeDetectionStrategy, Component, Input, NgZone, OnInit} from '@angula
 import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
-import {runTasksUntilStable,} from '../../testing/src/run-tasks-until-stable';
-import {HttpCallInstruction} from '../../testing/src/complete-http-calls';
 import {
   NoMatchingHttpInstructionForRequestFoundError
 } from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
@@ -13,6 +11,8 @@ import {
 import {
   MaximumAttemptsToStabilizeFixtureReachedError
 } from '../../testing/src/errors/MaximumAttemptsToStabilizeFixtureReachedError';
+import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { runTasksUntilStable } from '../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
 
 @Component({
   template: '<div>Test Component</div>',

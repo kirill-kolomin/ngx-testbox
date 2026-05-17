@@ -4,13 +4,13 @@ import {FormsModule, ReactiveFormsModule, FormBuilder, Validators} from '@angula
 import {HttpClient, provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpResponse} from '@angular/common/http';
-import {runTasksUntilStableAsync} from '../../testing/src/run-tasks-until-stable-async';
 import {DebugElementHarness} from '../../testing/src/debug-element-harness';
-import {HttpCallInstruction} from '../../testing/src/complete-http-calls';
 import {TestIdDirective} from '../lib/directives/test-id.directive';
 import {inject} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { By } from '@angular/platform-browser';
+import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 type Country = {code: string; name: string};
 

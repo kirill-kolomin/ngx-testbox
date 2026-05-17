@@ -5,13 +5,13 @@ import {
 } from '@angular/common/http/testing';
 import {HttpClient, HttpRequest, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {
-  completeHttpCalls,
-  getRequestsFromQueue,
-  HttpCallInstruction
-} from '../../testing/src/complete-http-calls';
+  completeHttpCallsAsync,
+} from '../../testing/src/stabilize-fixture/async/complete-http-calls-async';
 import {
   NoMatchingHttpInstructionForRequestFoundError
 } from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
+import { getRequestsFromQueue } from '../../testing/src/get-requests-from-queue';
+import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
 
 describe('completeHttpCalls', () => {
   let httpClient: HttpClient;
@@ -67,7 +67,7 @@ describe('completeHttpCalls', () => {
         [['/api/test', 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
       ];
 
-      await completeHttpCalls(instructions);
+      await completeHttpCallsAsync(instructions);
 
       expect(responseSpy).toHaveBeenCalledWith(mockBody);
     });
@@ -86,7 +86,7 @@ describe('completeHttpCalls', () => {
         ]
       ];
 
-      await completeHttpCalls(instructions);
+      await completeHttpCallsAsync(instructions);
 
       expect(responseSpy).toHaveBeenCalledWith(mockBody);
     });
@@ -101,7 +101,7 @@ describe('completeHttpCalls', () => {
         [[/\/api\/users\/\d+/, 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
       ];
 
-      await completeHttpCalls(instructions);
+      await completeHttpCallsAsync(instructions);
 
       expect(responseSpy).toHaveBeenCalledWith(mockBody);
     });
@@ -117,7 +117,7 @@ describe('completeHttpCalls', () => {
         [['/api/test', 'GET'], responseGetterSpy]
       ];
 
-      await completeHttpCalls(instructions);
+      await completeHttpCallsAsync(instructions);
 
       expect(responseGetterSpy).toHaveBeenCalled();
 
@@ -135,7 +135,7 @@ describe('completeHttpCalls', () => {
         [['/api/other', 'GET'], () => new HttpResponse({ body: {}, status: 200 })]
       ];
 
-      await expectAsync(completeHttpCalls(instructions)).toBeRejectedWithError(
+      await expectAsync(completeHttpCallsAsync(instructions)).toBeRejectedWithError(
         NoMatchingHttpInstructionForRequestFoundError,
       );
     });
@@ -143,7 +143,7 @@ describe('completeHttpCalls', () => {
     it('should skip cancelled requests', async () => {
       httpClient.get('/api/test').subscribe().unsubscribe();
 
-      await completeHttpCalls([]);
+      await completeHttpCallsAsync([]);
 
       httpTestingController.verify();
     });

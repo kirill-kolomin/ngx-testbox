@@ -1,5 +1,5 @@
-import { HttpCallInstruction, ResponseGetter } from "../complete-http-calls";
 import { CallTrackers } from "../interfaces/call-trackers";
+import { HttpCallInstruction, ResponseGetter } from "../interfaces/http-call";
 
 /**
  * Creates trackers for HTTP call instructions to monitor which ones are invoked.

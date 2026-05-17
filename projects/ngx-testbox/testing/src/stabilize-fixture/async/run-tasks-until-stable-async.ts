@@ -1,11 +1,12 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { CommonStabilizationParams } from "./interfaces/common-stabilization-params";
+import { CommonStabilizationParams } from "../../interfaces/common-stabilization-params";
 import { HttpTestingController, TestRequest } from "@angular/common/http/testing";
-import { trackRequiredHttpInstructionsToInvoke } from "./internals/track-required-http-instructions-to-invoke";
-import { completeHttpCalls, getRequestsFromQueue } from "./complete-http-calls";
-import { LongRunningComponentError } from "./errors/LongRunningComponentError";
-import { throwIfThereIsHttpInstructionNotInvoked } from "./internals/throw-if-there-is-http-instrcution-not-invoked";
-import { patchSetInterval } from "./internals/patch-set-interval";
+import { trackRequiredHttpInstructionsToInvoke } from "../../internals/track-required-http-instructions-to-invoke";
+import { completeHttpCallsAsync } from "./complete-http-calls-async";
+import { LongRunningComponentError } from "../../errors/LongRunningComponentError";
+import { throwIfThereIsHttpInstructionNotInvoked } from "../../internals/throw-if-there-is-http-instrcution-not-invoked";
+import { patchSetInterval } from "../../internals/patch-set-interval";
+import { getRequestsFromQueue } from "../../get-requests-from-queue";
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -88,7 +89,7 @@ export async function runTasksUntilStableAsync(
     }
 
     try {
-      await completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+      await completeHttpCallsAsync(requiredHttpCallInstructions, {testRequests: requests});
       requests = [];
     } catch (error) {
       reject(error);

@@ -1,4 +1,4 @@
-import { HttpCallInstruction } from "../complete-http-calls";
+import { HttpCallInstruction } from "./http-call";
 
 /**
  * Internal type used to track which HTTP call instructions have been invoked.
