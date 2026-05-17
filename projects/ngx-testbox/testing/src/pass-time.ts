@@ -2,8 +2,6 @@ import {flushMicrotasks, tick} from '@angular/core/testing';
 
 /**
  * Default time in milliseconds to advance the virtual clock in tests.
- * 
- * @deprecated Used only for fakeAsync zone. Will be deleted soon.
  */
 export const TIME_MS = 1000;
 

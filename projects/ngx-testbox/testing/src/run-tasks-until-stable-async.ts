@@ -81,7 +81,7 @@ export async function runTasksUntilStableAsync(
   async function runTasks(resolve: (value: any) => void, reject: (error: any) => void, _requests: TestRequest[] = []) {
     requests = [..._requests, ...getRequestsFromQueue(httpTestingController)];
 
-    if(requests.length === 0) {
+    if(requests.length === 0 && fixture.isStable()) {
       // Nothing left in the HTTP queue; we're stabilized.
       resolve(undefined);
       return;
@@ -104,7 +104,7 @@ export async function runTasksUntilStableAsync(
 
     requests = getRequestsFromQueue(httpTestingController);
 
-    if(requests.length === 0) {
+    if(requests.length === 0 && fixture.isStable()) {
       // Nothing left in the HTTP queue; we're stabilized.
       resolve(undefined);
     } else {

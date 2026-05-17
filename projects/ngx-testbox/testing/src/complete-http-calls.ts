@@ -37,7 +37,7 @@ export type HttpCallChecker = ((httpRequest: HttpRequest<unknown>) => boolean) |
  * A tuple containing an HTTP call checker and a response getter function.
  * Used to define how to handle specific HTTP requests during testing.
  */
-export type HttpCallInstruction = [HttpCallChecker, ResponseGetter]
+export type HttpCallInstruction = [HttpCallChecker, ResponseGetter];
 
 /**
  * Retrieves all pending HTTP requests from the testing controller queue.
