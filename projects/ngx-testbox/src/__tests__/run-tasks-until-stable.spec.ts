@@ -125,7 +125,7 @@ describe('runTasksUntilStable', () => {
   });
 
   describe('error handling', () => {
-    fit('should throw an error if maximum attempts are reached', fakeAsync(async () => {
+    it('should throw an error if maximum attempts are reached', fakeAsync(async () => {
       let error: Error | null = null;
 
       try {
