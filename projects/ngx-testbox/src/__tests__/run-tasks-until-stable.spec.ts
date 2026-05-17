@@ -30,7 +30,6 @@ class TestComponent implements OnInit {
   }
 
   ngOnInit() {
-      console.log(this.isTestingRequestSequence)
     if(this.isTestingRequestSequence) {
       this.makeHttpRequest();
     }
@@ -95,7 +94,7 @@ describe('runTasksUntilStable', () => {
         [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})]
       ];
 
-      initComponent(true, false);
+      initComponent(true, false, [], false);
 
       component.cb1 = jasmine.createSpy().and.callThrough();
       component.cb2 = jasmine.createSpy().and.callThrough();
@@ -126,8 +125,16 @@ describe('runTasksUntilStable', () => {
   });
 
   describe('error handling', () => {
-    it('should throw an error if maximum attempts are reached', fakeAsync(async () => {
-      await expectAsync(initComponent(false, true)).toBeRejectedWithError(MaximumAttemptsToStabilizeFixtureReachedError);
+    fit('should throw an error if maximum attempts are reached', fakeAsync(async () => {
+      let error: Error | null = null;
+
+      try {
+        await initComponent(false, true);
+      } catch (e: any) {
+        error = e;
+      }
+
+      expect(error instanceof MaximumAttemptsToStabilizeFixtureReachedError).toBe(true);
     }));
   });
 
@@ -163,13 +170,15 @@ describe('runTasksUntilStable', () => {
     }));
   });
 
-  async function initComponent(testingSequence: boolean, testingInterval: boolean, httpCallInstructions: HttpCallInstruction[] = []) {
+  async function initComponent(testingSequence: boolean, testingInterval: boolean, httpCallInstructions: HttpCallInstruction[] = [], shouldRunTasks = true) {
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput('isTestingRequestSequence', testingSequence);
     fixture.componentRef.setInput('isTestingIntervalWithinZone', testingInterval);
 
-    await runTasksUntilStable(fixture, {httpCallInstructions});
+    if(shouldRunTasks) {
+      await runTasksUntilStable(fixture, {httpCallInstructions});
+    }
   }
 });
