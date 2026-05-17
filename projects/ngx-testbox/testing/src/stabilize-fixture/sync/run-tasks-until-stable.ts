@@ -87,10 +87,17 @@ export const MAXIMUM_ATTEMPTS = 30;
  */
 export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   iterationMs,
-  httpCallInstructions = []
+  httpCallInstructions = [],
+  debug
 }: RunTasksUntilStableParams = {}) => {
-  const rollbackOriginalSetInterval = patchSetInterval();
-  const httpTestingController = TestBed.inject(HttpTestingController)
+  let rollbackOriginalSetInterval = () => {};
+
+  if(debug) {
+    rollbackOriginalSetInterval = patchSetInterval();
+  }
+
+  const httpTestingController = TestBed.inject(HttpTestingController);
+
 
   let attempt = 0;
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
