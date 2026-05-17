@@ -36,28 +36,28 @@ describe('HeroesComponent', () => {
     }).compileComponents();
   })
 
-  it('should display "My Heroes" in the title', fakeAsync(async () => {
-    await initComponent();
+  it('should display "My Heroes" in the title', fakeAsync(() => {
+    initComponent();
     expect(harness.elements.title.getTextContent()).toBe('My Heroes');
   }));
 
   describe('heroes list', () => {
-    it('should show all heroes when server responds with heroes', fakeAsync(async () => {
+    it('should show all heroes when server responds with heroes', fakeAsync(() => {
       const heroesLength = HEROES.length;
 
-      await initComponent([getHeroesSuccessHttpCallInstruction(heroesLength),]);
+      initComponent([getHeroesSuccessHttpCallInstruction(heroesLength),]);
       expect(harness.elements.heroItem.queryAll().length).toBe(heroesLength);
     }))
 
-    it('should not show any heroes if server responds with error', fakeAsync(async () => {
-      await initComponent([getHeroesFailHttpCallInstruction()]);
+    it('should not show any heroes if server responds with error', fakeAsync(() => {
+      initComponent([getHeroesFailHttpCallInstruction()]);
       expect(harness.elements.heroItem.queryAll().length).toBe(0);
     }))
 
-    it('should display hero id and name for each hero', fakeAsync(async () => {
+    it('should display hero id and name for each hero', fakeAsync(() => {
       const heroesLength = HEROES.length;
 
-      await initComponent([getHeroesSuccessHttpCallInstruction(heroesLength),]);
+      initComponent([getHeroesSuccessHttpCallInstruction(heroesLength),]);
 
       const heroes = harness.elements.heroItem.queryAll();
 
@@ -67,10 +67,10 @@ describe('HeroesComponent', () => {
       }
     }));
 
-    it('should create correct detail link for each hero', fakeAsync(async () => {
+    it('should create correct detail link for each hero', fakeAsync(() => {
       const heroesLength = HEROES.length;
 
-      await initComponent([getHeroesSuccessHttpCallInstruction(heroesLength),]);
+      initComponent([getHeroesSuccessHttpCallInstruction(heroesLength),]);
 
       const heroes = harness.elements.heroItem.queryAll();
 
@@ -81,8 +81,8 @@ describe('HeroesComponent', () => {
   })
 
   describe('add hero', () => {
-    it('should add new hero when valid name is entered', fakeAsync(async () => {
-      await initComponent();
+    it('should add new hero when valid name is entered', fakeAsync(() => {
+      initComponent();
 
       expect(harness.elements.heroItem.queryAll().length).toBe(0);
 
@@ -92,7 +92,7 @@ describe('HeroesComponent', () => {
         harness.setNameInputValue(`${name} ${i}`);
         harness.elements.addButton.click();
 
-        await runTasksUntilStable(fixture, {
+        runTasksUntilStable(fixture, {
           httpCallInstructions: [
             getPostHeroesSuccessHttpCallInstruction(),
           ],
@@ -107,14 +107,14 @@ describe('HeroesComponent', () => {
       }
     }));
 
-    it('should store full hero model (hp and attack) when adding', fakeAsync(async () => {
-      await initComponent();
+    it('should store full hero model (hp and attack) when adding', fakeAsync(() => {
+      initComponent();
 
       const name = 'Model Test Hero';
       harness.setNameInputValue(name);
       harness.elements.addButton.click();
 
-      await runTasksUntilStable(fixture, {
+      runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getPostHeroesSuccessHttpCallInstruction(),
         ],
@@ -128,8 +128,8 @@ describe('HeroesComponent', () => {
       expect(added.attack).toBe(10);
     }));
 
-    it('should not add hero when invalid name is provided', fakeAsync(async () => {
-      await initComponent();
+    it('should not add hero when invalid name is provided', fakeAsync(() => {
+      initComponent();
 
       expect(harness.elements.heroItem.queryAll().length).toBe(0);
 
@@ -138,15 +138,15 @@ describe('HeroesComponent', () => {
       for (let i = 1; i <= 10; i++) {
         harness.setNameInputValue(`${name}`);
         harness.elements.addButton.click();
-        await runTasksUntilStable(fixture)
+        runTasksUntilStable(fixture)
 
         const elements = harness.elements.heroItem.queryAll();
         expect(elements.length).toBe(0);
       }
     }));
 
-    it('should not add hero when server responds with error', fakeAsync(async () => {
-      await initComponent();
+    it('should not add hero when server responds with error', fakeAsync(() => {
+      initComponent();
 
       expect(harness.elements.heroItem.queryAll().length).toBe(0);
 
@@ -155,7 +155,7 @@ describe('HeroesComponent', () => {
       for (let i = 1; i <= 10; i++) {
         harness.setNameInputValue(`${name}`);
         harness.elements.addButton.click();
-        await runTasksUntilStable(fixture, {
+        runTasksUntilStable(fixture, {
           httpCallInstructions: [
             getPostHeroesFailHttpCallInstruction(),
           ],
@@ -166,15 +166,15 @@ describe('HeroesComponent', () => {
       }
     }));
 
-    it('should clear input field after adding hero', fakeAsync(async () => {
-      await initComponent();
+    it('should clear input field after adding hero', fakeAsync(() => {
+      initComponent();
 
       expect(harness.elements.heroItem.queryAll().length).toBe(0);
 
       const name = `Test Hero`;
       harness.setNameInputValue(`${name}`);
       harness.elements.addButton.click();
-      await runTasksUntilStable(fixture, {
+      runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getPostHeroesSuccessHttpCallInstruction(),
         ],
@@ -184,16 +184,16 @@ describe('HeroesComponent', () => {
   })
 
   describe('delete hero', () => {
-    it('should remove hero from list when delete button is clicked', fakeAsync(async () => {
+    it('should remove hero from list when delete button is clicked', fakeAsync(() => {
       const amountAtInitialShow = 5;
 
-      await initComponent([getHeroesSuccessHttpCallInstruction(amountAtInitialShow),]);
+      initComponent([getHeroesSuccessHttpCallInstruction(amountAtInitialShow),]);
 
       expect(harness.elements.heroItem.queryAll().length).toBe(amountAtInitialShow);
 
       for (let i = amountAtInitialShow; i > 0; i--) {
         harness.elements.heroDeleteButton.click();
-        await runTasksUntilStable(fixture, {
+        runTasksUntilStable(fixture, {
           httpCallInstructions: [
             getDeleteHeroSuccessHttpCallInstruction(),
           ],
@@ -202,16 +202,16 @@ describe('HeroesComponent', () => {
       }
     }));
 
-    it('should not remove hero from list if server responds with error', fakeAsync(async () => {
+    it('should not remove hero from list if server responds with error', fakeAsync(() => {
       const amountAtInitialShow = 5;
 
-      await initComponent([getHeroesSuccessHttpCallInstruction(amountAtInitialShow),]);
+      initComponent([getHeroesSuccessHttpCallInstruction(amountAtInitialShow),]);
 
       expect(harness.elements.heroItem.queryAll().length).toBe(amountAtInitialShow);
 
       for (let i = amountAtInitialShow; i > 0; i--) {
         harness.elements.heroDeleteButton.click();
-        await runTasksUntilStable(fixture, {
+        runTasksUntilStable(fixture, {
           httpCallInstructions: [
             getDeleteHeroFailHttpCallInstruction(),
           ],
@@ -221,11 +221,11 @@ describe('HeroesComponent', () => {
     }));
   })
 
-  async function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
+  function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
     fixture = TestBed.createComponent(HeroesComponent);
     harness = new HeroesHarness(fixture.debugElement);
 
-    await runTasksUntilStable(fixture, {
+    runTasksUntilStable(fixture, {
       httpCallInstructions,
     })
   }

@@ -51,7 +51,7 @@ describe('runTasksUntilStable - HTTP response delays', () => {
     httpTestingController.verify();
   });
 
-  it('stabilizes and completes callbacks for 10 sequential delayed HTTP responses', fakeAsync(async () => {
+  it('stabilizes and completes callbacks for 10 sequential delayed HTTP responses', fakeAsync(() => {
     fixture = TestBed.createComponent(DelayHttpComponent);
     component = fixture.componentInstance;
 
@@ -66,7 +66,7 @@ describe('runTasksUntilStable - HTTP response delays', () => {
       ];
     });
 
-    await runTasksUntilStable(fixture, {
+    runTasksUntilStable(fixture, {
       iterationMs: 500,
       httpCallInstructions: instructions,
       debug: false,

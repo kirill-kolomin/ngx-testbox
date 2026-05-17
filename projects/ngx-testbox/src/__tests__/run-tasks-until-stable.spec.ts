@@ -87,7 +87,7 @@ describe('runTasksUntilStable', () => {
   });
 
   describe('HTTP handling', () => {
-    it('should complete all subsequent HTTP calls with provided instructions', fakeAsync(async () => {
+    it('should complete all subsequent HTTP calls with provided instructions', fakeAsync(() => {
       const httpCallInstructions: HttpCallInstruction[] = [
         [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
         [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
@@ -100,36 +100,36 @@ describe('runTasksUntilStable', () => {
       component.cb2 = jasmine.createSpy().and.callThrough();
       component.cb3 = jasmine.createSpy().and.callThrough();
 
-      await runTasksUntilStable(fixture, {httpCallInstructions});
+      runTasksUntilStable(fixture, {httpCallInstructions});
 
       expect(component.cb1).toHaveBeenCalledWith({data: 'test'});
       expect(component.cb2).toHaveBeenCalledWith({data: 'test2'});
       expect(component.cb3).toHaveBeenCalledWith({data: 'test3'});
     }));
 
-    it('should throw an error if an HTTP instruction is not invoked', fakeAsync(async () => {
+    it('should throw an error if an HTTP instruction is not invoked', fakeAsync(() => {
       const httpCallInstructions: HttpCallInstruction[] = [
         [['/api/unused', 'GET'], () => new HttpResponse({body: {}, status: 200})]
       ];
 
-      await initComponent(false, false);
+      initComponent(false, false);
 
-      await expectAsync(runTasksUntilStable(fixture, {httpCallInstructions}))
-        .toBeRejectedWithError(HttpInstructionWasNotExecutedDuringFixtureStabilizationError);
+      expect(() => runTasksUntilStable(fixture, {httpCallInstructions}))
+        .toThrowError(HttpInstructionWasNotExecutedDuringFixtureStabilizationError);
     }));
 
-    it('should throw an error if an HTTP request is not handled', fakeAsync(async () => {
-      await expectAsync(initComponent(true, false))
-        .toBeRejectedWithError(NoMatchingHttpInstructionForRequestFoundError);
+    it('should throw an error if an HTTP request is not handled', fakeAsync(() => {
+      expect(() => initComponent(true, false))
+        .toThrowError(NoMatchingHttpInstructionForRequestFoundError);
     }));
   });
 
   describe('error handling', () => {
-    it('should throw an error if maximum attempts are reached', fakeAsync(async () => {
+    it('should throw an error if maximum attempts are reached', fakeAsync(() => {
       let error: Error | null = null;
 
       try {
-        await initComponent(false, true);
+        initComponent(false, true);
       } catch (e: any) {
         error = e;
       }
@@ -139,7 +139,7 @@ describe('runTasksUntilStable', () => {
   });
 
   describe('setInterval handling', () => {
-    it('should warn when setInterval is used inside Angular zone', fakeAsync(async () => {
+    it('should warn when setInterval is used inside Angular zone', fakeAsync(() => {
       let originalConsoleWarn = console.warn;
       let consoleWarnSpy = jasmine.createSpy('console.warn');
       console.warn = consoleWarnSpy;
@@ -150,7 +150,7 @@ describe('runTasksUntilStable', () => {
       fixture.componentRef.setInput('isTestingIntervalWithinZone', true);
 
       try {
-        await runTasksUntilStable(fixture, {debug: true});
+        runTasksUntilStable(fixture, {debug: true});
       } catch (error) {
       }
 
@@ -160,17 +160,17 @@ describe('runTasksUntilStable', () => {
       console.warn = originalConsoleWarn;
     }));
 
-    it('should restore original setInterval after completion', fakeAsync(async () => {
+    it('should restore original setInterval after completion', fakeAsync(() => {
       fixture = TestBed.createComponent(TestComponent);
       const originalSetInterval = window.setInterval;
 
-      await runTasksUntilStable(fixture);
+      runTasksUntilStable(fixture);
 
       expect(window.setInterval).toBe(originalSetInterval);
     }));
   });
 
-  async function initComponent(testingSequence: boolean, testingInterval: boolean, httpCallInstructions: HttpCallInstruction[] = [], shouldRunTasks = true) {
+  function initComponent(testingSequence: boolean, testingInterval: boolean, httpCallInstructions: HttpCallInstruction[] = [], shouldRunTasks = true) {
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
 
@@ -178,7 +178,7 @@ describe('runTasksUntilStable', () => {
     fixture.componentRef.setInput('isTestingIntervalWithinZone', testingInterval);
 
     if(shouldRunTasks) {
-      await runTasksUntilStable(fixture, {httpCallInstructions});
+      runTasksUntilStable(fixture, {httpCallInstructions});
     }
   }
 });

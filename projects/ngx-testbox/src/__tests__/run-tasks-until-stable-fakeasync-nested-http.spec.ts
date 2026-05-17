@@ -159,7 +159,7 @@ describe('runTasksUntilStable (fakeAsync) - nested HTTP', () => {
     httpTestingController.verify();
   });
 
-  it('should stabilize a nested directive -> component -> component chain and render the final allowance', fakeAsync(async () => {
+  it('should stabilize a nested directive -> component -> component chain and render the final allowance', fakeAsync(() => {
     fixture = TestBed.createComponent(NestedHttpGraphComponent);
 
     const httpCallInstructions: HttpCallInstruction[] = [
@@ -192,7 +192,7 @@ describe('runTasksUntilStable (fakeAsync) - nested HTTP', () => {
       ],
     ];
 
-    await runTasksUntilStable(fixture, {httpCallInstructions});
+    runTasksUntilStable(fixture, {httpCallInstructions});
 
     const el = fixture.nativeElement as HTMLElement;
     const allowed = el.querySelectorAll('.allowed');

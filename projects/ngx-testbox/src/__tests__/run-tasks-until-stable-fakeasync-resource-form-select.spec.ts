@@ -100,7 +100,7 @@ describe('runTasksUntilStable (fakeAsync) - resource + form', () => {
       ],
     ];
 
-    await runTasksUntilStable(fixture, {httpCallInstructions});
+    runTasksUntilStable(fixture, {httpCallInstructions});
 
     // Assert options are present in the select.
     const selectDebugEl = harness.elements.countrySelect.query();
@@ -120,7 +120,7 @@ describe('runTasksUntilStable (fakeAsync) - resource + form', () => {
       [['/api/submit', 'POST'], () => new HttpResponse({body: {success: true}})],
     ];
 
-    await runTasksUntilStable(fixture, {httpCallInstructions: submitInstructions});
+    runTasksUntilStable(fixture, {httpCallInstructions: submitInstructions});
 
     expect(harness.elements.successMessage.getTextContent().trim()).toBe('submitted successfully');
   }));

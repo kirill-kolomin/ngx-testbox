@@ -129,27 +129,27 @@ describe('runTasksUntilStable (fakeAsync) - signals/forms/effects', () => {
     }).compileComponents();
   });
 
-  it('should stabilize signal-based reactive forms (computed + formControl)', fakeAsync(async () => {
+  it('should stabilize signal-based reactive forms (computed + formControl)', fakeAsync(() => {
     const fixture: ComponentFixture<SignalFormComponent> = TestBed.createComponent(SignalFormComponent);
     const instance = fixture.componentInstance;
 
-    await runTasksUntilStable(fixture);
+    runTasksUntilStable(fixture);
 
     expect(instance.status()).toBe('submitted');
   }));
 
-  it('should allow effects to run after stabilization when dependent signal changes', fakeAsync(async () => {
+  it('should allow effects to run after stabilization when dependent signal changes', fakeAsync(() => {
     const fixture: ComponentFixture<EffectComponent> = TestBed.createComponent(EffectComponent);
     const instance = fixture.componentInstance;
     const scheduler = TestBed.inject(EffectScheduler);
 
     scheduler.value.set(42);
-    await runTasksUntilStable(fixture);
+    runTasksUntilStable(fixture);
 
     expect(instance.seen()).toBe(42);
   }));
 
-  it('should stabilize computed signal outputs after input signal updates', fakeAsync(async () => {
+  it('should stabilize computed signal outputs after input signal updates', fakeAsync(() => {
     const fixture: ComponentFixture<InputOutputHostComponent> = TestBed.createComponent(
       InputOutputHostComponent
     );
@@ -157,7 +157,7 @@ describe('runTasksUntilStable (fakeAsync) - signals/forms/effects', () => {
 
     // Set new input value, then run stabilization.
     instance.count.set(3);
-    await runTasksUntilStable(fixture);
+    runTasksUntilStable(fixture);
 
     // Update is synchronous for computed; validate input->computed propagation by checking host DOM.
     const el = fixture.nativeElement as HTMLElement;
