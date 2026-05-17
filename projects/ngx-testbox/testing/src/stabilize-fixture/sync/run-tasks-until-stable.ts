@@ -98,7 +98,6 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
   const httpTestingController = TestBed.inject(HttpTestingController);
 
-
   let attempt = 0;
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
   let requests = getRequestsFromQueue(httpTestingController);
@@ -116,8 +115,11 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
     passTime(iterationMs);
     completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
     fixture.detectChanges();
+    
     try {
       passTime(iterationMs);
+      fixture.detectChanges();
+      passTime();
     } catch (error) {
       // We need the catch in cases when http instruction responds with an error, and the error callback is not passed to the observer. Otherwise, the error will fail the runtime.
       if (!(error instanceof HttpErrorResponse)) {
