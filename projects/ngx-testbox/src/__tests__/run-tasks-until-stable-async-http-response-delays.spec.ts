@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
-import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
 import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
@@ -54,7 +54,7 @@ describe('runTasksUntilStableAsync - HTTP response delays', () => {
     fixture = TestBed.createComponent(DelayHttpComponentAsync);
     component = fixture.componentInstance;
 
-    const instructions: HttpCallInstruction[] = Array.from({length: TOTAL_CALLS}).map((_, idx) => {
+    const instructions: HttpCallInstructionAsync[] = Array.from({length: TOTAL_CALLS}).map((_, idx) => {
       const i = idx + 1;
       return [
         [`/api/n-${idx}`, 'GET'],

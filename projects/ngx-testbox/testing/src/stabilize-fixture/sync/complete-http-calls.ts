@@ -1,11 +1,9 @@
 import {TestBed} from '@angular/core/testing';
 import {HttpTestingController, TestRequest} from '@angular/common/http/testing';
-import {HttpResponse} from '@angular/common/http';
-import {FailedToGenerateHttpResponseError} from '../../errors/FailedToGenerateHttpResponseError';
 import {NoMatchingHttpInstructionForRequestFoundError} from '../../errors/NoMatchingHttpInstructionForRequestFoundError';
-import { HttpCallInstruction } from '../../interfaces/http-call';
+import {  HttpCallInstruction } from '../../interfaces/http-call';
 import { getRequestsFromQueue } from '../../get-requests-from-queue';
-import { CannotUsePromiseResponseWithinFakeAsync } from '../../errors/CannotUsePromiseResponseWithinFakeAsync';
+import { type RequestsPassageMediator } from '../../internals/requests-passage';
 
 /**
  * Completes all HTTP calls that are in the queue and processes all subsequent tasks.
@@ -20,14 +18,18 @@ import { CannotUsePromiseResponseWithinFakeAsync } from '../../errors/CannotUseP
  * @param options.testRequests - The HTTP requests to be handled. If not provided, it will use the queue from the testing controller.
  * @throws Error if no matching instruction is found for a request
  */
-export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
-  httpTestingController = TestBed.inject(HttpTestingController),
-  testRequests
-}: {
-  httpTestingController?: HttpTestingController;
-  testRequests?: TestRequest[];
-} = {}) => {
-  const requests = testRequests || getRequestsFromQueue(httpTestingController);
+export const collectHttpCalls = (
+  httpCallInstructions: HttpCallInstruction[], 
+  requestsPassageMediator: RequestsPassageMediator, 
+  {
+    httpTestingController = TestBed.inject(HttpTestingController),
+    testRequests,
+  }: {
+    httpTestingController?: HttpTestingController;
+    testRequests?: TestRequest[];
+  } = {}
+) => {
+  const requests = [...(testRequests || []), ...getRequestsFromQueue(httpTestingController)];
 
   for (let testRequest of requests) {
     if (testRequest.cancelled) {
@@ -56,33 +58,8 @@ export const completeHttpCalls = (httpCallInstructions: HttpCallInstruction[], {
       throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
     }
 
-    const [_, responseGetter] = instruction;
-    const urlSearchParams = extractSearchParams(request.urlWithParams);
+    const [_, responseGetter, delay = 0] = instruction;
 
-    let response: HttpResponse<any>;
-    try {
-      const rawResponse = responseGetter(request, urlSearchParams);
-
-      if(rawResponse instanceof Promise) {
-        throw new CannotUsePromiseResponseWithinFakeAsync();
-      }
-
-      response = rawResponse;
-    } catch (error) {
-      throw new FailedToGenerateHttpResponseError(error);
-    }
-
-    testRequest.flush(response.body as any, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-    });
+    requestsPassageMediator.addRequest(testRequest, responseGetter, delay);
   }
-}
-
-function extractSearchParams(requestUrl: string): URLSearchParams {
-  const queryParams = requestUrl.split('?')[1];
-  const urlSearchParams = new URLSearchParams(queryParams);
-
-  return urlSearchParams;
 }

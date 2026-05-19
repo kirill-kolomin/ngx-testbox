@@ -1,6 +1,5 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {passTime} from '../../pass-time';
-import {completeHttpCalls} from './complete-http-calls';
+import {ComponentFixture, flush, TestBed, tick} from '@angular/core/testing';
+import {collectHttpCalls} from './complete-http-calls';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MaximumAttemptsToStabilizeFixtureReachedError} from '../../errors/MaximumAttemptsToStabilizeFixtureReachedError';
 import {HttpTestingController} from '@angular/common/http/testing';
@@ -9,6 +8,8 @@ import { trackRequiredHttpInstructionsToInvoke } from '../../internals/track-req
 import { throwIfThereIsHttpInstructionNotInvoked } from '../../internals/throw-if-there-is-http-instrcution-not-invoked';
 import { patchSetInterval } from '../../internals/patch-set-interval';
 import { getRequestsFromQueue } from '../../get-requests-from-queue';
+import { RequestsPassageMediator } from '../../internals/requests-passage';
+import { HttpCallInstruction } from '../../interfaces/http-call';
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -17,10 +18,20 @@ import { getRequestsFromQueue } from '../../get-requests-from-queue';
  */
 export interface RunTasksUntilStableParams extends CommonStabilizationParams {
   /**
-   * The amount of time in milliseconds to advance the virtual clock in each iteration.
-   * This is passed to the passTime function.
+   * Array of HTTP call instructions to process during stabilization.
+   * These instructions define how to handle specific HTTP requests.
    */
-  iterationMs?: number;
+  httpCallInstructions?: HttpCallInstruction[];
+
+  /**
+   * The amount of time in milliseconds to advance the virtual clock after fixture was stabilized.
+   * Is needed to settle all internal Angular's tasks.
+   * This time advance runs eventually after all http requests/instructions were processed,
+   * meaning the function "runTasksUntilStable" will finish its execution additionaly in the time provided within the parameter.
+   * 
+   * By default is equal to 1000
+   */
+  eventualTimeAdvance?: number;
 
   /**
    * Maximum number of attempts to stabilize the fixture before throwing an error.
@@ -86,11 +97,12 @@ export const MAXIMUM_ATTEMPTS = 30;
  * Use {@link RunTasksUntilStableParams#componentLongRunTimeout componentLongRunTimeout} for the new async/await approach instead.
  */
 export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
-  iterationMs,
+  eventualTimeAdvance,
   httpCallInstructions = [],
   debug
 }: RunTasksUntilStableParams = {}) => {
   let rollbackOriginalSetInterval = () => {};
+  const _eventualTimeAdvance = eventualTimeAdvance ?? 1000;
 
   if(debug) {
     rollbackOriginalSetInterval = patchSetInterval();
@@ -101,6 +113,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   let attempt = 0;
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
   let requests = getRequestsFromQueue(httpTestingController);
+  const requestsPassageMediator = new RequestsPassageMediator(debug);
 
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
@@ -111,21 +124,31 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
       throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
     }
 
-    fixture.detectChanges();
-    passTime(iterationMs);
-    completeHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
-    fixture.detectChanges();
+    collectHttpCalls(requiredHttpCallInstructions, requestsPassageMediator, {testRequests: requests});
     
-    try {
-      passTime(iterationMs);
+    while(requestsPassageMediator.passRequests()) {
       fixture.detectChanges();
-      passTime();
-    } catch (error) {
-      // We need the catch in cases when http instruction responds with an error, and the error callback is not passed to the observer. Otherwise, the error will fail the runtime.
-      if (!(error instanceof HttpErrorResponse)) {
-        throw error;
+
+      try {
+        tick();
+      } catch (error) {
+        if(error instanceof HttpErrorResponse) {
+          if(debug) {
+            console.warn('Unhandled error occured while processing requests. Don\'t forget to add error handlers for your async http calls.')
+          }
+        } else {
+          throw error;
+        }
       }
+
+      fixture.detectChanges();
+      tick();
+
+      collectHttpCalls(requiredHttpCallInstructions, requestsPassageMediator, {testRequests: requests});
     }
+
+    // NOTE: Seems to be an internal Angular's timeout. For the tour-of-heroes is required to be gte 10.
+    tick(_eventualTimeAdvance);
 
     requests = getRequestsFromQueue(httpTestingController);
   }

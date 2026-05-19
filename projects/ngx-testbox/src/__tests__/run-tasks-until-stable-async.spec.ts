@@ -4,7 +4,7 @@ import {HttpTestingController, provideHttpClientTesting} from '@angular/common/h
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from '../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
 import {NoMatchingHttpInstructionForRequestFoundError} from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
-import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
 import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 @Component({
@@ -55,7 +55,7 @@ describe('runTasksUntilStableAsync', () => {
   });
 
   it('should complete subsequent HTTP calls with provided instructions', async () => {
-    const httpCallInstructions: HttpCallInstruction[] = [
+    const httpCallInstructions: HttpCallInstructionAsync[] = [
       [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
       [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
       [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})],
@@ -77,7 +77,7 @@ describe('runTasksUntilStableAsync', () => {
   });
 
   it('should throw an error if an HTTP instruction is not invoked', async () => {
-    const httpCallInstructions: HttpCallInstruction[] = [
+    const httpCallInstructions: HttpCallInstructionAsync[] = [
       [['/api/unused', 'GET'], () => new HttpResponse({body: {}, status: 200})],
       [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
       [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
@@ -101,7 +101,7 @@ describe('runTasksUntilStableAsync', () => {
   });
 
   it('should call advanceTimersBy during stabilization', async () => {
-    const httpCallInstructions: HttpCallInstruction[] = [
+    const httpCallInstructions: HttpCallInstructionAsync[] = [
       [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
       [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
       [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})],

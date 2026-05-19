@@ -1,5 +1,5 @@
 import { CallTrackers } from "../interfaces/call-trackers";
-import { HttpCallInstruction, ResponseGetter } from "../interfaces/http-call";
+import { HttpCallInstruction, HttpCallInstructionAsync, ResponseGetter, ResponseGetterAsync } from "../interfaces/http-call";
 
 /**
  * Creates trackers for HTTP call instructions to monitor which ones are invoked.
@@ -13,8 +13,8 @@ import { HttpCallInstruction, ResponseGetter } from "../interfaces/http-call";
  * @returns.callTrackers - Array of call trackers, each containing a function to check if the call was made
  * @internal
  */
-export function trackRequiredHttpInstructionsToInvoke(_httpCallInstructions: HttpCallInstruction[] = []): {
-  requiredHttpCallInstructions: HttpCallInstruction[],
+export function trackRequiredHttpInstructionsToInvoke<T extends HttpCallInstruction | HttpCallInstructionAsync = HttpCallInstruction>(_httpCallInstructions: T[] = []): {
+  requiredHttpCallInstructions: T[],
   callTrackers: CallTrackers
 } {
   const callTrackers: CallTrackers = [];
@@ -24,7 +24,7 @@ export function trackRequiredHttpInstructionsToInvoke(_httpCallInstructions: Htt
     let wasCalled = false;
     const responseGetter = httpCallInstruction[1];
 
-    const tracker: ResponseGetter = function (...args: Parameters<ResponseGetter>) {
+    const tracker: ResponseGetter | ResponseGetterAsync = function (...args: Parameters<ResponseGetter>) {
       wasCalled = true;
       return responseGetter(...args);
     }

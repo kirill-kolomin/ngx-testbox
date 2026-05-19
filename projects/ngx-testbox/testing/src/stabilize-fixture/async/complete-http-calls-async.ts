@@ -3,7 +3,7 @@ import {HttpTestingController, TestRequest} from '@angular/common/http/testing';
 import {HttpResponse} from '@angular/common/http';
 import {FailedToGenerateHttpResponseError} from '../../errors/FailedToGenerateHttpResponseError';
 import {NoMatchingHttpInstructionForRequestFoundError} from '../../errors/NoMatchingHttpInstructionForRequestFoundError';
-import { HttpCallInstruction } from '../../interfaces/http-call';
+import { HttpCallInstructionAsync } from '../../interfaces/http-call';
 import { getRequestsFromQueue } from '../../get-requests-from-queue';
 
 /**
@@ -19,7 +19,7 @@ import { getRequestsFromQueue } from '../../get-requests-from-queue';
  * @param options.testRequests - The HTTP requests to be handled. If not provided, it will use the queue from the testing controller.
  * @throws Error if no matching instruction is found for a request
  */
-export const completeHttpCallsAsync = async (httpCallInstructions: HttpCallInstruction[], {
+export const completeHttpCallsAsync = async (httpCallInstructions: HttpCallInstructionAsync[], {
   httpTestingController = TestBed.inject(HttpTestingController),
   testRequests
 }: {
@@ -35,7 +35,7 @@ export const completeHttpCallsAsync = async (httpCallInstructions: HttpCallInstr
 
     const {request} = testRequest;
 
-    const instruction: HttpCallInstruction | undefined = httpCallInstructions.find(([checker]) => {
+    const instruction: HttpCallInstructionAsync | undefined = httpCallInstructions.find(([checker]) => {
       if (typeof checker === "function") {
         return checker(request);
       }

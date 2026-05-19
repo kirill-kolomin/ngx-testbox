@@ -7,6 +7,7 @@ import { LongRunningComponentError } from "../../errors/LongRunningComponentErro
 import { throwIfThereIsHttpInstructionNotInvoked } from "../../internals/throw-if-there-is-http-instrcution-not-invoked";
 import { patchSetInterval } from "../../internals/patch-set-interval";
 import { getRequestsFromQueue } from "../../get-requests-from-queue";
+import { HttpCallInstructionAsync } from "../../interfaces/http-call";
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -24,6 +25,7 @@ export interface RunTasksUntilStableAsyncParams extends CommonStabilizationParam
    * The time when component is considered as too-long-running to finish the test. Measured in milliseconds.
    */
   componentLongRunTimeout?: number;
+  httpCallInstructions?: HttpCallInstructionAsync[];
 }
 
 /**
@@ -55,7 +57,7 @@ export async function runTasksUntilStableAsync(
 
   const _componentLongRunTimeout = componentLongRunTimeout ?? COMPONENT_LONG_RUN_TIMEOUT;
   const httpTestingController = TestBed.inject(HttpTestingController);
-  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
+  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke<HttpCallInstructionAsync>(httpCallInstructions);
 
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();

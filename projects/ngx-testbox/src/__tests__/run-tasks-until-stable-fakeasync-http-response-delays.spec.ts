@@ -59,15 +59,13 @@ describe('runTasksUntilStable - HTTP response delays', () => {
       const i = idx + 1;
       return [
         [`/api/n-${idx}`, 'GET'],
-        async () => {
-          await new Promise<void>((resolve) => setTimeout(resolve, i * 1000));
-          return new HttpResponse({body: {value: `value-${i}`}, status: 200});
-        },
+        () => new HttpResponse({body: {value: `value-${i}`}, status: 200}),
+        i * 1000
       ];
     });
 
     runTasksUntilStable(fixture, {
-      iterationMs: 500,
+      eventualTimeAdvance: 500,
       httpCallInstructions: instructions,
       debug: false,
       maxAttempts: 100

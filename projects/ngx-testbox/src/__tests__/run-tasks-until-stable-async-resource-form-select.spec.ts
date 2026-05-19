@@ -9,7 +9,7 @@ import {TestIdDirective} from '../lib/directives/test-id.directive';
 import {inject} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
 import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 type Country = {code: string; name: string};
@@ -97,7 +97,7 @@ describe('runTasksUntilStableAsync - resource + form', () => {
     const fixture = TestBed.createComponent(ResourceSelectFormComponent);
     const harness = new DebugElementHarness(fixture.debugElement, testIds);
 
-    const httpCallInstructions: HttpCallInstruction[] = [
+    const httpCallInstructions: HttpCallInstructionAsync[] = [
       [['/api/countries', 'GET'], () => new HttpResponse({body: [{code: 'GB', name: 'United Kingdom'}, {code: 'DE', name: 'Germany'}]})],
     ];
 
@@ -125,7 +125,7 @@ describe('runTasksUntilStableAsync - resource + form', () => {
 
     harness.elements.submitButton.click();
 
-    const submitInstructions: HttpCallInstruction[] = [
+    const submitInstructions: HttpCallInstructionAsync[] = [
       [['/api/submit', 'POST'], () => new HttpResponse({body: {success: true}})],
     ];
 

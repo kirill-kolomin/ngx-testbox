@@ -11,7 +11,7 @@ import {
   NoMatchingHttpInstructionForRequestFoundError
 } from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import { getRequestsFromQueue } from '../../testing/src/get-requests-from-queue';
-import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
 
 describe('completeHttpCalls', () => {
   let httpClient: HttpClient;
@@ -63,7 +63,7 @@ describe('completeHttpCalls', () => {
       httpClient.get('/api/test').subscribe(responseSpy);
 
       const mockBody = { data: 'test response' };
-      const instructions: HttpCallInstruction[] = [
+      const instructions: HttpCallInstructionAsync[] = [
         [['/api/test', 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
       ];
 
@@ -78,7 +78,7 @@ describe('completeHttpCalls', () => {
       httpClient.get('/api/test?param=value').subscribe(responseSpy);
 
       const mockBody = { data: 'test response' };
-      const instructions: HttpCallInstruction[] = [
+      const instructions: HttpCallInstructionAsync[] = [
         [
           (request: HttpRequest<unknown>) =>
             request.method === 'GET' && request.url.includes('/api/test'),
@@ -97,7 +97,7 @@ describe('completeHttpCalls', () => {
       httpClient.get('/api/users/123').subscribe(responseSpy);
 
       const mockBody = { id: 123, name: 'Test User' };
-      const instructions: HttpCallInstruction[] = [
+      const instructions: HttpCallInstructionAsync[] = [
         [[/\/api\/users\/\d+/, 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
       ];
 
@@ -113,7 +113,7 @@ describe('completeHttpCalls', () => {
 
       httpClient.get('/api/test?param1=value1&param2=value2').subscribe();
 
-      const instructions: HttpCallInstruction[] = [
+      const instructions: HttpCallInstructionAsync[] = [
         [['/api/test', 'GET'], responseGetterSpy]
       ];
 
@@ -131,7 +131,7 @@ describe('completeHttpCalls', () => {
     it('should throw an error if no matching instruction is found for a request', async () => {
       httpClient.get('/api/test').subscribe();
 
-      const instructions: HttpCallInstruction[] = [
+      const instructions: HttpCallInstructionAsync[] = [
         [['/api/other', 'GET'], () => new HttpResponse({ body: {}, status: 200 })]
       ];
 

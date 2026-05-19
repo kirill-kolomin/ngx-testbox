@@ -2,7 +2,7 @@
  * Public API Surface of ngx-testbox
  */
 
-export {completeHttpCalls} from './stabilize-fixture/sync/complete-http-calls';
+export {collectHttpCalls} from './stabilize-fixture/sync/complete-http-calls';
 export {runTasksUntilStable, type RunTasksUntilStableParams, MAXIMUM_ATTEMPTS} from './stabilize-fixture/sync/run-tasks-until-stable';
 export {completeHttpCallsAsync} from './stabilize-fixture/async/complete-http-calls-async';
 export {runTasksUntilStableAsync, type RunTasksUntilStableAsyncParams, COMPONENT_LONG_RUN_TIMEOUT} from './stabilize-fixture/async/run-tasks-until-stable-async'

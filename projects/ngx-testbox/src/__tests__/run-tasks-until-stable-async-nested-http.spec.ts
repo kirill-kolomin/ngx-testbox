@@ -11,7 +11,7 @@ import {
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting, HttpTestingController} from '@angular/common/http/testing';
-import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
 import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 type CurrencySymbolResponse = {currency: string; symbol: string};
@@ -161,7 +161,7 @@ describe('runTasksUntilStableAsync - nested HTTP', () => {
 
   it('should stabilize a nested directive -> component -> component chain and render the final allowance', async () => {
     fixture = TestBed.createComponent(NestedHttpGraphComponent);
-    const httpCallInstructions: HttpCallInstruction[] = [
+    const httpCallInstructions: HttpCallInstructionAsync[] = [
       [
         ['/api/countries', 'GET'],
         () => new Promise<HttpResponse<any>>(resolve => setTimeout(() => resolve(new HttpResponse<string[]>({body: ['FR', 'US'], status: 200})), 200)),
