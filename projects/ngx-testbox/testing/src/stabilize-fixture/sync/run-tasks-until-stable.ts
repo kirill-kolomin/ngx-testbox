@@ -9,7 +9,7 @@ import { throwIfThereIsHttpInstructionNotInvoked } from '../../internals/throw-i
 import { patchSetInterval } from '../../internals/patch-set-interval';
 import { getRequestsFromQueue } from '../../get-requests-from-queue';
 import { RequestsPassageMediator } from '../../internals/requests-passage';
-import { HttpCallInstruction } from '../../interfaces/http-call';
+import { Assert, HttpCallInstruction } from '../../interfaces/http-call';
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -125,8 +125,9 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
     }
 
     collectHttpCalls(requiredHttpCallInstructions, requestsPassageMediator, {testRequests: requests});
+    let passRequestsResult = requestsPassageMediator.passRequests();
     
-    while(requestsPassageMediator.passRequests()) {
+    while(passRequestsResult.shouldStabilizeAfterRequests) {
       fixture.detectChanges();
 
       try {
@@ -144,7 +145,10 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
       fixture.detectChanges();
       tick();
 
+      passRequestsResult.asserts?.forEach((assert) => assert());
+
       collectHttpCalls(requiredHttpCallInstructions, requestsPassageMediator, {testRequests: requests});
+      passRequestsResult = requestsPassageMediator.passRequests();
     }
 
     // NOTE: Seems to be an internal Angular's timeout. For the tour-of-heroes is required to be gte 10.

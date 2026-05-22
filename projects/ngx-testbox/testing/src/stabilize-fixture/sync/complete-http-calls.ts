@@ -58,7 +58,8 @@ export const collectHttpCalls = (
       throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
     }
 
-    const [_, responseGetter, delay = 0] = instruction;
+    const [_, responseGetter, options] = instruction;
+    const delay = options?.delay ?? 0;
 
     requestsPassageMediator.addRequest(testRequest, responseGetter, delay);
   }

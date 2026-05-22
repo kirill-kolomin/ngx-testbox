@@ -1,5 +1,10 @@
 import { HttpRequest, HttpResponse } from "@angular/common/http";
 
+/**
+ * Assert function that is called after an http instruction was processed.
+ * Note it doesn't wait for the fixture stability to run the callback, more likely there are ongoing async operations.
+ */
+export type Assert = () => void;
 
 /**
  * Represents an HTTP method (GET, POST, PUT, DELETE, etc.).
@@ -48,10 +53,12 @@ export type HttpCallChecker = ((httpRequest: HttpRequest<unknown>) => boolean) |
  * A tuple containing an HTTP call checker and a response getter function.
  * Used to define how to handle specific HTTP requests during testing.
  */
-export type HttpCallInstruction = [HttpCallChecker, ResponseGetter] | [HttpCallChecker, ResponseGetter, DelayTime];
+export type HttpCallInstruction = [HttpCallChecker, ResponseGetter] | [HttpCallChecker, ResponseGetter, HttpCallInstructionExtraParams];
 
 /**
  * A tuple containing an HTTP call checker and a response getter function.
  * Used to define how to handle specific HTTP requests during testing.
  */
 export type HttpCallInstructionAsync = [HttpCallChecker, ResponseGetterAsync];
+
+export type HttpCallInstructionExtraParams = { delay?: DelayTime; assert?: Assert };

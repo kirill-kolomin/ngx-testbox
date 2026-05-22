@@ -60,7 +60,7 @@ describe('runTasksUntilStable - HTTP response delays', () => {
       return [
         [`/api/n-${idx}`, 'GET'],
         () => new HttpResponse({body: {value: `value-${i}`}, status: 200}),
-        i * 1000
+        {delay: i * 1000}
       ];
     });
 

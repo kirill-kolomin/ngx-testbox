@@ -1,5 +1,3 @@
-import { HttpCallInstruction } from "./http-call";
-
 export interface CommonStabilizationParams {
   /**
    * When turned on (true) indicates places that invoke setInterval.
