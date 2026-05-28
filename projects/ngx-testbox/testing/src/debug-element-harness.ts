@@ -39,6 +39,20 @@ type ElementApi = {
    * @returns The text content of the element.
    */
   getTextContent: (parentDebugElement?: DebugElement) => string;
+
+  /**
+   * Sets the value of a form element (input/select) and dispatches a 'change' event.
+   * @param value - The value to set.
+   * @param parentDebugElement - Optional parent debug element to search within.
+   */
+  changeValue: (value: string, parentDebugElement?: DebugElement) => void;
+
+  /**
+   * Sets the value of a form element (input/select) and dispatches a 'input' event.
+   * @param value - The value to set.
+   * @param parentDebugElement - Optional parent debug element to search within.
+   */
+  inputValue: (value: string, parentDebugElement?: DebugElement) => void;
 }
 
 /**
@@ -89,6 +103,8 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
         click: (parentDebugElement?: DebugElement) => this.#clickOnElement(testId, parentDebugElement),
         focus: (parentDebugElement?: DebugElement) => this.#focusOnElement(testId, parentDebugElement),
         getTextContent: (parentDebugElement?: DebugElement) => this.#getTextContent(testId, parentDebugElement),
+        changeValue: (value: string, parentDebugElement?: DebugElement) => this.#changeValue(testId, value, parentDebugElement),
+        inputValue: (value: string, parentDebugElement?: DebugElement) => this.#inputValue(testId, value, parentDebugElement),
       } satisfies ElementApi;
 
       return elements
@@ -131,5 +147,27 @@ export class DebugElementHarness<TestIds extends readonly string[]> {
     }
 
     return element.nativeElement.textContent;
+  }
+
+  #changeValue(testId: TestIds[number], value: string, parentDebugElement?: DebugElement): void {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new NoElementByTestIdFoundError(testId);
+    }
+
+    element.nativeElement.value = value;
+    element.nativeElement.dispatchEvent(new Event('change'));
+  }
+
+  #inputValue(testId: TestIds[number], value: string, parentDebugElement?: DebugElement): void {
+    const element = this.#query(testId, parentDebugElement);
+
+    if (!element) {
+      throw new NoElementByTestIdFoundError(testId);
+    }
+
+    element.nativeElement.value = value;
+    element.nativeElement.dispatchEvent(new Event('input'));
   }
 }
