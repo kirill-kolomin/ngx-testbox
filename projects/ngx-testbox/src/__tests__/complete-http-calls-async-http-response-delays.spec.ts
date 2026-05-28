@@ -7,7 +7,7 @@ import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http'
 import {
   completeHttpCallsAsync,
 } from '../../testing/src/stabilize-fixture/async/complete-http-calls-async';
-import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
+import { EnrichedHttpInstructionAsync } from '../../testing/src/internals/enriched-http-instruction';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
@@ -44,7 +44,7 @@ describe('completeHttpCalls - HTTP response delays', () => {
     makeRequest(0);
     let index = 0;
 
-    const instructions: HttpCallInstructionAsync[] = Array.from({length: TOTAL_CALLS}).map((_, idx) => {
+    const instructions: EnrichedHttpInstructionAsync[] = Array.from({length: TOTAL_CALLS}).map((_, idx) => {
       const i = idx + 1;
       return [
         [`/api/n-${idx}`, 'GET'],
@@ -53,6 +53,7 @@ describe('completeHttpCalls - HTTP response delays', () => {
           index++;
           return new HttpResponse({body: {value: `value-${i}`}, status: 200});
         },
+        {callTracker: () => {}, markAsCancelled: () => {}}
       ];
     });
 

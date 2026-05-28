@@ -8,6 +8,7 @@ import { throwIfThereIsHttpInstructionNotInvoked } from "../../internals/throw-i
 import { patchSetInterval } from "../../internals/patch-set-interval";
 import { getRequestsFromQueue } from "../../get-requests-from-queue";
 import { HttpCallInstructionAsync } from "../../interfaces/http-call";
+import { EnrichedHttpInstructionAsync } from "../../internals/enriched-http-instruction";
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -57,7 +58,7 @@ export async function runTasksUntilStableAsync(
 
   const _componentLongRunTimeout = componentLongRunTimeout ?? COMPONENT_LONG_RUN_TIMEOUT;
   const httpTestingController = TestBed.inject(HttpTestingController);
-  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke<HttpCallInstructionAsync>(httpCallInstructions);
+  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
 
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
@@ -91,7 +92,7 @@ export async function runTasksUntilStableAsync(
     }
 
     try {
-      await completeHttpCallsAsync(requiredHttpCallInstructions, {testRequests: requests});
+      await completeHttpCallsAsync(requiredHttpCallInstructions as EnrichedHttpInstructionAsync[], {testRequests: requests});
       requests = [];
     } catch (error) {
       reject(error);

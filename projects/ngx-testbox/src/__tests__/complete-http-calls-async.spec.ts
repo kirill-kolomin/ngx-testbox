@@ -11,7 +11,7 @@ import {
   NoMatchingHttpInstructionForRequestFoundError
 } from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import { getRequestsFromQueue } from '../../testing/src/get-requests-from-queue';
-import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
+import { EnrichedHttpInstructionAsync } from '../../testing/src/internals/enriched-http-instruction';
 
 describe('completeHttpCalls', () => {
   let httpClient: HttpClient;
@@ -63,8 +63,8 @@ describe('completeHttpCalls', () => {
       httpClient.get('/api/test').subscribe(responseSpy);
 
       const mockBody = { data: 'test response' };
-      const instructions: HttpCallInstructionAsync[] = [
-        [['/api/test', 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
+      const instructions: EnrichedHttpInstructionAsync[] = [
+        [['/api/test', 'GET'], () => new HttpResponse({ body: mockBody, status: 200 }), {callTracker: () => {}, markAsCancelled: () => {}}]
       ];
 
       await completeHttpCallsAsync(instructions);
@@ -78,11 +78,12 @@ describe('completeHttpCalls', () => {
       httpClient.get('/api/test?param=value').subscribe(responseSpy);
 
       const mockBody = { data: 'test response' };
-      const instructions: HttpCallInstructionAsync[] = [
+      const instructions: EnrichedHttpInstructionAsync[] = [
         [
           (request: HttpRequest<unknown>) =>
             request.method === 'GET' && request.url.includes('/api/test'),
-          () => new HttpResponse({ body: mockBody, status: 200 })
+          () => new HttpResponse({ body: mockBody, status: 200 }),
+          {callTracker: () => {}, markAsCancelled: () => {}}
         ]
       ];
 
@@ -97,8 +98,8 @@ describe('completeHttpCalls', () => {
       httpClient.get('/api/users/123').subscribe(responseSpy);
 
       const mockBody = { id: 123, name: 'Test User' };
-      const instructions: HttpCallInstructionAsync[] = [
-        [[/\/api\/users\/\d+/, 'GET'], () => new HttpResponse({ body: mockBody, status: 200 })]
+      const instructions: EnrichedHttpInstructionAsync[] = [
+        [[/\/api\/users\/\d+/, 'GET'], () => new HttpResponse({ body: mockBody, status: 200 }), {callTracker: () => {}, markAsCancelled: () => {}}]
       ];
 
       await completeHttpCallsAsync(instructions);
@@ -113,8 +114,8 @@ describe('completeHttpCalls', () => {
 
       httpClient.get('/api/test?param1=value1&param2=value2').subscribe();
 
-      const instructions: HttpCallInstructionAsync[] = [
-        [['/api/test', 'GET'], responseGetterSpy]
+      const instructions: EnrichedHttpInstructionAsync[] = [
+        [['/api/test', 'GET'], responseGetterSpy, {callTracker: () => {}, markAsCancelled: () => {}}]
       ];
 
       await completeHttpCallsAsync(instructions);
@@ -131,8 +132,8 @@ describe('completeHttpCalls', () => {
     it('should throw an error if no matching instruction is found for a request', async () => {
       httpClient.get('/api/test').subscribe();
 
-      const instructions: HttpCallInstructionAsync[] = [
-        [['/api/other', 'GET'], () => new HttpResponse({ body: {}, status: 200 })]
+      const instructions: EnrichedHttpInstructionAsync[] = [
+        [['/api/other', 'GET'], () => new HttpResponse({ body: {}, status: 200 }), {callTracker: () => {}, markAsCancelled: () => {}}]
       ];
 
       await expectAsync(completeHttpCallsAsync(instructions)).toBeRejectedWithError(
