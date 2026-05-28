@@ -1,10 +1,10 @@
 import { HttpRequest, HttpResponse } from "@angular/common/http";
 
 /**
- * Assert function that is called after an http instruction was processed.
+ * OnCompleted function that is called after an http instruction was processed.
  * Note it doesn't wait for the fixture stability to run the callback, more likely there are ongoing async operations.
  */
-export type Assert = () => void;
+export type OnCompleted = () => void;
 
 /**
  * Represents an HTTP method (GET, POST, PUT, DELETE, etc.).
@@ -61,4 +61,4 @@ export type HttpCallInstruction = [HttpCallChecker, ResponseGetter] | [HttpCallC
  */
 export type HttpCallInstructionAsync = [HttpCallChecker, ResponseGetterAsync];
 
-export type HttpCallInstructionExtraParams = { delay?: DelayTime; assert?: Assert };
+export type HttpCallInstructionExtraParams = { delay?: DelayTime; onCompleted?: OnCompleted, willHaveBeenCancelled?: boolean; };

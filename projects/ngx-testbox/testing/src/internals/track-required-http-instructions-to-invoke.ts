@@ -1,5 +1,6 @@
 import { CallTrackers } from "../interfaces/call-trackers";
 import { HttpCallInstruction, HttpCallInstructionAsync, ResponseGetter, ResponseGetterAsync } from "../interfaces/http-call";
+import { EnrichedHttpInstruction, EnrichedHttpInstructionAsync } from "./enriched-http-instruction";
 
 /**
  * Creates trackers for HTTP call instructions to monitor which ones are invoked.
@@ -13,26 +14,29 @@ import { HttpCallInstruction, HttpCallInstructionAsync, ResponseGetter, Response
  * @returns.callTrackers - Array of call trackers, each containing a function to check if the call was made
  * @internal
  */
-export function trackRequiredHttpInstructionsToInvoke<T extends HttpCallInstruction | HttpCallInstructionAsync = HttpCallInstruction>(_httpCallInstructions: T[] = []): {
-  requiredHttpCallInstructions: T[],
+export function trackRequiredHttpInstructionsToInvoke<T extends (EnrichedHttpInstruction | EnrichedHttpInstructionAsync)>(httpCallInstructions: (HttpCallInstruction | HttpCallInstructionAsync)[] = []): {
+  requiredHttpCallInstructions: (EnrichedHttpInstruction | EnrichedHttpInstructionAsync)[],
   callTrackers: CallTrackers
 } {
   const callTrackers: CallTrackers = [];
-  const httpCallInstructions = _httpCallInstructions.slice()
+  const requiredHttpCallInstructions: T[] = [];
 
   for (let httpCallInstruction of httpCallInstructions) {
+    const [checker, getter, params] = httpCallInstruction;
     let wasCalled = false;
-    const responseGetter = httpCallInstruction[1];
 
-    const tracker: ResponseGetter | ResponseGetterAsync = function (...args: Parameters<ResponseGetter>) {
-      wasCalled = true;
-      return responseGetter(...args);
-    }
+    const callTracker = () => {wasCalled = true};
+    const markAsCancelled = () => {wasCalled = true};
     const checkWasCalled = () => wasCalled;
+    const enrichedPayload = {
+      ...params,
+      callTracker,
+      markAsCancelled ,
+    };
 
-    callTrackers.push([checkWasCalled, [httpCallInstruction[0], responseGetter]])
-    httpCallInstruction[1] = tracker;
+    callTrackers.push([checkWasCalled, [checker, getter]]);
+    requiredHttpCallInstructions.push([checker, getter, enrichedPayload] as T);
   }
 
-  return {requiredHttpCallInstructions: httpCallInstructions, callTrackers};
+  return {requiredHttpCallInstructions, callTrackers};
 }

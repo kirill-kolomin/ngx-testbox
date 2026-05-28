@@ -9,7 +9,8 @@ import { throwIfThereIsHttpInstructionNotInvoked } from '../../internals/throw-i
 import { patchSetInterval } from '../../internals/patch-set-interval';
 import { getRequestsFromQueue } from '../../get-requests-from-queue';
 import { RequestsPassageMediator } from '../../internals/requests-passage';
-import { Assert, HttpCallInstruction } from '../../interfaces/http-call';
+import { HttpCallInstruction } from '../../interfaces/http-call';
+import { EnrichedHttpInstruction } from '../../internals/enriched-http-instruction';
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -124,7 +125,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
       throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
     }
 
-    collectHttpCalls(requiredHttpCallInstructions, requestsPassageMediator, {testRequests: requests});
+    collectHttpCalls(requiredHttpCallInstructions as EnrichedHttpInstruction[], requestsPassageMediator, {testRequests: requests});
     let passRequestsResult = requestsPassageMediator.passRequests();
     
     while(passRequestsResult.shouldStabilizeAfterRequests) {
@@ -141,13 +142,14 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
           throw error;
         }
       }
-
+      
+      // NOTE it requires to have one more run.
       fixture.detectChanges();
       tick();
 
       passRequestsResult.asserts?.forEach((assert) => assert());
 
-      collectHttpCalls(requiredHttpCallInstructions, requestsPassageMediator, {testRequests: requests});
+      collectHttpCalls(requiredHttpCallInstructions as EnrichedHttpInstruction[], requestsPassageMediator, {testRequests: requests});
       passRequestsResult = requestsPassageMediator.passRequests();
     }
 

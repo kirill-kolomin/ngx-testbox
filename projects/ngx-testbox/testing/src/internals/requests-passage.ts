@@ -3,18 +3,18 @@ import { HttpResponse } from "@angular/common/http";
 import { CannotUsePromiseResponseWithinFakeAsync } from "../errors/CannotUsePromiseResponseWithinFakeAsync";
 import { FailedToGenerateHttpResponseError } from "../errors/FailedToGenerateHttpResponseError";
 import { passTime } from "../pass-time";
-import { Assert, HttpCallInstructionExtraParams, ResponseGetter } from "../interfaces/http-call";
+import { OnCompleted, ResponseGetter } from "../interfaces/http-call";
+import { EnrichedHttpInstructionPayload } from "./enriched-http-instruction";
 
 
 export class RequestsPassageMediator {
     #timePassed = 0;
-    #requests: Record<number, ([TestRequest, ResponseGetter] | [TestRequest, ResponseGetter, Assert])[]> = {};
+    #requests: Record<number, [TestRequest, ResponseGetter, EnrichedHttpInstructionPayload][]> = {};
 
     constructor(private debug = false) {}
 
-    addRequest(httpRequest: TestRequest, responseGetter: ResponseGetter, extraParams?: HttpCallInstructionExtraParams): void {
-        const delaySinceBeginning = extraParams?.delay ?? 0;
-        const assert = extraParams?.assert;
+    addRequest(httpRequest: TestRequest, responseGetter: ResponseGetter, instructionPayload: EnrichedHttpInstructionPayload): void {
+        const delaySinceBeginning = instructionPayload?.delay ?? 0;
         let delayDelta = delaySinceBeginning - this.#timePassed;
         
         if(this.debug && delayDelta < 0) {
@@ -24,14 +24,14 @@ export class RequestsPassageMediator {
         const key = delayDelta < 0 ? this.#timePassed : delaySinceBeginning;
 
         if(!this.#requests[key]) {
-            this.#requests[key] = assert ? [[httpRequest, responseGetter, assert]] : [[httpRequest, responseGetter]];
+            this.#requests[key] = [[httpRequest, responseGetter, instructionPayload]];
 
         } else {
-            this.#requests[key].push(assert ? [httpRequest, responseGetter, assert] : [httpRequest, responseGetter]);
+            this.#requests[key].push([httpRequest, responseGetter, instructionPayload]);
         }
     }
 
-    passRequests(): {shouldStabilizeAfterRequests: boolean, asserts?: Assert[]} {
+    passRequests(): {shouldStabilizeAfterRequests: boolean, asserts?: OnCompleted[]} {
         const key = Object.keys(this.#requests).sort((a, b) => Number(a) - Number(b))[0];
 
         if(!key) {
@@ -40,13 +40,13 @@ export class RequestsPassageMediator {
 
         const delay = Number(key) - this.#timePassed;
         const requests = this.#requests[Number(key)];
-        const asserts: Assert[] = [];
+        const asserts: OnCompleted[] = [];
 
         if(delay > 0) {
             passTime(delay);
         }
 
-        for(let [testRequest, responseGetter, assert] of requests) {
+        for(let [testRequest, responseGetter, instructionPayload] of requests) {
             const {request} = testRequest;
             const urlSearchParams = extractSearchParams(request.urlWithParams);
 
@@ -63,13 +63,19 @@ export class RequestsPassageMediator {
                 throw new FailedToGenerateHttpResponseError(error);
             }
 
+            instructionPayload?.onCompleted ? asserts.push(instructionPayload.onCompleted) : void 0;
+
+            if(testRequest.cancelled) {
+                instructionPayload?.willHaveBeenCancelled ? instructionPayload.markAsCancelled() : void 0;
+                continue;
+            }
+
             testRequest.flush(response.body as any, {
             status: response.status,
             statusText: response.statusText,
             headers: response.headers,
             });
-
-            assert ? asserts.push(assert) : void 0;
+            instructionPayload.callTracker();
         }
 
         delete this.#requests[Number(key)];

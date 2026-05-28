@@ -7,13 +7,12 @@ import {HttpResponse} from '@angular/common/http';
 import {DebugElementHarness} from '../../testing/src/debug-element-harness';
 import {TestIdDirective} from '../lib/directives/test-id.directive';
 import {firstValueFrom} from 'rxjs';
-import {By} from '@angular/platform-browser';
 import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
 import { runTasksUntilStable } from '../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
 
 type Country = {code: string; name: string};
 
-const testIds = ['countrySelect', 'submitButton', 'successMessage'] as const;
+const testIds = ['countrySelect', 'submitButton', 'successMessage', 'countryOption'] as const;
 const testIdMap = TestIdDirective.idsToMap(testIds);
 
 @Injectable({providedIn: 'root'})
@@ -38,7 +37,7 @@ class CountriesApi {
         <select formControlName="country" [testboxTestId]="testIdMap.countrySelect">
           <option [ngValue]="null">-- choose --</option>
           @for (country of countries; track country.code) {
-            <option [value]="country.code">{{ country.name }}</option>
+            <option [testboxTestId]="testIdMap.countryOption" [value]="country.code">{{ country.name }}</option>
           }
         </select>
       </label>
@@ -104,18 +103,13 @@ describe('runTasksUntilStable (fakeAsync) - resource + form', () => {
 
     runTasksUntilStable(fixture, {httpCallInstructions});
 
-    // Assert options are present in the select.
-    const selectDebugEl = harness.elements.countrySelect.query();
-    const optionEls = selectDebugEl.queryAll(By.css('option'));
+    const optionEls = harness.elements.countryOption.queryAll();
 
-    expect(optionEls.length).toBeGreaterThan(1);
-    expect(optionEls.map((o) => (o.nativeElement as HTMLOptionElement).value)).toContain('DE');
+    expect(optionEls.length).toBe(2);
+    expect(optionEls[0].nativeElement.textContent).toBe('United Kingdom')
+    expect(optionEls[1].nativeElement.textContent).toBe('Germany')
 
-    // Select Germany and submit.
-    (selectDebugEl.nativeElement as HTMLSelectElement).value = 'DE';
-    selectDebugEl.nativeElement.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-
+    harness.elements.countrySelect.changeValue('DE');
     harness.elements.submitButton.click();
 
     const submitInstructions: HttpCallInstruction[] = [

@@ -4,6 +4,7 @@ import {NoMatchingHttpInstructionForRequestFoundError} from '../../errors/NoMatc
 import {  HttpCallInstruction } from '../../interfaces/http-call';
 import { getRequestsFromQueue } from '../../get-requests-from-queue';
 import { type RequestsPassageMediator } from '../../internals/requests-passage';
+import { EnrichedHttpInstruction } from '../../internals/enriched-http-instruction';
 
 /**
  * Completes all HTTP calls that are in the queue and processes all subsequent tasks.
@@ -19,7 +20,7 @@ import { type RequestsPassageMediator } from '../../internals/requests-passage';
  * @throws Error if no matching instruction is found for a request
  */
 export const collectHttpCalls = (
-  httpCallInstructions: HttpCallInstruction[], 
+  httpCallInstructions: EnrichedHttpInstruction[], 
   requestsPassageMediator: RequestsPassageMediator, 
   {
     httpTestingController = TestBed.inject(HttpTestingController),
@@ -38,7 +39,7 @@ export const collectHttpCalls = (
 
     const {request} = testRequest;
 
-    const instruction: HttpCallInstruction | undefined = httpCallInstructions.find(([checker]) => {
+    const instruction: EnrichedHttpInstruction | undefined = httpCallInstructions.find(([checker]) => {
       if (typeof checker === "function") {
         return checker(request);
       }
@@ -59,8 +60,6 @@ export const collectHttpCalls = (
     }
 
     const [_, responseGetter, options] = instruction;
-    const delay = options?.delay ?? 0;
-
-    requestsPassageMediator.addRequest(testRequest, responseGetter, delay);
+    requestsPassageMediator.addRequest(testRequest, responseGetter, options);
   }
 }
