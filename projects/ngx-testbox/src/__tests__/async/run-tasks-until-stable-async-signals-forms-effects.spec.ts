@@ -10,6 +10,7 @@ import {
   output,
   signal,
   Signal,
+  viewChild,
 } from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {
@@ -122,14 +123,14 @@ class InputOutputComponent {
 class InputOutputHostComponent {
   count: WritableSignal<number> = signal(1);
   last: WritableSignal<number> = signal(-1);
+  child = viewChild.required(InputOutputComponent);
 
   onDoubledChange(v: number) {
     this.last.set(v);
   }
 
   bumpChild() {
-    // Call through template reference would be ideal, but we keep it simple by mutating input.
-    // The component's doubledChange is emitted when bump() is called.
+    this.child().bump();
   }
 }
 
@@ -176,5 +177,10 @@ describe('runTasksUntilStableAsync - signals/forms/effects', () => {
     const el = fixture.nativeElement as HTMLElement;
     const last = el.querySelector('.last')?.textContent?.trim();
     expect(last).toBe('-1');
+
+    instance.bumpChild();
+    await runTasksUntilStableAsync(fixture);
+
+    expect(instance.last()).toBe(6);
   });
 });

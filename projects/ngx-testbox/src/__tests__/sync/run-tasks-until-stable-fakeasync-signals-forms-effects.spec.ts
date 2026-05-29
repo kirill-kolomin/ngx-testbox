@@ -10,6 +10,7 @@ import {
   output,
   signal,
   Signal,
+  viewChild,
 } from '@angular/core';
 import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -115,9 +116,14 @@ class InputOutputComponent {
 class InputOutputHostComponent {
   count: WritableSignal<number> = signal(1);
   last: WritableSignal<number> = signal(-1);
+  child = viewChild.required(InputOutputComponent);
 
   onDoubledChange(v: number) {
     this.last.set(v);
+  }
+
+  bumpChild() {
+    this.child().bump();
   }
 }
 
@@ -163,5 +169,10 @@ describe('runTasksUntilStable (fakeAsync) - signals/forms/effects', () => {
     const el = fixture.nativeElement as HTMLElement;
     const last = el.querySelector('.last')?.textContent?.trim();
     expect(last).toBe('-1');
+    
+    instance.bumpChild();
+    runTasksUntilStable(fixture);
+
+    expect(instance.last()).toBe(6);
   }));
 });

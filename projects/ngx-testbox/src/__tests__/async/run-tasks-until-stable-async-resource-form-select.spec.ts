@@ -4,13 +4,13 @@ import {FormsModule, ReactiveFormsModule, FormBuilder, Validators} from '@angula
 import {HttpClient, provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpResponse} from '@angular/common/http';
-import {DebugElementHarness} from '../../testing/src/debug-element-harness';
-import {TestIdDirective} from '../lib/directives/test-id.directive';
+import {DebugElementHarness} from '../../../testing/src/debug-element-harness';
+import {TestIdDirective} from '../../lib/directives/test-id.directive';
 import {inject} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
-import { runTasksUntilStableAsync } from '../../testing/src/run-tasks-until-stable-async';
+import { HttpCallInstructionAsync } from '../../../testing/src/interfaces/http-call';
+import { runTasksUntilStableAsync } from '../../../testing/src/run-tasks-until-stable-async';
 
 type Country = {code: string; name: string};
 
@@ -115,7 +115,7 @@ describe('runTasksUntilStableAsync - resource + form', () => {
     // Select Germany and submit.
     (selectDebugEl.nativeElement as HTMLSelectElement).value = 'DE';
     selectDebugEl.nativeElement.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
+    fixture.detectChanges(); 
 
     harness.elements.submitButton.click();
 
