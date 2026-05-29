@@ -2,13 +2,14 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { CommonStabilizationParams } from "../../interfaces/common-stabilization-params";
 import { HttpTestingController, TestRequest } from "@angular/common/http/testing";
 import { trackRequiredHttpInstructionsToInvoke } from "../../internals/track-required-http-instructions-to-invoke";
-import { completeHttpCallsAsync } from "./complete-http-calls-async";
 import { LongRunningComponentError } from "../../errors/LongRunningComponentError";
 import { throwIfThereIsHttpInstructionNotInvoked } from "../../internals/throw-if-there-is-http-instrcution-not-invoked";
 import { patchSetInterval } from "../../internals/patch-set-interval";
 import { getRequestsFromQueue } from "../../get-requests-from-queue";
 import { HttpCallInstructionAsync } from "../../interfaces/http-call";
 import { EnrichedHttpInstructionAsync } from "../../internals/enriched-http-instruction";
+import { RequestsPassageMediatorAsync } from "./requests-passage-async-public";
+import { collectHttpCallsAsync } from "./collect-http-calls-async";
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -20,7 +21,7 @@ export interface RunTasksUntilStableAsyncParams extends CommonStabilizationParam
    * Optional callback to advance fake timers (Jasmine, Vitest, etc.)
    * during stabilization.
    */
-  advanceTimers?: () => void | Promise<void>;
+  advanceTimers?: (delayMs: number) => void | Promise<void>;
   
   /**
    * The time when component is considered as too-long-running to finish the test. Measured in milliseconds.
@@ -60,6 +61,8 @@ export async function runTasksUntilStableAsync(
   const httpTestingController = TestBed.inject(HttpTestingController);
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
 
+  const requestsPassageMediator = new RequestsPassageMediatorAsync(!!debug);
+
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
 
@@ -92,14 +95,31 @@ export async function runTasksUntilStableAsync(
     }
 
     try {
-      await completeHttpCallsAsync(requiredHttpCallInstructions as EnrichedHttpInstructionAsync[], {testRequests: requests});
+      collectHttpCallsAsync(requiredHttpCallInstructions as EnrichedHttpInstructionAsync[], requestsPassageMediator, {
+        testRequests: requests,
+      });
+
       requests = [];
+
+      let passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);
+      while (passRequestsResult.shouldStabilizeAfterRequests) {
+        // Let Angular run change detection and settle microtasks.
+        fixture.detectChanges();
+        passRequestsResult.asserts?.forEach((assert) => assert());
+
+        await fixture.whenStable();
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        // Collect newly scheduled HTTP requests that arrived after the previous batch.
+        requests = getRequestsFromQueue(httpTestingController);
+        collectHttpCallsAsync(requiredHttpCallInstructions as EnrichedHttpInstructionAsync[], requestsPassageMediator, {
+          testRequests: requests,
+        });
+        passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);
+      }
     } catch (error) {
       reject(error);
-    }
-
-    if (advanceTimers) {
-      await advanceTimers();
     }
 
     await fixture.whenStable();

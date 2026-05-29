@@ -59,6 +59,12 @@ export type HttpCallInstruction = [HttpCallChecker, ResponseGetter] | [HttpCallC
  * A tuple containing an HTTP call checker and a response getter function.
  * Used to define how to handle specific HTTP requests during testing.
  */
-export type HttpCallInstructionAsync = [HttpCallChecker, ResponseGetterAsync];
+export type HttpCallInstructionAsync =
+  | [HttpCallChecker, ResponseGetterAsync]
+  | [HttpCallChecker, ResponseGetterAsync, HttpCallInstructionExtraParams];
 
-export type HttpCallInstructionExtraParams = { delay?: DelayTime; onCompleted?: OnCompleted, willHaveBeenCancelled?: boolean; };
+export type HttpCallInstructionExtraParams = {
+  delay?: DelayTime;
+  onCompleted?: OnCompleted;
+  willHaveBeenCancelled?: boolean;
+};
