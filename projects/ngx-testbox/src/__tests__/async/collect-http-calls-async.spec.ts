@@ -1,9 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { HttpClient, HttpRequest, HttpResponse, provideHttpClient } from '@angular/common/http';
-import {
-  collectHttpCallsAsync,
-} from '../../../testing/src/internals/collect-http-calls-async';
+import { collectHttpCallsAsync } from '../../../testing/src/internals/collect-http-calls-async';
 import { NoMatchingHttpInstructionForRequestFoundError } from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
