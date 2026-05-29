@@ -1,4 +1,4 @@
-import {ComponentFixture, flush, TestBed, tick} from '@angular/core/testing';
+import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
 import {collectHttpCalls} from './collectHttpCalls';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MaximumAttemptsToStabilizeFixtureReachedError} from '../../errors/MaximumAttemptsToStabilizeFixtureReachedError';
