@@ -1,15 +1,15 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { CommonStabilizationParams } from "../../interfaces/common-stabilization-params";
+import { CommonStabilizationParams } from "./interfaces/common-stabilization-params";
 import { HttpTestingController, TestRequest } from "@angular/common/http/testing";
-import { trackRequiredHttpInstructionsToInvoke } from "../../internals/track-required-http-instructions-to-invoke";
-import { LongRunningComponentError } from "../../errors/LongRunningComponentError";
-import { throwIfThereIsHttpInstructionNotInvoked } from "../../internals/throw-if-there-is-http-instrcution-not-invoked";
-import { patchSetInterval } from "../../internals/patch-set-interval";
-import { getRequestsFromQueue } from "../../internals/get-requests-from-queue";
-import { HttpCallInstructionAsync } from "../../interfaces/http-call";
-import { EnrichedHttpInstructionAsync } from "../../internals/enriched-http-instruction";
-import { RequestsPassageMediatorAsync } from "../../internals/requests-passage-async-public";
-import { collectHttpCallsAsync } from "../../internals/collect-http-calls-async";
+import { trackRequiredHttpInstructionsToInvoke } from "./internals/track-required-http-instructions-to-invoke";
+import { LongRunningComponentError } from "./errors/LongRunningComponentError";
+import { throwIfThereIsHttpInstructionNotInvoked } from "./internals/throw-if-there-is-http-instrcution-not-invoked";
+import { patchSetInterval } from "./internals/patch-set-interval";
+import { getRequestsFromQueue } from "./internals/get-requests-from-queue";
+import { HttpCallInstructionAsync } from "./interfaces/http-call";
+import { EnrichedHttpInstructionAsync } from "./internals/enriched-http-instruction";
+import { RequestsPassageMediatorAsync } from "./internals/requests-passage-async-public";
+import { collectHttpCallsAsync } from "./internals/collect-http-calls-async";
 
 /**
  * Configuration parameters for the runTasksUntilStable function.

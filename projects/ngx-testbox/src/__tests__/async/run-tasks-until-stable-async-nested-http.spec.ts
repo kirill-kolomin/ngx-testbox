@@ -12,7 +12,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting, HttpTestingController} from '@angular/common/http/testing';
 import { HttpCallInstructionAsync } from '../../../testing/src/interfaces/http-call';
-import { runTasksUntilStableAsync } from '../../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
+import { runTasksUntilStableAsync } from '../../../testing/src/run-tasks-until-stable-async';
 
 type CurrencySymbolResponse = {currency: string; symbol: string};
 type MoneyLimitResponse = {limit: number};

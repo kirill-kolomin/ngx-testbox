@@ -5,7 +5,7 @@ import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http'
 import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from '../../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
 import {NoMatchingHttpInstructionForRequestFoundError} from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import { HttpCallInstructionAsync } from '../../../testing/src/interfaces/http-call';
-import { runTasksUntilStableAsync } from '../../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
+import { runTasksUntilStableAsync } from '../../../testing/src/run-tasks-until-stable-async';
 
 @Component({
   template: '<div>Async Test Component</div>',

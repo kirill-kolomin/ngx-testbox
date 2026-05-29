@@ -12,7 +12,7 @@ import {
   MaximumAttemptsToStabilizeFixtureReachedError
 } from '../../../testing/src/errors/MaximumAttemptsToStabilizeFixtureReachedError';
 import { HttpCallInstruction } from '../../../testing/src/interfaces/http-call';
-import { runTasksUntilStable } from '../../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
+import { runTasksUntilStable } from '../../../testing/src/run-tasks-until-stable';
 
 @Component({
   template: '<div>Test Component</div>',

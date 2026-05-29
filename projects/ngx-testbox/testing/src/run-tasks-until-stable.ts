@@ -1,16 +1,16 @@
 import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
-import {collectHttpCalls} from '../../internals/collectHttpCalls';
+import {collectHttpCalls} from './internals/collectHttpCalls';
 import {HttpErrorResponse} from '@angular/common/http';
-import {MaximumAttemptsToStabilizeFixtureReachedError} from '../../errors/MaximumAttemptsToStabilizeFixtureReachedError';
+import {MaximumAttemptsToStabilizeFixtureReachedError} from './errors/MaximumAttemptsToStabilizeFixtureReachedError';
 import {HttpTestingController} from '@angular/common/http/testing';
-import { CommonStabilizationParams } from '../../interfaces/common-stabilization-params';
-import { trackRequiredHttpInstructionsToInvoke } from '../../internals/track-required-http-instructions-to-invoke';
-import { throwIfThereIsHttpInstructionNotInvoked } from '../../internals/throw-if-there-is-http-instrcution-not-invoked';
-import { patchSetInterval } from '../../internals/patch-set-interval';
-import { getRequestsFromQueue } from '../../internals/get-requests-from-queue';
-import { RequestsPassageMediator } from '../../internals/requests-passage';
-import { HttpCallInstruction } from '../../interfaces/http-call';
-import { EnrichedHttpInstruction } from '../../internals/enriched-http-instruction';
+import { CommonStabilizationParams } from './interfaces/common-stabilization-params';
+import { trackRequiredHttpInstructionsToInvoke } from './internals/track-required-http-instructions-to-invoke';
+import { throwIfThereIsHttpInstructionNotInvoked } from './internals/throw-if-there-is-http-instrcution-not-invoked';
+import { patchSetInterval } from './internals/patch-set-interval';
+import { getRequestsFromQueue } from './internals/get-requests-from-queue';
+import { RequestsPassageMediator } from './internals/requests-passage';
+import { HttpCallInstruction } from './interfaces/http-call';
+import { EnrichedHttpInstruction } from './internals/enriched-http-instruction';
 
 /**
  * Configuration parameters for the runTasksUntilStable function.

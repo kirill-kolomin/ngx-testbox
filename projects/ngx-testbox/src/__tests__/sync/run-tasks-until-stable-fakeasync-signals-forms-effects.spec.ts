@@ -14,7 +14,7 @@ import {
 import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
-import { runTasksUntilStable } from '../../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
+import { runTasksUntilStable } from '../../../testing/src/run-tasks-until-stable';
 
 @Component({
   standalone: true,

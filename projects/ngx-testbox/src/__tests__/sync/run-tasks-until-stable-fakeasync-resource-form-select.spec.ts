@@ -8,7 +8,7 @@ import {DebugElementHarness} from '../../../testing/src/debug-element-harness';
 import {TestIdDirective} from '../../lib/directives/test-id.directive';
 import {firstValueFrom} from 'rxjs';
 import { HttpCallInstruction } from '../../../testing/src/interfaces/http-call';
-import { runTasksUntilStable } from '../../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
+import { runTasksUntilStable } from '../../../testing/src/run-tasks-until-stable';
 
 type Country = {code: string; name: string};
 

@@ -10,7 +10,7 @@ import {inject} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
-import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
+import { runTasksUntilStableAsync } from '../../testing/src/run-tasks-until-stable-async';
 
 type Country = {code: string; name: string};
 
