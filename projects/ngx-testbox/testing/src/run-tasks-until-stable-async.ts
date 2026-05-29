@@ -8,7 +8,7 @@ import { patchSetInterval } from "./internals/patch-set-interval";
 import { getRequestsFromQueue } from "./internals/get-requests-from-queue";
 import { HttpCallInstructionAsync } from "./interfaces/http-call";
 import { EnrichedHttpInstructionAsync } from "./internals/enriched-http-instruction";
-import { RequestsPassageMediatorAsync } from "./internals/requests-passage-async-public";
+import { RequestsPassageMediatorAsync } from "./internals/requests-passage-async";
 import { collectHttpCallsAsync } from "./internals/collect-http-calls-async";
 
 /**

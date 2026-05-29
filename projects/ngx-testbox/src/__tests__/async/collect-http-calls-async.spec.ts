@@ -5,7 +5,7 @@ import { collectHttpCallsAsync } from '../../../testing/src/internals/collect-ht
 import { NoMatchingHttpInstructionForRequestFoundError } from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
-import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async-public';
+import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async';
 
 describe('collectHttpCallsAsync', () => {
   let httpClient: HttpClient;

@@ -104,12 +104,6 @@ describe('runTasksUntilStableAsync - resource + form', () => {
     await runTasksUntilStableAsync(fixture, {httpCallInstructions});
 
 
-    await new Promise((resolve) => {
-      setTimeout(() => resolve(undefined), 100)
-    })
-    await fixture.whenStable()
-    await fixture.whenRenderingDone()
-
     // Assert options are present in the select.
     const selectDebugEl = harness.elements.countrySelect.query();
     const optionEls = selectDebugEl.queryAll(By.css('option'));

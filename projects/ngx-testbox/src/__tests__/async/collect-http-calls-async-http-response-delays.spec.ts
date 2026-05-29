@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { HttpClient, HttpResponse, provideHttpClient } from '@angular/common/http';
 import { collectHttpCallsAsync } from '../../../testing/src/internals/collect-http-calls-async';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
-import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async-public';
+import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async';
 import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
@@ -61,6 +61,7 @@ describe('collectHttpCallsAsync - HTTP response delays', () => {
         const res = await mediator.passRequests();
         expect(res.shouldStabilizeAfterRequests).toBeTrue();
       }
+      // Technical delay to not block thread
       await new Promise((resolve) => setTimeout(resolve, 16));
     }
 
