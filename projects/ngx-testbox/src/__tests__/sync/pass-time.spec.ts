@@ -1,5 +1,5 @@
 import { fakeAsync } from '@angular/core/testing';
-import { passTime, TIME_MS } from '../../testing/src/pass-time';
+import { passTime, TIME_MS } from '../../../testing/src/pass-time';
 
 describe('passTime', () => {
     it('should advance time by default amount when no parameter is provided', fakeAsync(() => {

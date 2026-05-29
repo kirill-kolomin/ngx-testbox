@@ -2,10 +2,10 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@an
 import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
-import {HttpCallInstruction} from '../../testing/src/interfaces/http-call';
-import {runTasksUntilStable} from '../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
-import {DebugElementHarness} from '../../testing/src/debug-element-harness';
-import {TestIdDirective} from '../lib/directives/test-id.directive';
+import {HttpCallInstruction} from '../../../testing/src/interfaces/http-call';
+import {runTasksUntilStable} from '../../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
+import {DebugElementHarness} from '../../../testing/src/debug-element-harness';
+import {TestIdDirective} from '../../lib/directives/test-id.directive';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 

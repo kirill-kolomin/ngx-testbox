@@ -2,10 +2,10 @@ import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
-import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from '../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
-import {NoMatchingHttpInstructionForRequestFoundError} from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
-import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
-import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
+import {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} from '../../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
+import {NoMatchingHttpInstructionForRequestFoundError} from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
+import { HttpCallInstructionAsync } from '../../../testing/src/interfaces/http-call';
+import { runTasksUntilStableAsync } from '../../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 @Component({
   template: '<div>Async Test Component</div>',

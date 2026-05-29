@@ -4,15 +4,15 @@ import {HttpTestingController, provideHttpClientTesting} from '@angular/common/h
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {
   NoMatchingHttpInstructionForRequestFoundError
-} from '../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
+} from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import {
   HttpInstructionWasNotExecutedDuringFixtureStabilizationError
-} from '../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
+} from '../../../testing/src/errors/HttpInstructionWasNotExecutedDuringFixtureStabilizationError';
 import {
   MaximumAttemptsToStabilizeFixtureReachedError
-} from '../../testing/src/errors/MaximumAttemptsToStabilizeFixtureReachedError';
-import { HttpCallInstruction } from '../../testing/src/interfaces/http-call';
-import { runTasksUntilStable } from '../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
+} from '../../../testing/src/errors/MaximumAttemptsToStabilizeFixtureReachedError';
+import { HttpCallInstruction } from '../../../testing/src/interfaces/http-call';
+import { runTasksUntilStable } from '../../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
 
 @Component({
   template: '<div>Test Component</div>',

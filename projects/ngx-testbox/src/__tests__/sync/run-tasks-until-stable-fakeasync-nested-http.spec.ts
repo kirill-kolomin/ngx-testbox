@@ -1,18 +1,18 @@
 import {
   ChangeDetectionStrategy,
+  Component,
   Directive,
   Input,
-  Component,
   ViewContainerRef,
   inject,
   OnInit,
   ChangeDetectorRef,
 } from '@angular/core';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting, HttpTestingController} from '@angular/common/http/testing';
-import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
-import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
+import { HttpCallInstruction } from '../../../testing/src/interfaces/http-call';
+import { runTasksUntilStable } from '../../../testing/src/stabilize-fixture/sync/run-tasks-until-stable';
 
 type CurrencySymbolResponse = {currency: string; symbol: string};
 type MoneyLimitResponse = {limit: number};
@@ -53,9 +53,9 @@ class ComponentB {
   standalone: true,
   selector: 'app-a',
   template: `
-  @if(ready()) {
-    <app-b [currency]="currency" [limit]="limit" />
-  }`,
+    @if(ready()) {
+      <app-b [currency]="currency" [limit]="limit" />
+    }`,
   imports: [ComponentB],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -142,7 +142,7 @@ class NestedHttpGraphComponent {
   }
 }
 
-describe('runTasksUntilStableAsync - nested HTTP', () => {
+describe('runTasksUntilStable (fakeAsync) - nested HTTP', () => {
   let fixture: ComponentFixture<NestedHttpGraphComponent>;
   let httpTestingController: HttpTestingController;
 
@@ -159,12 +159,17 @@ describe('runTasksUntilStableAsync - nested HTTP', () => {
     httpTestingController.verify();
   });
 
-  it('should stabilize a nested directive -> component -> component chain and render the final allowance', async () => {
+  it('should stabilize a nested directive -> component -> component chain and render the final allowance', fakeAsync(() => {
     fixture = TestBed.createComponent(NestedHttpGraphComponent);
-    const httpCallInstructions: HttpCallInstructionAsync[] = [
+
+    const httpCallInstructions: HttpCallInstruction[] = [
       [
         ['/api/countries', 'GET'],
-        () => new Promise<HttpResponse<any>>(resolve => setTimeout(() => resolve(new HttpResponse<string[]>({body: ['FR', 'US'], status: 200})), 200)),
+        () =>
+          new HttpResponse<any>({
+            body: ['FR', 'US'],
+            status: 200,
+          }),
       ],
       [
         ['/api/currencies', 'GET'],
@@ -187,12 +192,12 @@ describe('runTasksUntilStableAsync - nested HTTP', () => {
       ],
     ];
 
-    await runTasksUntilStableAsync(fixture, {httpCallInstructions});
+    runTasksUntilStable(fixture, {httpCallInstructions});
 
     const el = fixture.nativeElement as HTMLElement;
     const allowed = el.querySelectorAll('.allowed');
     expect(allowed.length).toBe(2);
     expect(allowed[0]?.textContent?.trim()).toBe('Allowed: true');
     expect(allowed[1]?.textContent?.trim()).toBe('Allowed: true');
-  });
+  }));
 });

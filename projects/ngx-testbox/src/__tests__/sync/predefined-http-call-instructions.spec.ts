@@ -3,8 +3,8 @@ import {
   getPredefinedResponseGetter,
   httpMethods, httpStatuses,
   predefinedHttpCallInstructions
-} from '../../testing/src/predefined-http-call-instructions';
-import { EndpointPath, HttpCallInstruction } from '../../testing/src/interfaces/http-call';
+} from '../../../testing/src/predefined-http-call-instructions';
+import { EndpointPath, HttpCallInstruction } from '../../../testing/src/interfaces/http-call';
 
 describe('predefinedHttpCallInstructions', () => {
   describe('getPredefinedResponseGetter', () => {

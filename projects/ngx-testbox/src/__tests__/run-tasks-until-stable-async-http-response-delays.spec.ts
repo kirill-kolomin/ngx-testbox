@@ -2,8 +2,8 @@ import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
-import { HttpCallInstructionAsync } from '../../testing/src/interfaces/http-call';
-import { runTasksUntilStableAsync } from '../../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
+import { HttpCallInstructionAsync } from '../testing/src/interfaces/http-call';
+import { runTasksUntilStableAsync } from '../testing/src/stabilize-fixture/async/run-tasks-until-stable-async';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
