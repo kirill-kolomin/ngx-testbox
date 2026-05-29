@@ -2,9 +2,9 @@ import { TestRequest } from "@angular/common/http/testing";
 import { HttpResponse } from "@angular/common/http";
 import { CannotUsePromiseResponseWithinFakeAsync } from "../errors/CannotUsePromiseResponseWithinFakeAsync";
 import { FailedToGenerateHttpResponseError } from "../errors/FailedToGenerateHttpResponseError";
-import { passTime } from "../pass-time";
 import { OnCompleted, ResponseGetter } from "../interfaces/http-call";
 import { EnrichedHttpInstructionPayload } from "./enriched-http-instruction";
+import { tick } from "@angular/core/testing";
 
 
 export class RequestsPassageMediator {
@@ -43,7 +43,7 @@ export class RequestsPassageMediator {
         const asserts: OnCompleted[] = [];
 
         if(delay > 0) {
-            passTime(delay);
+            tick(delay);
         }
 
         for(let [testRequest, responseGetter, instructionPayload] of requests) {
