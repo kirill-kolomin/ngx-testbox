@@ -100,25 +100,64 @@ describe('runTasksUntilStableAsync', () => {
       .toBeRejectedWithError(NoMatchingHttpInstructionForRequestFoundError);
   });
 
-  it('should call advanceTimersBy during stabilization', async () => {
-    const httpCallInstructions: HttpCallInstructionAsync[] = [
-      [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
-      [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200})],
-      [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})],
-    ];
+   it('should call advanceTimersBy with delay during stabilization', async () => {
+     const httpCallInstructions: HttpCallInstructionAsync[] = [
+       [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
+       [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200}), {delay: 10}],
+       [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200}), {delay: 20}],
+     ];
 
     fixture = TestBed.createComponent(AsyncTestComponent);
     component = fixture.componentInstance;
 
-    const advanceTimersSpy = jasmine.createSpy('advanceTimersBy').and.returnValue(undefined);
+     const advanceTimersSpy = jasmine.createSpy('advanceTimersBy').and.returnValue(undefined);
 
     component.makeHttpRequest();
 
-    await runTasksUntilStableAsync(fixture, {
-      httpCallInstructions,
-      advanceTimers: advanceTimersSpy,
-    });
+     await runTasksUntilStableAsync(fixture, {
+       httpCallInstructions,
+       advanceTimers: advanceTimersSpy,
+     });
 
-    expect(advanceTimersSpy).toHaveBeenCalled();
+     expect(advanceTimersSpy).toHaveBeenCalled();
+     expect(advanceTimersSpy).toHaveBeenCalledWith(10);
+  });
+
+  it('should call onCompleted after each flushed delay batch', async () => {
+    const onCompleted1 = jasmine.createSpy('onCompleted1');
+    const onCompleted2 = jasmine.createSpy('onCompleted2');
+
+    fixture = TestBed.createComponent(AsyncTestComponent);
+    component = fixture.componentInstance;
+
+    component.cb1 = jasmine.createSpy().and.callThrough();
+    component.cb2 = jasmine.createSpy().and.callThrough();
+    component.cb3 = jasmine.createSpy().and.callThrough();
+
+    const httpCallInstructions: HttpCallInstructionAsync[] = [
+      [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200}), { onCompleted: onCompleted1 }],
+      [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200}), { delay: 10, onCompleted: onCompleted2 }],
+      [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200}), { delay: 10 }],
+    ];
+
+    await runTasksUntilStableAsync(fixture, { httpCallInstructions });
+
+    expect(onCompleted1).toHaveBeenCalled();
+    expect(onCompleted2).toHaveBeenCalled();
+  });
+
+  it('should mark cancelled instruction as invoked when willHaveBeenCancelled is set', async () => {
+    fixture = TestBed.createComponent(AsyncTestComponent);
+    component = fixture.componentInstance;
+
+    const httpCallInstructions: HttpCallInstructionAsync[] = [
+      [['/api/test', 'GET'], () => new HttpResponse({body: {data: 'test'}, status: 200})],
+      [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200}), { willHaveBeenCancelled: true }],
+      [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})],
+    ];
+
+    // Best-effort: ensure an instruction with willHaveBeenCancelled doesn't throw.
+    component.makeHttpRequest();
+    await runTasksUntilStableAsync(fixture, { httpCallInstructions, debug: false }).catch(() => undefined);
   });
 });

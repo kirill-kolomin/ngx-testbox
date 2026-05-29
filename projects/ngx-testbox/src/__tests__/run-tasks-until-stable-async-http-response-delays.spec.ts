@@ -58,15 +58,12 @@ describe('runTasksUntilStableAsync - HTTP response delays', () => {
       const i = idx + 1;
       return [
         [`/api/n-${idx}`, 'GET'],
-        () =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve(new HttpResponse({body: {value: `value-${i}`}, status: 200}));
-            }, i * 300);
-          }),
+        () => new HttpResponse({body: {value: `value-${i}`}, status: 200}),
+        { delay: i * 300 },
       ];
     });
 
+    // Use real timers; without advanceTimers the library falls back to setTimeout.
     await runTasksUntilStableAsync(fixture, {
       httpCallInstructions: instructions,
       // Total delay for i=1..10 is 55s; give some headroom for scheduling.
