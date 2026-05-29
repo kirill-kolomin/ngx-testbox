@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, TestRequest } from '@angular/common/http/testing';
 import { NoMatchingHttpInstructionForRequestFoundError } from '../../errors/NoMatchingHttpInstructionForRequestFoundError';
-import { getRequestsFromQueue } from '../../get-requests-from-queue';
+import { getRequestsFromQueue } from '../../internals/get-requests-from-queue';
 import { type RequestsPassageMediatorAsync } from './requests-passage-async-public';
 import { EnrichedHttpInstructionAsync } from '../../internals/enriched-http-instruction';
 

@@ -5,7 +5,7 @@ import { trackRequiredHttpInstructionsToInvoke } from "../../internals/track-req
 import { LongRunningComponentError } from "../../errors/LongRunningComponentError";
 import { throwIfThereIsHttpInstructionNotInvoked } from "../../internals/throw-if-there-is-http-instrcution-not-invoked";
 import { patchSetInterval } from "../../internals/patch-set-interval";
-import { getRequestsFromQueue } from "../../get-requests-from-queue";
+import { getRequestsFromQueue } from "../../internals/get-requests-from-queue";
 import { HttpCallInstructionAsync } from "../../interfaces/http-call";
 import { EnrichedHttpInstructionAsync } from "../../internals/enriched-http-instruction";
 import { RequestsPassageMediatorAsync } from "./requests-passage-async-public";

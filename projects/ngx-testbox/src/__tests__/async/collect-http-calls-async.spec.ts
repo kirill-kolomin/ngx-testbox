@@ -5,7 +5,7 @@ import {
   collectHttpCallsAsync,
 } from '../../../testing/src/stabilize-fixture/async/collect-http-calls-async';
 import { NoMatchingHttpInstructionForRequestFoundError } from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
-import { getRequestsFromQueue } from '../../../testing/src/get-requests-from-queue';
+import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
 import { RequestsPassageMediatorAsync } from '../../../testing/src/stabilize-fixture/async/requests-passage-async-public';
 

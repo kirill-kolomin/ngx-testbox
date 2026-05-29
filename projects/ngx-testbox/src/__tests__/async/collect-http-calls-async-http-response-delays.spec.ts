@@ -4,7 +4,7 @@ import { HttpClient, HttpResponse, provideHttpClient } from '@angular/common/htt
 import { collectHttpCallsAsync } from '../../../testing/src/stabilize-fixture/async/collect-http-calls-async';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
 import { RequestsPassageMediatorAsync } from '../../../testing/src/stabilize-fixture/async/requests-passage-async-public';
-import { getRequestsFromQueue } from '../../../testing/src/get-requests-from-queue';
+import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
