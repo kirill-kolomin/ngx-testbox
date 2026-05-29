@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { HttpClient, HttpResponse, provideHttpClient } from '@angular/common/http';
-import { collectHttpCallsAsync } from '../../../testing/src/stabilize-fixture/async/collect-http-calls-async';
+import { collectHttpCallsAsync } from '../../../testing/src/internals/collect-http-calls-async';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
-import { RequestsPassageMediatorAsync } from '../../../testing/src/stabilize-fixture/async/requests-passage-async-public';
+import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async-public';
 import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;

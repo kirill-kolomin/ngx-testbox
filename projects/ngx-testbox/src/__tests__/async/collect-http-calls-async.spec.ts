@@ -3,11 +3,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { HttpClient, HttpRequest, HttpResponse, provideHttpClient } from '@angular/common/http';
 import {
   collectHttpCallsAsync,
-} from '../../../testing/src/stabilize-fixture/async/collect-http-calls-async';
+} from '../../../testing/src/internals/collect-http-calls-async';
 import { NoMatchingHttpInstructionForRequestFoundError } from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
-import { RequestsPassageMediatorAsync } from '../../../testing/src/stabilize-fixture/async/requests-passage-async-public';
+import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async-public';
 
 describe('collectHttpCallsAsync', () => {
   let httpClient: HttpClient;

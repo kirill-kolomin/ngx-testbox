@@ -1,5 +1,5 @@
 import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
-import {collectHttpCalls} from './collectHttpCalls';
+import {collectHttpCalls} from '../../internals/collectHttpCalls';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MaximumAttemptsToStabilizeFixtureReachedError} from '../../errors/MaximumAttemptsToStabilizeFixtureReachedError';
 import {HttpTestingController} from '@angular/common/http/testing';
