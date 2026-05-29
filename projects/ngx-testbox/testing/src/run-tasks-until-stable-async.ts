@@ -47,9 +47,7 @@ export async function runTasksUntilStableAsync(
     advanceTimers,
     componentLongRunTimeout,
     debug
-  }: RunTasksUntilStableAsyncParams = {
-    componentLongRunTimeout: COMPONENT_LONG_RUN_TIMEOUT
-  }
+  }: RunTasksUntilStableAsyncParams = {}
 ): Promise<void> {
   let rollbackOriginalSetInterval = () => {};
 

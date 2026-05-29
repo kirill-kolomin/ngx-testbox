@@ -155,9 +155,12 @@ describe('runTasksUntilStableAsync', () => {
       [['/api/second', 'GET'], () => new HttpResponse({body: {data: 'test2'}, status: 200}), { willHaveBeenCancelled: true }],
       [['/api/third', 'GET'], () => new HttpResponse({body: {data: 'test3'}, status: 200})],
     ];
+    const errorSpy = jasmine.createSpy().and.returnValue(undefined);
 
     // Best-effort: ensure an instruction with willHaveBeenCancelled doesn't throw.
     component.makeHttpRequest();
-    await runTasksUntilStableAsync(fixture, { httpCallInstructions, debug: false }).catch(() => undefined);
+    await runTasksUntilStableAsync(fixture, { httpCallInstructions, debug: false }).catch(errorSpy);
+
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });

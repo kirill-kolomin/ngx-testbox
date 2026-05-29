@@ -8,6 +8,10 @@ import {runTasksUntilStableAsync} from '../../../testing/src/run-tasks-until-sta
 import {DebugElementHarness} from '../../../testing/src/debug-element-harness';
 import {TestIdDirective} from '../../lib/directives/test-id.directive';
 import {Subscription} from 'rxjs';
+import clock = jasmine.clock;
+
+
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 600_000;
 
 type Country = 'US' | 'DE';
 const testIds = [
@@ -34,7 +38,7 @@ const testIds = [
 
     <label>
       Format. <span [testboxTestId]="testIds.formatLoading" *ngIf="loadingFormats">Loading...</span>
-        <select class="format" testboxTestId="format" [disabled]="loadingFormats || formats.length === 0" (change)="onFormatChange($event.target.value)">
+        <select class="format" testboxTestId="format" [disabled]="loadingFormats || formats.length === 0">
           <option [testboxTestId]="testIds.formatOption" *ngFor="let f of formats" [value]="f">{{f}}</option>
         </select>
     </label>
@@ -98,15 +102,19 @@ class CountryRaceAsyncComponent implements OnInit {
         this.cdr.markForCheck();
       });
   }
-
-  // Not used, but referenced by template.
-  onFormatChange(_: string) {
-    // no-op
-  }
 }
 
 describe('runTasksUntilStableAsync - country race cancellation and loading state', () => {
   let fixture: ComponentFixture<CountryRaceAsyncComponent>;
+  let tick: (delayMs: number) => void | Promise<void>;
+
+  beforeAll(() => {
+    tick = clock().install().tick;
+  })
+
+  afterAll(() => {
+    clock().uninstall();
+  })
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -127,7 +135,7 @@ describe('runTasksUntilStableAsync - country race cancellation and loading state
         ['/api/countries/DE/formats', 'GET'],
         () => new HttpResponse({body: ['SEPA'], status: 200}),
         {
-          delay: 200,
+          delay: 20000,
           willHaveBeenCancelled: true,
           onCompleted: () => {
             deFormatsCalledTimes++;
@@ -153,7 +161,7 @@ describe('runTasksUntilStableAsync - country race cancellation and loading state
         ['/api/countries/US/formats', 'GET'],
         () => new HttpResponse({body: ['ACH', 'DRD'], status: 200}),
         {
-          delay: 400,
+          delay: 40000,
           onCompleted: () => {
             const formatOptions = harness.elements.formatOption.queryAll();
             expect(formatOptions.length).toBe(2);
@@ -172,7 +180,7 @@ describe('runTasksUntilStableAsync - country race cancellation and loading state
         ['/api/countries/US/codes', 'GET'],
         () => new HttpResponse({body: ['US-WIRE-1', 'US-WIRE-2'], status: 200}),
         {
-          delay: 500,
+          delay: 50000,
           willHaveBeenCancelled: true,
           onCompleted: () => {
             const formatOptions = harness.elements.formatOption.queryAll();
@@ -191,7 +199,7 @@ describe('runTasksUntilStableAsync - country race cancellation and loading state
         ['/api/countries/DE/codes', 'GET'],
         () => new HttpResponse({body: ['DE-ACH-1', 'DE-ACH-2'], status: 200}),
         {
-          delay: 600,
+          delay: 60000,
           onCompleted: () => {
             const formatOptions = harness.elements.formatOption.queryAll();
             const codeOptions = harness.elements.codeOption.queryAll();
@@ -217,6 +225,8 @@ describe('runTasksUntilStableAsync - country race cancellation and loading state
 
     await runTasksUntilStableAsync(fixture, {
       httpCallInstructions,
+      componentLongRunTimeout: 600000,
+      advanceTimers: (delayMs) => tick(delayMs)
     });
 
     const formatOptions = harness.elements.formatOption.queryAll();

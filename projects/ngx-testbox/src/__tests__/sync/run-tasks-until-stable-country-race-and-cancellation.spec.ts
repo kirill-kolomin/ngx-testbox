@@ -28,7 +28,7 @@ const testIds = ['country', 'format', 'formatOption', 'formatLoading', 'code', '
 
     <label>
       Format. <span [testboxTestId]="testIds.formatLoading" *ngIf="loadingFormats">Loading...</span>
-        <select class="format" testboxTestId="format" [disabled]="loadingFormats || formats.length === 0" (change)="onFormatChange($event.target.value)">
+        <select class="format" testboxTestId="format" [disabled]="loadingFormats || formats.length === 0">
           <option [testboxTestId]="testIds.formatOption" *ngFor="let f of formats" [value]="f">{{f}}</option>
         </select>
     </label>
