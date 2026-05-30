@@ -23,7 +23,7 @@ export class RequestsPassageMediator<
       testRequests?: TestRequest[];
     } = {},
   ) {
-    const requests = testRequests || getRequestsFromQueue(httpTestingController);
+    const requests = [...(testRequests || []), ...getRequestsFromQueue(httpTestingController)];
 
     for (const testRequest of requests) {
       if (testRequest.cancelled) {

@@ -98,9 +98,8 @@ export async function runTasksUntilStableAsync(
 
     try {
       requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {
-        testRequests: requests,
+        testRequests: requests
       });
-      requests = [];
 
       let passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);
       while (passRequestsResult.shouldStabilizeAfterRequests) {
@@ -113,11 +112,7 @@ export async function runTasksUntilStableAsync(
         await fixture.whenStable();
 
         // Collect newly scheduled HTTP requests that arrived after the previous batch.
-        requests = getRequestsFromQueue(httpTestingController);
-        requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {
-          testRequests: requests,
-        });
-        requests = [];
+        requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions);
         passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);
       }
     } catch (error) {

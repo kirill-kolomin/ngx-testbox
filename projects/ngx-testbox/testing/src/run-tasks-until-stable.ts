@@ -154,9 +154,8 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
       passRequestsResult.asserts?.forEach((assert) => assert());
 
-      requests = getRequestsFromQueue(httpTestingController);
-      requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
-      requests = [];
+      // Collect newly scheduled HTTP requests that arrived after the previous batch.
+      requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions);
       passRequestsResult = requestsPassageMediator.passRequests();
     }
 
