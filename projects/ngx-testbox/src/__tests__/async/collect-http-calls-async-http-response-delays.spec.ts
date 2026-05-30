@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { HttpClient, HttpResponse, provideHttpClient } from '@angular/common/http';
-import { collectHttpCallsAsync } from '../../../testing/src/internals/collect-http-calls-async';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
 import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async';
 import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
@@ -57,7 +56,7 @@ describe('collectHttpCallsAsync - HTTP response delays', () => {
     while (received.length < TOTAL_CALLS) {
       const requests = getRequestsFromQueue(httpTestingController);
       if (requests.length > 0) {
-        collectHttpCallsAsync(instructions, mediator, { testRequests: requests });
+        mediator.collectHttpCalls(instructions, { testRequests: requests });
         const res = await mediator.passRequests();
         expect(res.shouldStabilizeAfterRequests).toBeTrue();
       }

@@ -15,7 +15,7 @@ import { EnrichedHttpInstruction, EnrichedHttpInstructionAsync } from "./enriche
  * @internal
  */
 export function trackRequiredHttpInstructionsToInvoke<T extends (EnrichedHttpInstruction | EnrichedHttpInstructionAsync)>(httpCallInstructions: (HttpCallInstruction | HttpCallInstructionAsync)[] = []): {
-  requiredHttpCallInstructions: (EnrichedHttpInstruction | EnrichedHttpInstructionAsync)[],
+  requiredHttpCallInstructions: T[],
   callTrackers: CallTrackers
 } {
   const callTrackers: CallTrackers = [];

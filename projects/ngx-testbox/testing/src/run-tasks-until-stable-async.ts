@@ -9,7 +9,7 @@ import { getRequestsFromQueue } from "./internals/get-requests-from-queue";
 import { HttpCallInstructionAsync } from "./interfaces/http-call";
 import { EnrichedHttpInstructionAsync } from "./internals/enriched-http-instruction";
 import { RequestsPassageMediatorAsync } from "./internals/requests-passage-async";
-import { collectHttpCallsAsync } from "./internals/collect-http-calls-async";
+
 import { validateHttpInstructions } from "./internals/validate-http-instructions";
 
 /**
@@ -50,7 +50,8 @@ export async function runTasksUntilStableAsync(
     debug
   }: RunTasksUntilStableAsyncParams = {}
 ): Promise<void> {
-  validateHttpInstructions(httpCallInstructions);
+  const _httpCallInstructions = httpCallInstructions.slice();
+  validateHttpInstructions(_httpCallInstructions);
 
   let rollbackOriginalSetInterval = () => {};
 
@@ -60,7 +61,7 @@ export async function runTasksUntilStableAsync(
 
   const _componentLongRunTimeout = componentLongRunTimeout ?? COMPONENT_LONG_RUN_TIMEOUT;
   const httpTestingController = TestBed.inject(HttpTestingController);
-  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
+  const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke<EnrichedHttpInstructionAsync>(_httpCallInstructions);
 
   const requestsPassageMediator = new RequestsPassageMediatorAsync();
 
@@ -96,7 +97,7 @@ export async function runTasksUntilStableAsync(
     }
 
     try {
-      collectHttpCallsAsync(requiredHttpCallInstructions as EnrichedHttpInstructionAsync[], requestsPassageMediator, {
+      requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {
         testRequests: requests,
       });
 
@@ -114,7 +115,7 @@ export async function runTasksUntilStableAsync(
 
         // Collect newly scheduled HTTP requests that arrived after the previous batch.
         requests = getRequestsFromQueue(httpTestingController);
-        collectHttpCallsAsync(requiredHttpCallInstructions as EnrichedHttpInstructionAsync[], requestsPassageMediator, {
+        requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {
           testRequests: requests,
         });
         passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);

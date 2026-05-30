@@ -1,13 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { HttpClient, HttpRequest, HttpResponse, provideHttpClient } from '@angular/common/http';
-import { collectHttpCallsAsync } from '../../../testing/src/internals/collect-http-calls-async';
 import { NoMatchingHttpInstructionForRequestFoundError } from '../../../testing/src/errors/NoMatchingHttpInstructionForRequestFoundError';
 import { getRequestsFromQueue } from '../../../testing/src/internals/get-requests-from-queue';
 import { EnrichedHttpInstructionAsync } from '../../../testing/src/internals/enriched-http-instruction';
 import { RequestsPassageMediatorAsync } from '../../../testing/src/internals/requests-passage-async';
 
-describe('collectHttpCallsAsync', () => {
+describe('RequestsPassageMediator.collectHttpCalls', () => {
   let httpClient: HttpClient;
   let httpTestingController: HttpTestingController;
 
@@ -52,7 +51,7 @@ describe('collectHttpCallsAsync', () => {
     ];
 
     const requests = getRequestsFromQueue(httpTestingController);
-    collectHttpCallsAsync(instructions, mediator, { testRequests: requests });
+    mediator.collectHttpCalls(instructions, { testRequests: requests });
     const result = await mediator.passRequests();
     expect(result.shouldStabilizeAfterRequests).toBeTrue();
 
@@ -74,7 +73,7 @@ describe('collectHttpCallsAsync', () => {
     ];
 
     const requests = getRequestsFromQueue(httpTestingController);
-    collectHttpCallsAsync(instructions, mediator, { testRequests: requests });
+    mediator.collectHttpCalls(instructions, { testRequests: requests });
     await mediator.passRequests();
 
     expect(responseSpy).toHaveBeenCalledWith(mockBody);
@@ -91,7 +90,7 @@ describe('collectHttpCallsAsync', () => {
 
     const requests = getRequestsFromQueue(httpTestingController);
     expect(() =>
-      collectHttpCallsAsync(instructions, mediator, { testRequests: requests }),
+      mediator.collectHttpCalls(instructions, { testRequests: requests }),
     ).toThrowError(NoMatchingHttpInstructionForRequestFoundError);
   });
 
@@ -100,7 +99,7 @@ describe('collectHttpCallsAsync', () => {
 
     const mediator = new RequestsPassageMediatorAsync();
     const requests = getRequestsFromQueue(httpTestingController);
-    collectHttpCallsAsync([], mediator, { testRequests: requests });
+    mediator.collectHttpCalls([], { testRequests: requests });
     await mediator.passRequests();
 
     httpTestingController.verify();
