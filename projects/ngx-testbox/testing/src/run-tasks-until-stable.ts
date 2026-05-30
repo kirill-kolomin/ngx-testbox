@@ -119,7 +119,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke<EnrichedHttpInstruction>(_httpCallInstructions);
   let requests = getRequestsFromQueue(httpTestingController);
   const requestsPassageMediator = new RequestsPassageMediatorSync();
-
+console.log(1, requests);
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
 
@@ -130,6 +130,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
     }
 
     requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+    requests = [];
     let passRequestsResult = requestsPassageMediator.passRequests();
     
     while(passRequestsResult.shouldStabilizeAfterRequests) {
@@ -153,7 +154,10 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
       passRequestsResult.asserts?.forEach((assert) => assert());
 
+      requests = getRequestsFromQueue(httpTestingController);
+      console.log('before loop pass requests', requests);
       requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+      requests = [];
       passRequestsResult = requestsPassageMediator.passRequests();
     }
 
@@ -161,6 +165,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
     tick(_eventualTimeAdvance);
 
     requests = getRequestsFromQueue(httpTestingController);
+console.log(2, requests);
   }
 
   throwIfThereIsHttpInstructionNotInvoked(callTrackers);

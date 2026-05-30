@@ -100,7 +100,6 @@ export async function runTasksUntilStableAsync(
       requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {
         testRequests: requests,
       });
-
       requests = [];
 
       let passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);
@@ -118,6 +117,7 @@ export async function runTasksUntilStableAsync(
         requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {
           testRequests: requests,
         });
+        requests = [];
         passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);
       }
     } catch (error) {

@@ -13,11 +13,65 @@ export class RequestsPassageMediator<
   protected timePassed = 0;
   protected requests: Record<number, [TestRequest, RG, EnrichedHttpInstructionPayload][]> = {};
 
-  addRequest(httpRequest: TestRequest, responseGetter: RG, instructionPayload: EnrichedHttpInstructionPayload): void {
+  collectHttpCalls(
+    httpCallInstructions: Instr[],
+    {
+      httpTestingController = TestBed.inject(HttpTestingController),
+      testRequests,
+    }: {
+      httpTestingController?: HttpTestingController;
+      testRequests?: TestRequest[];
+    } = {},
+  ) {
+    console.log('collect', testRequests)
+    const requests = testRequests || getRequestsFromQueue(httpTestingController);
+
+    for (const testRequest of requests) {
+      if (testRequest.cancelled) {
+        continue;
+      }
+
+      const { request } = testRequest;
+
+      const instructionIndex = httpCallInstructions.findIndex(([checker]) => {
+        if (typeof checker === "function") {
+          return checker(request);
+        }
+        if (Array.isArray(checker)) {
+          const path = checker[0];
+          const method = checker[1];
+
+          if (path instanceof RegExp) {
+            return request.url.match(path) && request.method === method;
+          }
+          return request.url.includes(path) && request.method === method;
+        }
+        return false;
+      });
+
+      console.log(request.url, instructionIndex)
+      if (instructionIndex === -1) {
+        throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
+      }
+
+      const instruction = httpCallInstructions.splice(instructionIndex, 1)[0];
+      // const instruction = httpCallInstructions[instructionIndex];
+      const [, responseGetter, options] = instruction;
+      this.#registerRequest(testRequest, responseGetter as RG, options);
+    }
+  }
+
+  protected extractSearchParams(requestUrl: string): URLSearchParams {
+    const queryParams = requestUrl.split("?")[1];
+    return new URLSearchParams(queryParams);
+  }
+
+  #registerRequest(httpRequest: TestRequest, responseGetter: RG, instructionPayload: EnrichedHttpInstructionPayload): void {
     let key: number;
 
     if (instructionPayload.timeline !== undefined) {
       if (this.timePassed > instructionPayload.timeline) {
+        console.log('HttpInstructionTimelineExceededError')
         throw new HttpInstructionTimelineExceededError(instructionPayload.timeline, this.timePassed);
       }
       key = instructionPayload.timeline;
@@ -34,54 +88,5 @@ export class RequestsPassageMediator<
     } else {
       this.requests[key].push([httpRequest, responseGetter, instructionPayload]);
     }
-  }
-
-  collectHttpCalls(
-    httpCallInstructions: Instr[],
-    {
-      httpTestingController = TestBed.inject(HttpTestingController),
-      testRequests,
-    }: {
-      httpTestingController?: HttpTestingController;
-      testRequests?: TestRequest[];
-    } = {},
-  ) {
-    const requests = testRequests || getRequestsFromQueue(httpTestingController);
-
-    for (const testRequest of requests) {
-      if (testRequest.cancelled) {
-        continue;
-      }
-
-      const { request } = testRequest;
-
-      const instruction = httpCallInstructions.find(([checker]) => {
-        if (typeof checker === "function") {
-          return checker(request);
-        }
-        if (Array.isArray(checker)) {
-          const path = checker[0];
-          const method = checker[1];
-
-          if (path instanceof RegExp) {
-            return request.url.match(path) && request.method === method;
-          }
-          return request.url.includes(path) && request.method === method;
-        }
-        return false;
-      });
-
-      if (instruction === undefined) {
-        throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
-      }
-
-      const [, responseGetter, options] = instruction;
-      this.addRequest(testRequest, responseGetter as RG, options);
-    }
-  }
-
-  protected extractSearchParams(requestUrl: string): URLSearchParams {
-    const queryParams = requestUrl.split("?")[1];
-    return new URLSearchParams(queryParams);
   }
 }
