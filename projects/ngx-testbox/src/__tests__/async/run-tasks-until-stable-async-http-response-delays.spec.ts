@@ -4,6 +4,7 @@ import {HttpTestingController, provideHttpClientTesting} from '@angular/common/h
 import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http';
 import { HttpCallInstructionAsync } from '../../../testing/src/interfaces/http-call';
 import { runTasksUntilStableAsync } from '../../../testing/src/run-tasks-until-stable-async';
+import clock = jasmine.clock;
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
@@ -36,6 +37,15 @@ describe('runTasksUntilStableAsync - HTTP response delays', () => {
   let fixture: ComponentFixture<DelayHttpComponentAsync>;
   let component: DelayHttpComponentAsync;
   let httpTestingController: HttpTestingController;
+  let tick: (delayMs: number) => void | Promise<void>;
+
+  beforeAll(() => {
+    tick = clock().install().tick;
+  })
+
+  afterAll(() => {
+    clock().uninstall();
+  })
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -69,6 +79,7 @@ describe('runTasksUntilStableAsync - HTTP response delays', () => {
       // Total delay for i=1..10 is 55s; give some headroom for scheduling.
       componentLongRunTimeout: 90_000,
       debug: false,
+      advanceTimers: (delayMs) => tick(delayMs),
     });
 
     expect(component.results).toEqual(

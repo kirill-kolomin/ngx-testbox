@@ -40,7 +40,7 @@ describe('collectHttpCallsAsync - HTTP response delays', () => {
 
     makeRequest(0);
 
-    const mediator = new RequestsPassageMediatorAsync(false);
+    const mediator = new RequestsPassageMediatorAsync();
 
     const instructions: EnrichedHttpInstructionAsync[] = Array.from({ length: TOTAL_CALLS }).map((_, idx) => {
       const i = idx + 1;
