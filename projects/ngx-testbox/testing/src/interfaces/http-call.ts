@@ -41,6 +41,11 @@ export type ResponseGetterAsync = (httpRequest: HttpRequest<unknown>, searchPara
 */
 export type DelayTime = number;
 
+/*
+   Milliseconds of absolute timeline time.
+*/
+export type TimelineTime = number;
+
 /**
  * A checker that determines if a specific HTTP request matches with a provided http call instruction for further handling.
  * Can be either:
@@ -65,6 +70,7 @@ export type HttpCallInstructionAsync =
 
 export type HttpCallInstructionExtraParams = {
   delay?: DelayTime;
+  timeline?: TimelineTime;
   onCompleted?: OnCompleted;
   willHaveBeenCancelled?: boolean;
 };

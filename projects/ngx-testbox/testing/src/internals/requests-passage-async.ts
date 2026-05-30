@@ -1,6 +1,7 @@
 import { TestRequest } from '@angular/common/http/testing';
 import { HttpResponse } from '@angular/common/http';
 import { FailedToGenerateHttpResponseError } from '../errors/FailedToGenerateHttpResponseError';
+import { HttpInstructionTimelineExceededError } from '../errors/HttpInstructionTimelineExceededError';
 import { OnCompleted, ResponseGetterAsync } from '../interfaces/http-call';
 import { EnrichedHttpInstructionPayload } from './enriched-http-instruction';
 
@@ -8,25 +9,25 @@ export class RequestsPassageMediatorAsync {
   #timePassed = 0;
   #requests: Record<number, [TestRequest, ResponseGetterAsync, EnrichedHttpInstructionPayload][]> = {};
 
-  constructor(private debug = false) {}
-
   addRequest(
     httpRequest: TestRequest,
     responseGetter: ResponseGetterAsync,
     instructionPayload: EnrichedHttpInstructionPayload,
   ): void {
-    const delaySinceBeginning = instructionPayload?.delay ?? 0;
-    const delayDelta = delaySinceBeginning - this.#timePassed;
+    let key: number;
 
-    if (this.debug && delayDelta < 0) {
-      console.warn(
-        `A request ${httpRequest.request.method} ${httpRequest.request.url} should have been called ${Math.abs(
-          delayDelta,
-        )}ms ago. Probably you need to align your sequence of delays.`,
-      );
+    if (instructionPayload.timeline !== undefined) {
+      if (this.#timePassed > instructionPayload.timeline) {
+        throw new HttpInstructionTimelineExceededError(instructionPayload.timeline, this.#timePassed);
+      }
+      key = instructionPayload.timeline;
+    } else {
+      const delay = instructionPayload.delay ?? 0;
+      key = this.#timePassed + delay;
+      if (key < this.#timePassed) {
+        key = this.#timePassed;
+      }
     }
-
-    const key = delayDelta < 0 ? this.#timePassed : delaySinceBeginning;
 
     if (!this.#requests[key]) {
       this.#requests[key] = [[httpRequest, responseGetter, instructionPayload]];

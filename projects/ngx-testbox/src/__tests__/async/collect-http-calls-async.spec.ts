@@ -44,7 +44,7 @@ describe('collectHttpCallsAsync', () => {
     const responseSpy = jasmine.createSpy('responseSpy');
     httpClient.get('/api/test').subscribe(responseSpy);
 
-    const mediator = new RequestsPassageMediatorAsync(false);
+    const mediator = new RequestsPassageMediatorAsync();
 
     const mockBody = { data: 'test response' };
     const instructions: EnrichedHttpInstructionAsync[] = [
@@ -63,7 +63,7 @@ describe('collectHttpCallsAsync', () => {
     const responseSpy = jasmine.createSpy('responseSpy');
     httpClient.get('/api/test?param=value').subscribe(responseSpy);
 
-    const mediator = new RequestsPassageMediatorAsync(false);
+    const mediator = new RequestsPassageMediatorAsync();
     const mockBody = { data: 'test response' };
     const instructions: EnrichedHttpInstructionAsync[] = [
       [
@@ -83,7 +83,7 @@ describe('collectHttpCallsAsync', () => {
   it('should throw an error if no matching instruction is found for a request', async () => {
     httpClient.get('/api/test').subscribe();
 
-    const mediator = new RequestsPassageMediatorAsync(false);
+    const mediator = new RequestsPassageMediatorAsync();
 
     const instructions: EnrichedHttpInstructionAsync[] = [
       [['/api/other', 'GET'], () => new HttpResponse({ body: {}, status: 200 }), { callTracker: () => {}, markAsCancelled: () => {} }],
@@ -98,7 +98,7 @@ describe('collectHttpCallsAsync', () => {
   it('should skip cancelled requests', async () => {
     httpClient.get('/api/test').subscribe().unsubscribe();
 
-    const mediator = new RequestsPassageMediatorAsync(false);
+    const mediator = new RequestsPassageMediatorAsync();
     const requests = getRequestsFromQueue(httpTestingController);
     collectHttpCallsAsync([], mediator, { testRequests: requests });
     await mediator.passRequests();

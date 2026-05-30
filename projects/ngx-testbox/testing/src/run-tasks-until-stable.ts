@@ -11,6 +11,7 @@ import { getRequestsFromQueue } from './internals/get-requests-from-queue';
 import { RequestsPassageMediator } from './internals/requests-passage';
 import { HttpCallInstruction } from './interfaces/http-call';
 import { EnrichedHttpInstruction } from './internals/enriched-http-instruction';
+import { validateHttpInstructions } from './internals/validate-http-instructions';
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -102,6 +103,8 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   httpCallInstructions = [],
   debug
 }: RunTasksUntilStableParams = {}) => {
+  validateHttpInstructions(httpCallInstructions);
+
   let rollbackOriginalSetInterval = () => {};
   const _eventualTimeAdvance = eventualTimeAdvance ?? 1000;
 
@@ -114,7 +117,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   let attempt = 0;
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
   let requests = getRequestsFromQueue(httpTestingController);
-  const requestsPassageMediator = new RequestsPassageMediator(debug);
+  const requestsPassageMediator = new RequestsPassageMediator();
 
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();

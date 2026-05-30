@@ -1,5 +1,5 @@
 import { CallTrackers } from "../interfaces/call-trackers";
-import { HttpCallInstruction, HttpCallInstructionAsync, ResponseGetter, ResponseGetterAsync } from "../interfaces/http-call";
+import { HttpCallInstruction, HttpCallInstructionAsync } from "../interfaces/http-call";
 import { EnrichedHttpInstruction, EnrichedHttpInstructionAsync } from "./enriched-http-instruction";
 
 /**

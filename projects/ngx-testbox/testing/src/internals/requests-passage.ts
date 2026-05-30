@@ -2,6 +2,7 @@ import { TestRequest } from "@angular/common/http/testing";
 import { HttpResponse } from "@angular/common/http";
 import { CannotUsePromiseResponseWithinFakeAsync } from "../errors/CannotUsePromiseResponseWithinFakeAsync";
 import { FailedToGenerateHttpResponseError } from "../errors/FailedToGenerateHttpResponseError";
+import { HttpInstructionTimelineExceededError } from "../errors/HttpInstructionTimelineExceededError";
 import { OnCompleted, ResponseGetter } from "../interfaces/http-call";
 import { EnrichedHttpInstructionPayload } from "./enriched-http-instruction";
 import { tick } from "@angular/core/testing";
@@ -11,17 +12,21 @@ export class RequestsPassageMediator {
     #timePassed = 0;
     #requests: Record<number, [TestRequest, ResponseGetter, EnrichedHttpInstructionPayload][]> = {};
 
-    constructor(private debug = false) {}
-
     addRequest(httpRequest: TestRequest, responseGetter: ResponseGetter, instructionPayload: EnrichedHttpInstructionPayload): void {
-        const delaySinceBeginning = instructionPayload?.delay ?? 0;
-        let delayDelta = delaySinceBeginning - this.#timePassed;
-        
-        if(this.debug && delayDelta < 0) {
-            console.warn(`A request ${httpRequest.request.method} ${httpRequest.request.url} should have been called ${Math.abs(delayDelta)}ms ago. Probably you need to align your sequence of delays.`);
-        }
+        let key: number;
 
-        const key = delayDelta < 0 ? this.#timePassed : delaySinceBeginning;
+        if (instructionPayload.timeline !== undefined) {
+            if (this.#timePassed > instructionPayload.timeline) {
+                throw new HttpInstructionTimelineExceededError(instructionPayload.timeline, this.#timePassed);
+            }
+            key = instructionPayload.timeline;
+        } else {
+            const delay = instructionPayload.delay ?? 0;
+            key = this.#timePassed + delay;
+            if (key < this.#timePassed) {
+                key = this.#timePassed;
+            }
+        }
 
         if(!this.#requests[key]) {
             this.#requests[key] = [[httpRequest, responseGetter, instructionPayload]];

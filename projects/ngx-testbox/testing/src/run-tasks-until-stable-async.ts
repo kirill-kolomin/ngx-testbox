@@ -10,6 +10,7 @@ import { HttpCallInstructionAsync } from "./interfaces/http-call";
 import { EnrichedHttpInstructionAsync } from "./internals/enriched-http-instruction";
 import { RequestsPassageMediatorAsync } from "./internals/requests-passage-async";
 import { collectHttpCallsAsync } from "./internals/collect-http-calls-async";
+import { validateHttpInstructions } from "./internals/validate-http-instructions";
 
 /**
  * Configuration parameters for the runTasksUntilStable function.
@@ -49,6 +50,8 @@ export async function runTasksUntilStableAsync(
     debug
   }: RunTasksUntilStableAsyncParams = {}
 ): Promise<void> {
+  validateHttpInstructions(httpCallInstructions);
+
   let rollbackOriginalSetInterval = () => {};
 
   if(debug) {
@@ -59,7 +62,7 @@ export async function runTasksUntilStableAsync(
   const httpTestingController = TestBed.inject(HttpTestingController);
   const {callTrackers, requiredHttpCallInstructions} = trackRequiredHttpInstructionsToInvoke(httpCallInstructions);
 
-  const requestsPassageMediator = new RequestsPassageMediatorAsync(!!debug);
+  const requestsPassageMediator = new RequestsPassageMediatorAsync();
 
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
