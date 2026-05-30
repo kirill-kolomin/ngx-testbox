@@ -130,7 +130,7 @@ export async function runTasksUntilStableAsync(
       // Nothing left in the HTTP queue; we're stabilized.
       resolve(undefined);
     } else {
-      setTimeout(() => runTasks(resolve, reject, requests), 16);
+      setTimeout(() => runTasks(resolve, reject, requests));
     }
   }
 }
