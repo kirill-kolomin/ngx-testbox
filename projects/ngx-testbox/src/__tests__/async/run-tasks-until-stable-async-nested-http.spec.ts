@@ -180,10 +180,12 @@ describe('runTasksUntilStableAsync - nested HTTP', () => {
       [
         ['/api/money-limit', 'GET'],
         () => new HttpResponse<MoneyLimitResponse>({body: {limit: 1000}, status: 200}),
+        {sustainable: true}
       ],
       [
         ['/api/allowance', 'GET'],
         () => new HttpResponse<AllowanceResponse>({body: {allowed: true}, status: 200}),
+        {sustainable: true}
       ],
     ];
 

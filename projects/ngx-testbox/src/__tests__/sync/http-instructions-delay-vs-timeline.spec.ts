@@ -20,6 +20,7 @@ class HttpInstructionsComponent implements OnInit {
   constructor(private readonly http: HttpClient) {}
 
   ngOnInit() {
+    console.log('init')
     this.http.get('/api/a').subscribe((v: any) => this.results.push(v.value));
     this.http.get('/api/b').subscribe((v: any) => this.results.push(v.value));
     this.http.get('/api/c').subscribe((v: any) => this.results.push(v.value));

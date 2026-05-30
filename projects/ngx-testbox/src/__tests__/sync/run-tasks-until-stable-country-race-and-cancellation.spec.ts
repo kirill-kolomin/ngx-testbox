@@ -111,9 +111,22 @@ describe('runTasksUntilStable (fakeAsync) - country race cancellation and loadin
     fixture = TestBed.createComponent(CountryRaceComponent);
     fixture.detectChanges();
     const harness = new DebugElementHarness(fixture.debugElement, testIds);
-    let deFormatsCalledTimes = 0;
-
+    
     const httpCallInstructions: HttpCallInstruction[] = [
+      [
+        ['/api/countries/DE/formats', 'GET'],
+        () => new HttpResponse({body: ['SEPA'], status: 200}),
+        {
+          timeline: 2000,
+          willHaveBeenCancelled: true,
+          onCompleted: () => {
+            expect(!!harness.elements.codeLoading.query()).toBe(true);
+            expect(harness.elements.codeOption.queryAll().length).toBe(0);
+            expect(!!harness.elements.formatLoading.query()).toBe(true);
+            expect(harness.elements.formatOption.queryAll().length).toBe(0);
+          },
+        },
+      ],
       [
         ['/api/countries/DE/formats', 'GET'],
         () => new HttpResponse({body: ['SEPA'], status: 200}),
@@ -121,30 +134,21 @@ describe('runTasksUntilStable (fakeAsync) - country race cancellation and loadin
           delay: 200,
           willHaveBeenCancelled: true,
           onCompleted: () => {
-            deFormatsCalledTimes++;
+            const formatOptions = harness.elements.formatOption.queryAll();
 
             expect(!!harness.elements.codeLoading.query()).toBe(true);
             expect(harness.elements.codeOption.queryAll().length).toBe(0);
-
-            if(deFormatsCalledTimes === 2) {
-            // Second time user waits for the DE formats get loaded, so it renders one element
-              const formatOptions = harness.elements.formatOption.queryAll();
-
-              expect(formatOptions.length).toBe(1);
-              expect(formatOptions[0].nativeElement.textContent).toBe('SEPA');
-              expect(!!harness.elements.formatLoading.query()).toBe(false);
-            } else {
-              expect(!!harness.elements.formatLoading.query()).toBe(true);
-              expect(harness.elements.formatOption.queryAll().length).toBe(0);
-            }
-          }
+            expect(formatOptions.length).toBe(1);
+            expect(formatOptions[0].nativeElement.textContent).toBe('SEPA');
+            expect(!!harness.elements.formatLoading.query()).toBe(false);
+          },
         },
       ],
       [
         ['/api/countries/US/formats', 'GET'],
         () => new HttpResponse({body: ['ACH', 'DRD'], status: 200}),
         {
-          delay: 400,
+          timeline: 4000,
           onCompleted: () => {
             const formatOptions = harness.elements.formatOption.queryAll();
             expect(formatOptions.length).toBe(2);
@@ -154,16 +158,16 @@ describe('runTasksUntilStable (fakeAsync) - country race cancellation and loadin
             expect(harness.elements.codeOption.queryAll().length).toBe(0);
             expect(!!harness.elements.formatLoading.query()).toBe(false);
 
-            // User decides again to switch to DE again
+            // User decides to switch to DE again
             harness.elements.country.changeValue('DE');
-          }
+          },
         },
       ],
       [
         ['/api/countries/US/codes', 'GET'],
         () => new HttpResponse({body: ['US-WIRE-1', 'US-WIRE-2'], status: 200}),
         {
-          delay: 500,
+          timeline: 4500,
           willHaveBeenCancelled: true,
           onCompleted: () => {
             const formatOptions = harness.elements.formatOption.queryAll();
@@ -175,14 +179,32 @@ describe('runTasksUntilStable (fakeAsync) - country race cancellation and loadin
             expect(!!harness.elements.formatLoading.query()).toBe(false);
 
             expect(codeOptions.length).toBe(0);
-          }
+          },
         },
       ],
       [
         ['/api/countries/DE/codes', 'GET'],
         () => new HttpResponse({body: ['DE-ACH-1', 'DE-ACH-2'], status: 200}),
         {
-          delay: 600,
+          timeline: 5000,
+          willHaveBeenCancelled: true,
+          onCompleted: () => {
+            const formatOptions = harness.elements.formatOption.queryAll();
+            const codeOptions = harness.elements.codeOption.queryAll();
+            expect(formatOptions.length).toBe(1);
+            expect(formatOptions[0].nativeElement.textContent).toBe('SEPA');
+            expect(!!harness.elements.formatLoading.query()).toBe(false);
+            // The request was cancelled, the codes will arive in 400ms (look the next instruction)
+            expect(!!harness.elements.codeLoading.query()).toBe(true);
+            expect(codeOptions.length).toBe(0);
+          },
+        },
+      ],
+      [
+        ['/api/countries/DE/codes', 'GET'],
+        () => new HttpResponse({body: ['DE-ACH-1', 'DE-ACH-2'], status: 200}),
+        {
+          timeline: 5400,
           onCompleted: () => {
             const formatOptions = harness.elements.formatOption.queryAll();
             const codeOptions = harness.elements.codeOption.queryAll();
@@ -193,12 +215,11 @@ describe('runTasksUntilStable (fakeAsync) - country race cancellation and loadin
             expect(codeOptions.length).toBe(2);
             expect(codeOptions[0].nativeElement.textContent).toBe('DE-ACH-1');
             expect(codeOptions[1].nativeElement.textContent).toBe('DE-ACH-2');
-          }
+          },
         },
-      ],
+      ]
     ];
 
-    // Initial user choice: US.
     harness.elements.country.changeValue('DE');
 
     setTimeout(() => {
@@ -220,7 +241,5 @@ describe('runTasksUntilStable (fakeAsync) - country race cancellation and loadin
     expect(codeOptions.length).toBe(2);
     expect(codeOptions[0].nativeElement.textContent).toBe('DE-ACH-1');
     expect(codeOptions[1].nativeElement.textContent).toBe('DE-ACH-2');
-    // The instruction was called 2 times because user 2 times decided to switch to DE
-    expect(deFormatsCalledTimes).toBe(2);
   }));
 });

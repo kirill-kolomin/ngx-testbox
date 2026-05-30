@@ -112,8 +112,6 @@ describe('runTasksUntilStableAsync', () => {
 
      const advanceTimersSpy = jasmine.createSpy('advanceTimersBy').and.returnValue(undefined);
 
-    component.makeHttpRequest();
-
      await runTasksUntilStableAsync(fixture, {
        httpCallInstructions,
        advanceTimers: advanceTimersSpy,
@@ -157,8 +155,6 @@ describe('runTasksUntilStableAsync', () => {
     ];
     const errorSpy = jasmine.createSpy().and.returnValue(undefined);
 
-    // Best-effort: ensure an instruction with willHaveBeenCancelled doesn't throw.
-    component.makeHttpRequest();
     await runTasksUntilStableAsync(fixture, { httpCallInstructions, debug: false }).catch(errorSpy);
 
     expect(errorSpy).not.toHaveBeenCalled();
