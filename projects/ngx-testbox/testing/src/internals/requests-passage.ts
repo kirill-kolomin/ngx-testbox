@@ -9,7 +9,7 @@ import { EnrichedHttpInstruction } from "./enriched-http-instruction";
 export class RequestsPassageMediatorSync extends RequestsPassageMediator<ResponseGetter, EnrichedHttpInstruction> {
     passRequests(): {shouldStabilizeAfterRequests: boolean, asserts?: OnCompleted[]} {
         const key = Object.keys(this.requests).sort((a, b) => Number(a) - Number(b))[0];
-console.log(this.requests, Object.keys(this.requests).sort((a, b) => Number(a) - Number(b)))
+
         if(!key) {
             return {shouldStabilizeAfterRequests: false};
         }
@@ -56,7 +56,6 @@ console.log(this.requests, Object.keys(this.requests).sort((a, b) => Number(a) -
 
         delete this.requests[Number(key)];
         this.timePassed = Number(key);
-        console.log('nowa timeline is ', this.timePassed)
 
         return {shouldStabilizeAfterRequests: true, asserts};
     }

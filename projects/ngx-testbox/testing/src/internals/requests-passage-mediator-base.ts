@@ -23,7 +23,6 @@ export class RequestsPassageMediator<
       testRequests?: TestRequest[];
     } = {},
   ) {
-    console.log('collect', testRequests)
     const requests = testRequests || getRequestsFromQueue(httpTestingController);
 
     for (const testRequest of requests) {
@@ -49,7 +48,6 @@ export class RequestsPassageMediator<
         return false;
       });
 
-      console.log(request.url, instructionIndex)
       if (instructionIndex === -1) {
         throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
       }
@@ -75,7 +73,6 @@ export class RequestsPassageMediator<
 
     if (instructionPayload.timeline !== undefined) {
       if (this.timePassed > instructionPayload.timeline) {
-        console.log('HttpInstructionTimelineExceededError')
         throw new HttpInstructionTimelineExceededError(instructionPayload.timeline, this.timePassed);
       }
       key = instructionPayload.timeline;
