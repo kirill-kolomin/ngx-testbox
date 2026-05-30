@@ -73,4 +73,9 @@ export type HttpCallInstructionExtraParams = {
   timeline?: TimelineTime;
   onCompleted?: OnCompleted;
   willHaveBeenCancelled?: boolean;
+  /**
+   * Each http instruction by default is handled only 1 time, then disappear.
+   * Marking it sustainable makes it executable accross all http requests for the current fixture stabilization process.
+   */
+  sustainable?: boolean;
 };

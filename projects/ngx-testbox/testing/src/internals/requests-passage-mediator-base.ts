@@ -54,8 +54,12 @@ export class RequestsPassageMediator<
         throw new NoMatchingHttpInstructionForRequestFoundError(request.url, request.method);
       }
 
-      const instruction = httpCallInstructions.splice(instructionIndex, 1)[0];
-      // const instruction = httpCallInstructions[instructionIndex];
+      const instruction = httpCallInstructions[instructionIndex];
+
+      if(!instruction[2].sustainable) {
+        httpCallInstructions.splice(instructionIndex, 1);
+      }
+
       const [, responseGetter, options] = instruction;
       this.#registerRequest(testRequest, responseGetter as RG, options);
     }
