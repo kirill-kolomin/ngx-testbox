@@ -13,9 +13,9 @@ import { RequestsPassageMediatorAsync } from "./internals/requests-passage-async
 import { validateHttpInstructions } from "./internals/validate-http-instructions";
 
 /**
- * Configuration parameters for the runTasksUntilStable function.
+ * Configuration parameters for the runTasksUntilStableAsync function.
  *
- * @interface RunTasksUntilStableParams
+ * @interface RunTasksUntilStableAsyncParams
  */
 export interface RunTasksUntilStableAsyncParams extends CommonStabilizationParams {
   /**
@@ -26,20 +26,52 @@ export interface RunTasksUntilStableAsyncParams extends CommonStabilizationParam
   
   /**
    * The time when component is considered as too-long-running to finish the test. Measured in milliseconds.
+   *
+   * Defaults to **10000**.
    */
   componentLongRunTimeout?: number;
   httpCallInstructions?: HttpCallInstructionAsync[];
 }
 
 /**
- * The time when component is considered as too-long-running in order to finish the test.
+ * The default timeout in milliseconds after which runTasksUntilStableAsync considers the component too long running.
+ * @deprecated This constant is not part of the public API. Use the componentLongRunTimeout parameter instead.
  */
 export const COMPONENT_LONG_RUN_TIMEOUT = 10_000;
 
 /**
  * Runs Angular change detection and processes tasks until the component fixture is stable.
  *
- * Might be running within zoneless Angular applications.
+ * This is the async/await variant designed for both zoneless and zoneful Angular applications.
+ * It waits for real asynchronous operations to complete rather than simulating time with tick().
+ *
+ * It does the following operations:
+ * 1. Runs change detection.
+ * 2. Responds to HTTP requests.
+ * 3. Waits for the fixture to become stable using real time or provided timer advancement.
+ * 4. Runs the cycle again until both the fixture is stable and no HTTP requests remain.
+ *
+ * @param fixture - The component fixture to stabilize
+ * @param params - Optional configuration parameters
+ * @throws LongRunningComponentError if the component does not stabilize within componentLongRunTimeout (default: 10000ms)
+ * @throws Error if any HTTP instruction is not invoked during stabilization
+ * @throws Error if any HTTP request is not handled during stabilization
+ *
+ * @example
+ * ```typescript
+ * it('should load data', async () => {
+ *   const fixture = TestBed.createComponent(MyComponent);
+ *
+ *   await runTasksUntilStableAsync(fixture, {
+ *     httpCallInstructions: [
+ *       [['api/users', 'GET'], () => new HttpResponse({ body: users, status: 200 })]
+ *     ]
+ *   });
+ *
+ *   // Now you can make assertions
+ *   expect(fixture.componentInstance.users).toEqual(users);
+ * });
+ * ```
  */
 export async function runTasksUntilStableAsync(
   fixture: ComponentFixture<unknown>,

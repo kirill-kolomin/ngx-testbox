@@ -26,19 +26,20 @@ export interface RunTasksUntilStableParams extends CommonStabilizationParams {
   httpCallInstructions?: HttpCallInstruction[];
 
   /**
-   * The amount of time in milliseconds to advance the virtual clock after fixture was stabilized.
-   * Is needed to settle all internal Angular's tasks.
-   * This time advance runs eventually after all http requests/instructions were processed,
-   * meaning the function "runTasksUntilStable" will finish its execution additionaly in the time provided within the parameter.
-   * 
-   * By default is equal to 1000
+   * The amount of time in milliseconds to advance the virtual clock at the end of each stabilization cycle.
+   * This time advance runs after each cycle where HTTP requests were processed and the fixture was stabilized,
+   * helping to settle any remaining internal Angular tasks (timers, microtasks) before the next cycle begins.
+   *
+   * Defaults to **1000**.
    */
   eventualTimeAdvance?: number;
 
   /**
    * Maximum number of attempts to stabilize the fixture before throwing an error.
    * This prevents infinite loops when a fixture cannot be stabilized.
-  */
+   *
+   * Defaults to **30**.
+   */
   maxAttempts?: number;
 }
 
@@ -46,7 +47,7 @@ export interface RunTasksUntilStableParams extends CommonStabilizationParams {
  * Maximum number of attempts to stabilize the fixture before throwing an error.
  * This prevents infinite loops when a fixture cannot be stabilized.
  */
-export const MAXIMUM_ATTEMPTS = 30;
+const MAXIMUM_ATTEMPTS = 30;
 
 /**
  * Runs Angular change detection and processes tasks until the component fixture is stable.
@@ -74,7 +75,7 @@ export const MAXIMUM_ATTEMPTS = 30;
  *
  * @param fixture - The component fixture to stabilize
  * @param params - Optional configuration parameters
- * @throws Error if the fixture cannot be stabilized after MAXIMUM_ATTEMPTS
+ * @throws Error if the fixture cannot be stabilized after the configured maxAttempts (default: 30)
  * @throws Error if any HTTP instruction is not invoked during stabilization
  * @throws Error if any HTTP request is not handled during stabilization
  *
@@ -82,21 +83,21 @@ export const MAXIMUM_ATTEMPTS = 30;
  *
  * - This function is designed to work only within fakeAsync zone within the "zoneful" Angular app. Not for zoneless apps.
  * - When you created a component using the method createComponent of fixture, the fixture is marked as stable, if you don't run any asynchronous tasks within the component constructor or within its dependencies.
- * Make sure you set everything up (did overrides to methods, passed values to inputs, etc.), as you need to call this function to run the Angular component's life cycle.
- * Once you called it, the ngOnInit method will be invoked, and the fixture now is in status unstable.
+ *   Make sure you set everything up (did overrides to methods, passed values to inputs, etc.), as you need to call this function to run the Angular component's life cycle.
+ *   Once you called it, the ngOnInit method will be invoked, and the fixture now is in status unstable.
  * - This function processes only http requests, which were made using Angular http client.
  * - To guarantee that your passed http call instructions will be invoked, the function will throw if some of them were not invoked during stabilization.
- * E.g., this is useful for cases when you initialize your component with some data as the initial state, and your test case covers error responses, which preserve the initial state still.
- * Though visually nothing happened for users, but as for you as a developer, you wanted to make sure that your component is not broken after the error response.
+ *   E.g., this is useful for cases when you initialize your component with some data as the initial state, and your test case covers error responses, which preserve the initial state still.
+ *   Though visually nothing happened for users, but as for you as a developer, you wanted to make sure that your component is not broken after the error response.
  * - And vice versa, if you didn't process any of the HTTP requests that entered the queue of tasks, the function will throw an error.
- * So it helps you to cover that piece of code which you expect to cover.
- * For cases with side effects as HTTP calls, I recommend overriding such methods with stubs.
+ *   So it helps you to cover that piece of code which you expect to cover.
+ *   For cases with side effects as HTTP calls, I recommend overriding such methods with stubs.
  * - When in your code you have used setInterval calls, potentially this may be a problem for stabilizing the fixture.
- * In this case you might need to mock the place where setInterval is invoked or run the piece of code outside the angular zone using the NgZone.prototype.runOutsideAngular method.
- * Additionally, you will receive warnings in the console log if setInterval is detected with stack trace pointing you to easier find the place where setInterval is invoked.
- * 
+ *   In this case you might need to mock the place where setInterval is invoked or run the piece of code outside the angular zone using the NgZone.prototype.runOutsideAngular method.
+ *   Additionally, you will receive warnings in the console log if setInterval is detected with stack trace pointing you to easier find the place where setInterval is invoked.
+ *
  * Note: Potentially will be deprecated if Angular team decides to deprecate fakeAsync and zone.js in their future releases.
- * Use {@link RunTasksUntilStableParams#componentLongRunTimeout componentLongRunTimeout} for the new async/await approach instead.
+ * Use runTasksUntilStableAsync and its componentLongRunTimeout parameter for the new async/await approach instead.
  */
 export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   eventualTimeAdvance,
