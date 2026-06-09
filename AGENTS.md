@@ -41,7 +41,7 @@ npm start
 ## Entry Points
 The library exposes two entry points configured via `paths` in `tsconfig.json`:
 - `ngx-testbox` — main runtime exports (e.g., `TestIdDirective`)
-- `ngx-testbox/testing` — testing utilities (e.g., `runTasksUntilStable`, `DebugElementHarness`, `completeHttpCalls`)
+- `ngx-testbox/testing` — testing utilities (e.g., `runTasksUntilStable`, `runTasksUntilStableAsync`, `DebugElementHarness`)
 
 The physical source for `ngx-testbox/testing` is under `projects/ngx-testbox/testing/src/`.
 
