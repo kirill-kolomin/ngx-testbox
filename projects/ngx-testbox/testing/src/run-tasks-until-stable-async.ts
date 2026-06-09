@@ -30,6 +30,10 @@ export interface RunTasksUntilStableAsyncParams extends CommonStabilizationParam
    * Defaults to **10000**.
    */
   componentLongRunTimeout?: number;
+  /**
+   * Array of HTTP call instructions to process during stabilization.
+   * These instructions define how to handle specific HTTP requests.
+   */
   httpCallInstructions?: HttpCallInstructionAsync[];
 }
 
@@ -42,20 +46,20 @@ export const COMPONENT_LONG_RUN_TIMEOUT = 10_000;
 /**
  * Runs Angular change detection and processes tasks until the component fixture is stable.
  *
- * This is the async/await variant designed for both zoneless and zoneful Angular applications.
- * It waits for real asynchronous operations to complete rather than simulating time with tick().
+ * This is the **recommended default** for new tests. It is the async/await variant designed for both zoneless and zoneful Angular applications.
+ * It waits for real asynchronous operations to complete rather than simulating time with `tick()`.
  *
  * It does the following operations:
  * 1. Runs change detection.
  * 2. Responds to HTTP requests.
- * 3. Waits for the fixture to become stable using real time or provided timer advancement.
+ * 3. Waits for the fixture to become stable (via real time or a fake timer callback).
  * 4. Runs the cycle again until both the fixture is stable and no HTTP requests remain.
  *
  * @param fixture - The component fixture to stabilize
  * @param params - Optional configuration parameters
- * @throws LongRunningComponentError if the component does not stabilize within componentLongRunTimeout (default: 10000ms)
- * @throws Error if any HTTP instruction is not invoked during stabilization
- * @throws Error if any HTTP request is not handled during stabilization
+ * @throws {LongRunningComponentError} if the component does not stabilize within `componentLongRunTimeout` (default: 10000ms)
+ * @throws {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} if any HTTP instruction is not invoked during stabilization
+ * @throws {NoMatchingHttpInstructionForRequestFoundError} if any HTTP request is not handled during stabilization
  *
  * @example
  * ```typescript

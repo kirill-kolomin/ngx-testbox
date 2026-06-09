@@ -51,14 +51,14 @@ const MAXIMUM_ATTEMPTS = 30;
 
 /**
  * Runs Angular change detection and processes tasks until the component fixture is stable.
- * This function is designed as the core functionality of the ngx-testbox library.
- * It handles asynchronous operations in Angular components.
+ * **This function is designed to work only within a `fakeAsync` zone.**
+ * It is the core functionality of the ngx-testbox library for the sync/fakeAsync approach.
  *
  * It does the following operations:
  * 1. Runs change detection.
  * 2. Responds to HTTP requests.
  * 3. Pushes time forward. Executes until all asynchronous operations are resolved so that the fixture becomes stable.
- * 4. Runs the cycle again.
+ * 4. Runs the cycle again until the fixture is stable.
  *
  * @example
  * ```typescript
@@ -75,9 +75,10 @@ const MAXIMUM_ATTEMPTS = 30;
  *
  * @param fixture - The component fixture to stabilize
  * @param params - Optional configuration parameters
- * @throws Error if the fixture cannot be stabilized after the configured maxAttempts (default: 30)
- * @throws Error if any HTTP instruction is not invoked during stabilization
- * @throws Error if any HTTP request is not handled during stabilization
+ * @throws {MaximumAttemptsToStabilizeFixtureReachedError} if the fixture cannot be stabilized after the configured maxAttempts (default: 30)
+ * @throws {HttpInstructionWasNotExecutedDuringFixtureStabilizationError} if any HTTP instruction is not invoked during stabilization
+ * @throws {NoMatchingHttpInstructionForRequestFoundError} if any HTTP request is not handled during stabilization
+ * @throws {CannotUsePromiseResponseWithinFakeAsync} if a sync response getter returns a Promise
  *
  * @remarks
  *
