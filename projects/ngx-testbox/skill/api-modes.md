@@ -1,5 +1,7 @@
 # ngx-testbox API Modes
 
+Load `async-approach.md` for async-first guidance and `sync-fakeasync-approach.md` for `fakeAsync` guidance. This file is only the shared API reference for instruction shapes and timing semantics.
+
 ## Stabilization APIs
 
 Both stabilization APIs are supported parts of the library.
@@ -60,9 +62,7 @@ Parameters:
 
 Important implementation detail:
 
-- The current `runTasksUntilStable` implementation defines `maxAttempts` in the interface but does not actually read it; it always uses `30`. Do not promise configurable max attempts unless the library implementation is changed.
-
-`eventualTimeAdvance` is useful when Angular or the component schedules internal timers that need a small push between stabilization rounds. In repo examples, some flows need a very small value like `1`, while broader app examples rely on the default.
+`eventualTimeAdvance` is useful when Angular or the component schedules internal timers that need a small push between stabilization rounds. Some flows only need a very small value like `1`, while others can rely on the default.
 
 ## HTTP instruction model
 

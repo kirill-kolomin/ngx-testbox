@@ -1,5 +1,7 @@
 # ngx-testbox Examples
 
+Use this file as a pattern index. For full mode-specific examples, load `async-approach.md` or `sync-fakeasync-approach.md`.
+
 ## Common patterns
 
 ### Initial load
@@ -70,69 +72,23 @@ Use:
 - `onCompleted` for intermediate loading-state assertions
 - `advanceTimers` in async mode if fake timers are installed
 
-Canonical repo examples:
-
-- `projects/ngx-testbox/src/__tests__/async/run-tasks-until-stable-async-country-race-and-cancellation.spec.ts`
-- `projects/ngx-testbox/src/__tests__/sync/run-tasks-until-stable-country-race-and-cancellation.spec.ts`
+Load `async-approach.md` or `sync-fakeasync-approach.md` for full race and cancellation examples.
 
 ### Intermediate assertions during multi-step flows
 
 Use `onCompleted` callbacks instead of manually splitting the request flow if the test is really about transient states.
 
-Canonical repo examples:
-
-- `projects/ngx-testbox/src/__tests__/async/run-tasks-until-stable-async-intermediate-asserts.spec.ts`
-- `projects/ngx-testbox/src/__tests__/sync/run-tasks-until-stable-intermediate-asserts.spec.ts`
+Load `async-approach.md` or `sync-fakeasync-approach.md` for full `onCompleted` examples.
 
 ### Reusable component-specific harness
 
 For larger specs, define a component harness class that extends `DebugElementHarness<typeof testIds>` and adds semantic helper methods like `setHeroName`, `clickSaveButton`, or `getHeroTitle`.
 
-Canonical repo examples:
-
-- `projects/tour-of-heroes/src/app/heroes/heroes.harness.ts`
-- `projects/tour-of-heroes/src/app/hero-detail/hero-detail.harness.ts`
-
 This is preferred when raw `harness.elements.*` usage starts to make tests repetitive.
 
-## Canonical examples in this repository
+## Source Material Note
 
-Use these files as source-of-truth examples before inventing a pattern:
-
-### Public docs
-
-- `ngx-testbox-docs/docs/core-concepts.md`
-- `ngx-testbox-docs/docs/Guides/test-components.md`
-- `ngx-testbox-docs/docs/Approaches/async-approach.md`
-- `ngx-testbox-docs/docs/Approaches/sync-approach.md`
-- `ngx-testbox-docs/docs/Api/http-call-instruction.md`
-- `ngx-testbox-docs/docs/troubleshooting.md`
-
-### Public API implementation
-
-- `projects/ngx-testbox/testing/src/public_api.ts`
-- `projects/ngx-testbox/testing/src/run-tasks-until-stable.ts`
-- `projects/ngx-testbox/testing/src/run-tasks-until-stable-async.ts`
-- `projects/ngx-testbox/testing/src/debug-element-harness.ts`
-- `projects/ngx-testbox/testing/src/interfaces/http-call.ts`
-- `projects/ngx-testbox/src/lib/directives/test-id.directive.ts`
-
-### Library specs
-
-- `projects/ngx-testbox/src/__tests__/async/run-tasks-until-stable-async.spec.ts`
-- `projects/ngx-testbox/src/__tests__/async/run-tasks-until-stable-async-intermediate-asserts.spec.ts`
-- `projects/ngx-testbox/src/__tests__/async/run-tasks-until-stable-async-country-race-and-cancellation.spec.ts`
-- `projects/ngx-testbox/src/__tests__/sync/run-tasks-until-stable.spec.ts`
-- `projects/ngx-testbox/src/__tests__/sync/run-tasks-until-stable-intermediate-asserts.spec.ts`
-- `projects/ngx-testbox/src/__tests__/sync/run-tasks-until-stable-country-race-and-cancellation.spec.ts`
-- `projects/ngx-testbox/src/__tests__/debug-element-harness.spec.ts`
-
-### Example app specs
-
-- `projects/tour-of-heroes/src/app/heroes/heroes.component.spec.ts`
-- `projects/tour-of-heroes/src/app/hero-detail/hero-detail.component.spec.ts`
-- `projects/tour-of-heroes/src/app/dashboard/dashboard.component.spec.ts`
-- `projects/tour-of-heroes/src/app/hero-search/hero-search.component.spec.ts`
+These examples were distilled from the library docs, the public API surface, and the development repository's own tests. Keep this shipped file self-contained; do not rely on non-shipping `.spec.ts` paths when teaching a consumer-facing pattern.
 
 ## Recommended default skeletons
 

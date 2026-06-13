@@ -27,8 +27,8 @@
 
 ## Supported Modes
 
-- Async: `runTasksUntilStableAsync` plus `predefinedHttpCallInstructionsAsync`
-- Sync: `runTasksUntilStable` plus `predefinedHttpCallInstructions`
+- Async: `runTasksUntilStableAsync` plus `predefinedHttpCallInstructionsAsync`; see `async-approach.md`
+- Sync: `runTasksUntilStable` plus `predefinedHttpCallInstructions`; see `sync-fakeasync-approach.md`
 
 Both are supported parts of the library.
 
@@ -101,12 +101,8 @@ runTasksUntilStable(fixture, {
 - `HttpInstructionTimelineExceededError`: impossible ordering
 - `NoElementByTestIdFoundError`: harness target missing
 
-TODO: Create separate md files with the examples, due to the fact the generated library won't have these spec files.
-## Repo Examples
+## More Examples
 
-- `projects/ngx-testbox/src/__tests__/async/run-tasks-until-stable-async.spec.ts`
-- `projects/ngx-testbox/src/__tests__/async/run-tasks-until-stable-async-country-race-and-cancellation.spec.ts`
-- `projects/ngx-testbox/src/__tests__/sync/run-tasks-until-stable.spec.ts`
-- `projects/ngx-testbox/src/__tests__/sync/run-tasks-until-stable-country-race-and-cancellation.spec.ts`
-- `projects/tour-of-heroes/src/app/heroes/heroes.component.spec.ts`
-- `projects/tour-of-heroes/src/app/hero-detail/hero-detail.component.spec.ts`
+- `examples.md`: cross-cutting patterns and reusable harness guidance
+- `async-approach.md`: async loading, POST, filtering, race/cancellation, and delayed-response examples
+- `sync-fakeasync-approach.md`: sync `fakeAsync` loading, POST, filtering, race/cancellation, and stabilization examples

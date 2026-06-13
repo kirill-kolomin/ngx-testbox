@@ -82,7 +82,7 @@ Available element APIs per test ID:
 
 Behavior details that matter:
 
-- `query()` returns the matching `DebugElement`. If nothing matches, Angular returns `null`.
+- `query()` returns the matching `DebugElement`. If nothing matches, Angular returns `null`, but that's fine. That's better to fall fast, don't try to adapt tests to null value.
 - `queryAll()` returns an array and is safe for zero matches.
 - Action helpers like `click`, `focus`, `getTextContent`, `changeValue`, and `inputValue` throw `NoElementByTestIdFoundError` if the target element is missing.
 - `changeValue()` dispatches a `'change'` event.
