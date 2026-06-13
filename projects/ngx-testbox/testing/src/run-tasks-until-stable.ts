@@ -103,8 +103,10 @@ const MAXIMUM_ATTEMPTS = 30;
 export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   eventualTimeAdvance,
   httpCallInstructions = [],
-  debug
+  debug,
+  maxAttempts,
 }: RunTasksUntilStableParams = {}) => {
+  const _maxAttempts = maxAttempts || MAXIMUM_ATTEMPTS;
   const _httpCallInstructions = httpCallInstructions.slice();
   validateHttpInstructions(_httpCallInstructions);
 
@@ -127,8 +129,8 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
 
   // By an unknown reason angular Zone is still stable despite having requests in the queue. So I need to look to make the check if there is requests in the queue.
   while (!fixture.isStable() || requests.length > 0) {
-    if (attempt++ > MAXIMUM_ATTEMPTS) {
-      throw new MaximumAttemptsToStabilizeFixtureReachedError(MAXIMUM_ATTEMPTS)
+    if (attempt++ > _maxAttempts) {
+      throw new MaximumAttemptsToStabilizeFixtureReachedError(_maxAttempts)
     }
 
     requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
