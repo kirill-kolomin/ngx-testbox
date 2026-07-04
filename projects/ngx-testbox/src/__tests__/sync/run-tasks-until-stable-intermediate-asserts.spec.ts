@@ -89,7 +89,6 @@ describe('runTasksUntilStable (fakeAsync) - intermediate assertion callbacks', (
     ];
 
     runTasksUntilStable(fixture, {
-      eventualTimeAdvance: 1,
       httpCallInstructions: instructions,
       debug: false,
       maxAttempts: 50,

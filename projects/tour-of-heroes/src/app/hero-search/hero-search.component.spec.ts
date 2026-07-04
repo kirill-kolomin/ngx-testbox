@@ -52,11 +52,12 @@ describe('HeroSearchComponent', () => {
       const searchTerm = 'ma'; // Should match heroes with 'ma' in their name
       initComponent();
 
-      harness.setSearchBoxValue(searchTerm);
+      harness.elements.searchBox.inputValue(searchTerm);
       runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchSuccessHttpCallInstruction()
         ],
+        stabilizationTimeAdvance: 300,
       });
 
       const heroElements = harness.getHeroElements();
@@ -73,8 +74,8 @@ describe('HeroSearchComponent', () => {
       const searchTerm = '     ';
       initComponent();
 
-      harness.setSearchBoxValue(searchTerm);
-      runTasksUntilStable(fixture);
+      harness.elements.searchBox.inputValue(searchTerm);
+      runTasksUntilStable(fixture, {stabilizationTimeAdvance: 300});
 
       const results = harness.getHeroElements();
       expect(results.length).toBe(0);
@@ -84,11 +85,12 @@ describe('HeroSearchComponent', () => {
       const searchTerm = 'xyz'; // Should not match any hero names
       initComponent();
 
-      harness.setSearchBoxValue(searchTerm);
+      harness.elements.searchBox.inputValue(searchTerm);
       runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchEmptyHttpCallInstruction(searchTerm)
         ],
+        stabilizationTimeAdvance: 300,
       });
 
       expect(harness.getHeroElements().length).toBe(0);
@@ -98,11 +100,12 @@ describe('HeroSearchComponent', () => {
       const searchTerm = 'error'; // Will trigger an error response
       initComponent();
 
-      harness.setSearchBoxValue(searchTerm);
+      harness.elements.searchBox.inputValue(searchTerm);
       runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchErrorHttpCallInstruction(searchTerm)
         ],
+        stabilizationTimeAdvance: 300,
       });
 
       expect(harness.getHeroElements().length).toBe(0);
@@ -112,11 +115,12 @@ describe('HeroSearchComponent', () => {
       const searchTerm = 'ma'; // Should match heroes with 'ma' in their name
       initComponent();
 
-      harness.setSearchBoxValue(searchTerm);
+      harness.elements.searchBox.inputValue(searchTerm);
       runTasksUntilStable(fixture, {
         httpCallInstructions: [
           getHeroesSearchSuccessHttpCallInstruction()
         ],
+        stabilizationTimeAdvance: 300,
       });
 
       const results = harness.getHeroElements();

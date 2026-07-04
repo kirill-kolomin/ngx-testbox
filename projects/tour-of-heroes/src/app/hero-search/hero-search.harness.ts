@@ -7,12 +7,6 @@ export class HeroSearchHarness extends DebugElementHarness<typeof testIds> {
     super(debugElement, testIds);
   }
 
-  setSearchBoxValue(value: string): void {
-    const searchBox = this.elements.searchBox.query().nativeElement;
-    searchBox.value = value;
-    searchBox.dispatchEvent(new Event('input'));
-  }
-
   getSearchBoxValue(): string {
     return this.elements.searchBox.query().nativeElement.value;
   }

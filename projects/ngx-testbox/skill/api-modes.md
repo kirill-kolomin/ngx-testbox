@@ -47,7 +47,7 @@ await runTasksUntilStableAsync(fixture, {
 ```typescript
 runTasksUntilStable(fixture, {
   httpCallInstructions,
-  eventualTimeAdvance,
+  stabilizationTimeAdvance,
   maxAttempts,
   debug,
 });
@@ -56,13 +56,13 @@ runTasksUntilStable(fixture, {
 Parameters:
 
 - `httpCallInstructions?: HttpCallInstruction[]`
-- `eventualTimeAdvance?: number` default `1000`
+- `stabilizationTimeAdvance?: number` default `0`
 - `maxAttempts?: number` is part of the public type, but the current implementation enforces an internal constant limit of `30`
 - `debug?: boolean`
 
 Important implementation detail:
 
-`eventualTimeAdvance` is useful when Angular or the component schedules internal timers that need a small push between stabilization rounds. Some flows only need a very small value like `1`, while others can rely on the default.
+`stabilizationTimeAdvance` is useful when Angular or the component schedules internal timers that need a small push between stabilization rounds. Some flows need to wait for debounce or throttle timeouts, usually `300`, while others can rely on the default.
 
 ## HTTP instruction model
 

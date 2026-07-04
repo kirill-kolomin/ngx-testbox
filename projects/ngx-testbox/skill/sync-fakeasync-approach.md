@@ -21,7 +21,7 @@ runTasksUntilStable(fixture, {
 Parameters that matter most:
 
 - `httpCallInstructions?: HttpCallInstruction[]`
-- `eventualTimeAdvance?: number` default `1000`
+- `stabilizationTimeAdvance?: number` default `0`
 - `maxAttempts?: number` public type field, while the current implementation enforces an internal constant limit
 - `debug?: boolean`
 
@@ -30,7 +30,7 @@ Parameters that matter most:
 - Only use this API inside `fakeAsync` tests.
 - Response getters must be synchronous. Returning a `Promise` throws `CannotUsePromiseResponseWithinFakeAsync`.
 - `runTasksUntilStable` drives stabilization with Angular fakeAsync time and repeated stabilization rounds.
-- `eventualTimeAdvance` is useful when the component or Angular needs a small time nudge between rounds.
+- `stabilizationTimeAdvance` is useful when the component or Angular needs a small time nudge between rounds.
 
 ## Minimal Setup Pattern
 
@@ -149,11 +149,11 @@ runTasksUntilStable(fixture, {
 
 ### Stabilization that needs a small time nudge
 
-When the flow only needs Angular time to move slightly between stabilization rounds, use a very small `eventualTimeAdvance`.
+When the flow only needs Angular time to move slightly between stabilization rounds (debounce or throttle), use a very small `stabilizationTimeAdvance`.
 
 ```typescript
 runTasksUntilStable(fixture, {
-  eventualTimeAdvance: 1,
+  stabilizationTimeAdvance: 300,
   httpCallInstructions: [
     predefinedHttpCallInstructions.get.success('/api/items', () => items),
   ],

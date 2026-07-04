@@ -65,7 +65,7 @@ describe('runTasksUntilStable - HTTP response delays', () => {
     });
 
     runTasksUntilStable(fixture, {
-      eventualTimeAdvance: 500,
+      stabilizationTimeAdvance: 500,
       httpCallInstructions: instructions,
       debug: false,
       maxAttempts: 100

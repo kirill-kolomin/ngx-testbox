@@ -97,7 +97,6 @@ describe('HTTP instructions - delay vs timeline', () => {
     ];
 
     runTasksUntilStable(fixture, {
-      eventualTimeAdvance: 0,
       httpCallInstructions: instructions,
       debug: false,
       maxAttempts: 50,

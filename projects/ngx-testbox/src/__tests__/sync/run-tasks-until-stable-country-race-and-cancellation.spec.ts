@@ -228,7 +228,6 @@ describe('runTasksUntilStable (fakeAsync) - country race cancellation and loadin
     }, 100);
 
     runTasksUntilStable(fixture, {
-      eventualTimeAdvance: 1,
       httpCallInstructions,
     });
 

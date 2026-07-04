@@ -27,12 +27,13 @@ export interface RunTasksUntilStableParams extends CommonStabilizationParams {
 
   /**
    * The amount of time in milliseconds to advance the virtual clock at the end of each stabilization cycle.
-   * This time advance runs after each cycle where HTTP requests were processed and the fixture was stabilized,
+   * This time advance runs after each cycle where HTTP requests were processed and the fixture is trying stabilize,
    * helping to settle any remaining internal Angular tasks (timers, microtasks) before the next cycle begins.
+   * This migth be needed to wait for debounce or throttle timeouts.
    *
-   * Defaults to **1000**.
+   * Defaults to **0**.
    */
-  eventualTimeAdvance?: number;
+  stabilizationTimeAdvance?: number;
 
   /**
    * Maximum number of attempts to stabilize the fixture before throwing an error.
@@ -101,17 +102,17 @@ const MAXIMUM_ATTEMPTS = 30;
  * Use runTasksUntilStableAsync and its componentLongRunTimeout parameter for the new async/await approach instead.
  */
 export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
-  eventualTimeAdvance,
+  stabilizationTimeAdvance,
   httpCallInstructions = [],
   debug,
   maxAttempts,
 }: RunTasksUntilStableParams = {}) => {
   const _maxAttempts = maxAttempts || MAXIMUM_ATTEMPTS;
   const _httpCallInstructions = httpCallInstructions.slice();
+  const _stabilizationTimeAdvance = stabilizationTimeAdvance ?? 0;
   validateHttpInstructions(_httpCallInstructions);
 
   let rollbackOriginalSetInterval = () => {};
-  const _eventualTimeAdvance = eventualTimeAdvance ?? 1000;
 
   if(debug) {
     rollbackOriginalSetInterval = patchSetInterval();
@@ -163,8 +164,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
       passRequestsResult = requestsPassageMediator.passRequests();
     }
 
-    // NOTE: Seems to be an internal Angular's timeout. For the tour-of-heroes is required to be gte 10.
-    tick(_eventualTimeAdvance);
+    tick(_stabilizationTimeAdvance);
 
     requests = getRequestsFromQueue(httpTestingController);
   }

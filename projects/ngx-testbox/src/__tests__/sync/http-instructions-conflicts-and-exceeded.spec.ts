@@ -51,7 +51,6 @@ describe('fakeAsync HTTP instructions errors', () => {
 
     expect(() => {
       runTasksUntilStable(fixture, {
-        eventualTimeAdvance: 0,
         httpCallInstructions: instructions,
         debug: false,
         maxAttempts: 10,
@@ -73,7 +72,6 @@ describe('fakeAsync HTTP instructions errors', () => {
 
     expect(() => {
       runTasksUntilStable(fixture, {
-        eventualTimeAdvance: 0,
         httpCallInstructions: pastTimelineInstructions,
         debug: false,
         maxAttempts: 10,
