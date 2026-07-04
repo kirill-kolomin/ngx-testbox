@@ -57,12 +57,12 @@ Parameters:
 
 - `httpCallInstructions?: HttpCallInstruction[]`
 - `stabilizationTimeAdvance?: number` default `0`
-- `maxAttempts?: number` is part of the public type, but the current implementation enforces an internal constant limit of `30`
+- `maxAttempts?: number` default `30`
 - `debug?: boolean`
 
 Important implementation detail:
 
-`stabilizationTimeAdvance` is useful when Angular or the component schedules internal timers that need a small push between stabilization rounds. Some flows need to wait for debounce or throttle timeouts, usually `300`, while others can rely on the default.
+`stabilizationTimeAdvance` is useful when Angular or the component schedules internal timers that need a push between stabilization rounds. Some flows need to wait for debounce or throttle timeouts, while others can rely on the default.
 
 ## HTTP instruction model
 

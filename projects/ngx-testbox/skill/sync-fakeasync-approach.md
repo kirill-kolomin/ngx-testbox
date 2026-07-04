@@ -22,7 +22,7 @@ Parameters that matter most:
 
 - `httpCallInstructions?: HttpCallInstruction[]`
 - `stabilizationTimeAdvance?: number` default `0`
-- `maxAttempts?: number` public type field, while the current implementation enforces an internal constant limit
+- `maxAttempts?: number` default `30`
 - `debug?: boolean`
 
 ## Rules That Matter
@@ -30,7 +30,7 @@ Parameters that matter most:
 - Only use this API inside `fakeAsync` tests.
 - Response getters must be synchronous. Returning a `Promise` throws `CannotUsePromiseResponseWithinFakeAsync`.
 - `runTasksUntilStable` drives stabilization with Angular fakeAsync time and repeated stabilization rounds.
-- `stabilizationTimeAdvance` is useful when the component or Angular needs a small time nudge between rounds.
+- `stabilizationTimeAdvance` advances virtual time on every stabilization attempt.
 
 ## Minimal Setup Pattern
 
@@ -149,16 +149,19 @@ runTasksUntilStable(fixture, {
 
 ### Stabilization that needs a small time nudge
 
-When the flow only needs Angular time to move slightly between stabilization rounds (debounce or throttle), use a very small `stabilizationTimeAdvance`.
+When the flow only needs Angular time to move slightly on each stabilization attempt (debounce or throttle), use a `stabilizationTimeAdvance` and tune `maxAttempts` to cover the total timer delay.
 
 ```typescript
 runTasksUntilStable(fixture, {
   stabilizationTimeAdvance: 300,
+  maxAttempts: 30,
   httpCallInstructions: [
     predefinedHttpCallInstructions.get.success('/api/items', () => items),
   ],
 });
 ```
+
+Rule of thumb: `stabilizationTimeAdvance * maxAttempts` should cover the timer delay you need to flush.
 
 ## Common Failure Patterns
 

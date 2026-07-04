@@ -26,10 +26,9 @@ export interface RunTasksUntilStableParams extends CommonStabilizationParams {
   httpCallInstructions?: HttpCallInstruction[];
 
   /**
-   * The amount of time in milliseconds to advance the virtual clock at the end of each stabilization cycle.
-   * This time advance runs after each cycle where HTTP requests were processed and the fixture is trying stabilize,
-   * helping to settle any remaining internal Angular tasks (timers, microtasks) before the next cycle begins.
-   * This migth be needed to wait for debounce or throttle timeouts.
+   * The amount of time in milliseconds to advance the virtual clock on each stabilization attempt.
+   * This time advance is cumulative across attempts and runs even when there are no pending HTTP requests,
+   * helping the fixture settle timer-driven work such as debounce or throttle timeouts.
    *
    * Defaults to **0**.
    */
@@ -107,7 +106,7 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   debug,
   maxAttempts,
 }: RunTasksUntilStableParams = {}) => {
-  const _maxAttempts = maxAttempts || MAXIMUM_ATTEMPTS;
+  const _maxAttempts = maxAttempts ?? MAXIMUM_ATTEMPTS;
   const _httpCallInstructions = httpCallInstructions.slice();
   const _stabilizationTimeAdvance = stabilizationTimeAdvance ?? 0;
   validateHttpInstructions(_httpCallInstructions);
@@ -128,47 +127,50 @@ export const runTasksUntilStable = (fixture: ComponentFixture<unknown>, {
   // Triggers the ngOnInit to mark the fixture as unstable right after the component is created.
   fixture.detectChanges();
 
-  // By an unknown reason angular Zone is still stable despite having requests in the queue. So I need to look to make the check if there is requests in the queue.
-  while (!fixture.isStable() || requests.length > 0) {
-    if (attempt++ > _maxAttempts) {
-      throw new MaximumAttemptsToStabilizeFixtureReachedError(_maxAttempts)
-    }
-
-    requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
-    requests = [];
-    let passRequestsResult = requestsPassageMediator.passRequests();
-    
-    while(passRequestsResult.shouldStabilizeAfterRequests) {
-      fixture.detectChanges();
-
-      try {
-        tick();
-      } catch (error) {
-        if(error instanceof HttpErrorResponse) {
-          if(debug) {
-            console.warn('Unhandled error occured while processing requests. Don\'t forget to add error handlers for your async http calls.')
-          }
-        } else {
-          throw error;
-        }
+  try {
+    // By an unknown reason angular Zone is still stable despite having requests in the queue. So I need to look to make the check if there is requests in the queue.
+    while (!fixture.isStable() || requests.length > 0) {
+      if (attempt++ > _maxAttempts) {
+        throw new MaximumAttemptsToStabilizeFixtureReachedError(_maxAttempts)
       }
+
+      requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions, {testRequests: requests});
+      requests = [];
+      let passRequestsResult = requestsPassageMediator.passRequests();
       
-      // NOTE it requires to have one more run.
-      fixture.detectChanges();
-      tick();
+      while(passRequestsResult.shouldStabilizeAfterRequests) {
+        fixture.detectChanges();
 
-      passRequestsResult.asserts?.forEach((assert) => assert());
+        try {
+          tick();
+        } catch (error) {
+          if(error instanceof HttpErrorResponse) {
+            if(debug) {
+              console.warn('Unhandled error occured while processing requests. Don\'t forget to add error handlers for your async http calls.')
+            }
+          } else {
+            throw error;
+          }
+        }
+        
+        // NOTE it requires to have one more run.
+        fixture.detectChanges();
+        tick();
 
-      // Collect newly scheduled HTTP requests that arrived after the previous batch.
-      requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions);
-      passRequestsResult = requestsPassageMediator.passRequests();
+        passRequestsResult.asserts?.forEach((assert) => assert());
+
+        // Collect newly scheduled HTTP requests that arrived after the previous batch.
+        requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions);
+        passRequestsResult = requestsPassageMediator.passRequests();
+      }
+
+      tick(_stabilizationTimeAdvance);
+
+      requests = getRequestsFromQueue(httpTestingController);
     }
 
-    tick(_stabilizationTimeAdvance);
-
-    requests = getRequestsFromQueue(httpTestingController);
+    throwIfThereIsHttpInstructionNotInvoked(callTrackers);
+  } finally {
+    rollbackOriginalSetInterval();
   }
-
-  throwIfThereIsHttpInstructionNotInvoked(callTrackers);
-  rollbackOriginalSetInterval();
 }
