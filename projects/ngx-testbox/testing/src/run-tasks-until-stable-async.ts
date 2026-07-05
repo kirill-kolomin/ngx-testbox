@@ -145,10 +145,6 @@ export async function runTasksUntilStableAsync(
         fixture.detectChanges();
         passRequestsResult.asserts?.forEach((assert) => assert());
 
-        await fixture.whenStable();
-        fixture.detectChanges();
-        await fixture.whenStable();
-
         // Collect newly scheduled HTTP requests that arrived after the previous batch.
         requestsPassageMediator.collectHttpCalls(requiredHttpCallInstructions);
         passRequestsResult = await requestsPassageMediator.passRequests(advanceTimers);
@@ -156,10 +152,6 @@ export async function runTasksUntilStableAsync(
     } catch (error) {
       reject(error);
     }
-
-    await fixture.whenStable();
-    fixture.detectChanges();
-    await fixture.whenStable();
 
     requests = getRequestsFromQueue(httpTestingController);
 
