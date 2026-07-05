@@ -62,13 +62,13 @@ export class TestIdDirective implements AfterViewInit {
    *
    * @example
    * ```typescript
-   * const testIds = TestIdDirective.idsToMap(['submit-button', 'cancel-button', 'user-name']);
-   * // Results in: { 'submit-button': 'submit-button', 'cancel-button': 'cancel-button', 'user-name': 'user-name' }
+   * const testIds = TestIdDirective.idsToMap(['submitButton', 'cancelButton', 'userName']);
+   * // Results in: { submitButton: 'submitButton', cancelButton: 'cancelButton', userName: 'userName' }
    *
    * // Can be used in a component:
-   * @Component({
-   *   template: `<button [testboxTestId]="testIds.submit-button">Submit</button>`
-   * })
+ * @Component({
+ *   template: `<button [testboxTestId]="testIds.submitButton">Submit</button>`
+ * })
    * class MyComponent {
    *   testIds = testIds;
    * }

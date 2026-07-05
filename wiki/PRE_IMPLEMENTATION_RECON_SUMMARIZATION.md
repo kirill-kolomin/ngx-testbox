@@ -1,0 +1,1 @@
+Summarize the findings of this recon as a structured markdown document I can use as input for the next stage (plan creation). Include: relevant files and their roles, current behavior, constraints or gotchas, and open questions.

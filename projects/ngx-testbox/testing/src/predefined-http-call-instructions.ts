@@ -1,6 +1,6 @@
-import {EndpointPath, HttpCallInstruction, ResponseGetter} from './complete-http-calls';
 import {HttpResponse} from '@angular/common/http';
 import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
+import { EndpointPath, HttpCallInstruction, ResponseGetter } from './interfaces/http-call';
 
 /**
  * Creates a response getter function that returns HTTP responses with predefined status codes.
@@ -55,7 +55,8 @@ export const httpStatuses = ['success', 'error'] as const;
  * having to manually specify the status codes and response formats. It supports all common
  * HTTP methods and both success and error responses.
  *
- * Mainly you will use it with runTasksUntilStable.
+ * Mainly you will use it with `runTasksUntilStable` (the fakeAsync sync approach).
+ * For the async/await approach, use `predefinedHttpCallInstructionsAsync` instead.
  *
  * Each method in the object is a function that takes next parameters:
  * - path - EndpointPath

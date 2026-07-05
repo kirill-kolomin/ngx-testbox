@@ -1,3 +1,9 @@
+/**
+ * Thrown by both `runTasksUntilStable` and `runTasksUntilStableAsync` when
+ * an instruction was provided but no matching request was ever made during stabilization.
+ *
+ * Remove the unused instruction, or verify your component triggers the expected request.
+ */
 export class HttpInstructionWasNotExecutedDuringFixtureStabilizationError extends Error {
   constructor(index: number, instruction: string) {
     super(

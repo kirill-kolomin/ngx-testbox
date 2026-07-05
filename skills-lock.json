@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "debug": {
+      "source": "vltansky/debug-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "0590d5ac4c08224442453e4f2c5c348798ad9aa6ca7e43a42f02cd25d2267155"
+    }
+  }
+}

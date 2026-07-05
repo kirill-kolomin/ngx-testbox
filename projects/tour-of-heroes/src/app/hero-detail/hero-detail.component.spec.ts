@@ -55,7 +55,7 @@ describe('HeroDetailComponent', () => {
     }).compileComponents();
   });
 
-  it('should display hero details when hero is loaded', fakeAsync(async () => {
+  it('should display hero details when hero is loaded', fakeAsync(() => {
     initComponent();
 
     expect(harness.getHeroId()).toBe(testHero.id.toString());
@@ -65,7 +65,7 @@ describe('HeroDetailComponent', () => {
     expect(harness.getHeroAttack()).toBe(String(testHero.attack));
   }));
 
-  it('should allow editing hp and attack and send numeric values on save', fakeAsync(async () => {
+  it('should allow editing hp and attack and send numeric values on save', fakeAsync(() => {
     initComponent();
 
     const newHp = 150;
@@ -92,14 +92,14 @@ describe('HeroDetailComponent', () => {
     expect(locationSpy.back).toHaveBeenCalled();
   }));
 
-  it('should not display hero details when hero fails to load', fakeAsync(async () => {
+  it('should not display hero details when hero fails to load', fakeAsync(() => {
     initComponent([getHeroErrorHttpCallInstruction()]);
 
     // The hero detail container should not be present
     expect(harness.elements.heroDetail.queryAll().length).toBe(0);
   }));
 
-  it('should allow editing the hero', fakeAsync(async () => {
+  it('should allow editing the hero', fakeAsync(() => {
     initComponent();
 
     const newHp = 200;
@@ -115,7 +115,7 @@ describe('HeroDetailComponent', () => {
     expect(harness.getHeroAttack()).toBe(String(newAttack));
   }));
 
-  it('should save hero and navigate back when save button is clicked', fakeAsync(async () => {
+  it('should save hero and navigate back when save button is clicked', fakeAsync(() => {
     initComponent();
 
     const newName = 'Updated Hero Name';
@@ -130,7 +130,7 @@ describe('HeroDetailComponent', () => {
     expect(locationSpy.back).toHaveBeenCalled();
   }));
 
-  it('should not navigate back when save fails', fakeAsync(async () => {
+  it('should not navigate back when save fails', fakeAsync(() => {
     initComponent();
 
     const newName = 'Updated Hero Name';
@@ -145,7 +145,7 @@ describe('HeroDetailComponent', () => {
     expect(locationSpy.back).not.toHaveBeenCalled();
   }));
 
-  it('should navigate back when go back button is clicked', fakeAsync(async () => {
+  it('should navigate back when go back button is clicked', fakeAsync(() => {
     initComponent();
 
     harness.clickGoBackButton();

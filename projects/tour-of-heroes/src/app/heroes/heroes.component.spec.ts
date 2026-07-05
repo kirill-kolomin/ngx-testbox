@@ -36,20 +36,20 @@ describe('HeroesComponent', () => {
     }).compileComponents();
   })
 
-  it('should display "My Heroes" in the title', fakeAsync(async () => {
+  it('should display "My Heroes" in the title', fakeAsync(() => {
     initComponent();
     expect(harness.elements.title.getTextContent()).toBe('My Heroes');
   }));
 
   describe('heroes list', () => {
-    it('should show all heroes when server responds with heroes', fakeAsync(async () => {
+    it('should show all heroes when server responds with heroes', fakeAsync(() => {
       const heroesLength = HEROES.length;
 
       initComponent([getHeroesSuccessHttpCallInstruction(heroesLength),]);
       expect(harness.elements.heroItem.queryAll().length).toBe(heroesLength);
     }))
 
-    it('should not show any heroes if server responds with error', fakeAsync(async () => {
+    it('should not show any heroes if server responds with error', fakeAsync(() => {
       initComponent([getHeroesFailHttpCallInstruction()]);
       expect(harness.elements.heroItem.queryAll().length).toBe(0);
     }))
@@ -81,7 +81,7 @@ describe('HeroesComponent', () => {
   })
 
   describe('add hero', () => {
-    it('should add new hero when valid name is entered', fakeAsync(async () => {
+    it('should add new hero when valid name is entered', fakeAsync(() => {
       initComponent();
 
       expect(harness.elements.heroItem.queryAll().length).toBe(0);

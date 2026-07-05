@@ -1,0 +1,3 @@
+[submodule "ngx-testbox-docs-v2"]
+	path = ngx-testbox-docs-v2
+	url = git@github.com:kirill-kolomin/ngx-testbox-docs-v2.git

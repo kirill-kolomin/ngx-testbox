@@ -26,19 +26,19 @@ describe('DashboardComponent', () => {
     }).compileComponents();
   })
 
-  it('should display "Top Heroes" in the title', fakeAsync(async () => {
+  it('should display "Top Heroes" in the title', fakeAsync(() => {
     initComponent();
     expect(harness.elements.title.getTextContent()).toBe('Top Heroes');
   }));
 
   describe('heroes menu', () => {
-    it('should show heroes when server responds with heroes', fakeAsync(async () => {
+    it('should show heroes when server responds with heroes', fakeAsync(() => {
       initComponent([getHeroesSuccessHttpCallInstruction(5)]);
 
       expect(harness.elements.heroLink.queryAll().length).toBe(4);
     }))
 
-    it('should not show any heroes if server responds with error', fakeAsync(async () => {
+    it('should not show any heroes if server responds with error', fakeAsync(() => {
       initComponent([getHeroesFailHttpCallInstruction()]);
       expect(harness.elements.heroLink.queryAll().length).toBe(0);
     }))
