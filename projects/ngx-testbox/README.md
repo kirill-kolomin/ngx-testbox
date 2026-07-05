@@ -29,18 +29,16 @@ Abstract away internal implementation details and focus on what actually matters
 ## Getting Started
 
 ```bash
-
 npm install ngx-testbox
-
 ```
 
-Or using yarn
+## AI Agent Skill
 
 ```bash
-
-yarn add ngx-testbox
-
+npx skillpm install ngx-testbox-agent-skill
 ```
+
+Repository: <https://github.com/kirill-kolomin/ngx-testbox-agent-skill#readme>
 
 ## Quick Example
 
