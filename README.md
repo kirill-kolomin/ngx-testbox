@@ -45,8 +45,7 @@ Repository: <https://github.com/kirill-kolomin/ngx-testbox-agent-skill#readme>
 ## Quick Example
 
 ```typescript
-import { fakeAsync } from '@angular/core/testing';
-import { DebugElementHarness, predefinedHttpCallInstructions, runTasksUntilStable } from 'ngx-testbox/testing';
+import { DebugElementHarness, predefinedHttpCallInstructionsAsync, runTasksUntilStableAsync } from 'ngx-testbox/testing';
 
 describe('MyComponent', () => {
   let harness: DebugElementHarness<typeof testIds>;
@@ -55,19 +54,19 @@ describe('MyComponent', () => {
     // setup TestBed, component, and harness
   });
 
-  it('should display data on success', fakeAsync(() => {
+  it('should display data on success', async () => {
     const mockData = [{ id: 1, name: 'Item A' }];
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStableAsync(fixture, {
       httpCallInstructions: [
-        predefinedHttpCallInstructions.get.success('/api/items', mockData)
+        predefinedHttpCallInstructionsAsync.get.success('/api/items', () => mockData)
       ]
     });
 
     const items = harness.elements.item.queryAll();
     expect(items.length).toBe(1);
     expect(harness.elements.itemText.getTextContent(items[0])).toContain('Item A');
-  }));
+  });
 });
 ```
 
