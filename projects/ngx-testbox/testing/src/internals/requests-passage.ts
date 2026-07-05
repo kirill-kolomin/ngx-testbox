@@ -36,6 +36,10 @@ export class RequestsPassageMediatorSync extends RequestsPassageMediator<Respons
 
                 response = rawResponse;
             } catch (error) {
+                if(error instanceof CannotUsePromiseResponseWithinFakeAsync) {
+                    throw error;
+                }
+
                 throw new FailedToGenerateHttpResponseError(error);
             }
 

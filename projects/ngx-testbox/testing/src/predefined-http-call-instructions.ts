@@ -1,6 +1,7 @@
 import {HttpResponse} from '@angular/common/http';
 import {FailedToGenerateHttpResponseError} from './errors/FailedToGenerateHttpResponseError';
 import { EndpointPath, HttpCallInstruction, ResponseGetter } from './interfaces/http-call';
+import { CannotUsePromiseResponseWithinFakeAsync } from './errors/CannotUsePromiseResponseWithinFakeAsync';
 
 /**
  * Creates a response getter function that returns HTTP responses with predefined status codes.
@@ -24,6 +25,10 @@ export const getPredefinedResponseGetter = (status: 'success' | 'error', respons
       originalResponse = responseGetter?.(...args);
     } catch (error) {
       throw new FailedToGenerateHttpResponseError(error)
+    }
+
+    if (originalResponse instanceof Promise) {
+      throw new CannotUsePromiseResponseWithinFakeAsync();
     }
 
     // Check if originalResponse is an HttpResponse

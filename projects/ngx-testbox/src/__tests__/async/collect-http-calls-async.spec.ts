@@ -100,8 +100,9 @@ describe('RequestsPassageMediator.collectHttpCalls', () => {
     const mediator = new RequestsPassageMediatorAsync();
     const requests = getRequestsFromQueue(httpTestingController);
     mediator.collectHttpCalls([], { testRequests: requests });
-    await mediator.passRequests();
+    const result = await mediator.passRequests();
 
+    expect(result.shouldStabilizeAfterRequests).toBeFalse();
     httpTestingController.verify();
   });
 });

@@ -11,6 +11,7 @@ import {
 import {
   MaximumAttemptsToStabilizeFixtureReachedError
 } from '../../../testing/src/errors/MaximumAttemptsToStabilizeFixtureReachedError';
+import { CannotUsePromiseResponseWithinFakeAsync } from '../../../testing/src/errors/CannotUsePromiseResponseWithinFakeAsync';
 import { HttpCallInstruction } from '../../../testing/src/interfaces/http-call';
 import { runTasksUntilStable } from '../../../testing/src/run-tasks-until-stable';
 
@@ -121,6 +122,15 @@ describe('runTasksUntilStable', () => {
     it('should throw an error if an HTTP request is not handled', fakeAsync(() => {
       expect(() => initComponent(true, false))
         .toThrowError(NoMatchingHttpInstructionForRequestFoundError);
+    }));
+
+    it('should throw when a response getter returns a Promise', fakeAsync(() => {
+      const httpCallInstructions: HttpCallInstruction[] = [
+        [['/api/test', 'GET'], () => Promise.resolve(new HttpResponse({body: {data: 'test'}, status: 200})) as any]
+      ];
+
+      expect(() => initComponent(true, false, httpCallInstructions))
+        .toThrowError(CannotUsePromiseResponseWithinFakeAsync);
     }));
   });
 

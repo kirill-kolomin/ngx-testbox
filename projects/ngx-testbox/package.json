@@ -7,8 +7,8 @@
     "name": "Kirill Kolomin"
   },
   "peerDependencies": {
-    "@angular/common": ">=9.0.0",
-    "@angular/core": ">=9.0.0"
+    "@angular/common": ">=15.0.0",
+    "@angular/core": ">=15.0.0"
   },
   "sideEffects": false,
   "keywords": ["Angular testing", "Integration testing", "Component testing", "HTML attribute for testing", "Testing utilities"],

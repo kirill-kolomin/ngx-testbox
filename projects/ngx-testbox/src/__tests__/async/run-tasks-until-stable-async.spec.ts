@@ -95,9 +95,12 @@ describe('runTasksUntilStableAsync', () => {
   it('should throw an error if an HTTP request is not handled', async () => {
     fixture = TestBed.createComponent(AsyncTestComponent);
     component = fixture.componentInstance;
+    const originalSetInterval = window.setInterval;
 
-    await expectAsync(runTasksUntilStableAsync(fixture))
+    await expectAsync(runTasksUntilStableAsync(fixture, {debug: true}))
       .toBeRejectedWithError(NoMatchingHttpInstructionForRequestFoundError);
+
+    expect(window.setInterval).toBe(originalSetInterval);
   });
 
    it('should call advanceTimersBy with delay during stabilization', async () => {

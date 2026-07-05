@@ -108,20 +108,22 @@ export async function runTasksUntilStableAsync(
 
   let longRunTimeoutTimer: number | null = null;
 
-  await Promise.race([
-    new Promise((_, reject) => {
-      longRunTimeoutTimer = setTimeout(() => reject(new LongRunningComponentError(_componentLongRunTimeout)), _componentLongRunTimeout);
-    }),
-    (new Promise((resolve, reject) => runTasks(resolve, reject)))
-  ]);
+  try {
+    await Promise.race([
+      new Promise((_, reject) => {
+        longRunTimeoutTimer = setTimeout(() => reject(new LongRunningComponentError(_componentLongRunTimeout)), _componentLongRunTimeout);
+      }),
+      (new Promise((resolve, reject) => runTasks(resolve, reject)))
+    ]);
 
-  if(longRunTimeoutTimer) {
-    clearTimeout(longRunTimeoutTimer);
+    throwIfThereIsHttpInstructionNotInvoked(callTrackers);
+  } finally {
+    if(longRunTimeoutTimer) {
+      clearTimeout(longRunTimeoutTimer);
+    }
+
+    rollbackOriginalSetInterval();
   }
-
-  // Ensure all expected HTTP instructions were invoked.
-  throwIfThereIsHttpInstructionNotInvoked(callTrackers);
-  rollbackOriginalSetInterval();
 
   async function runTasks(resolve: (value: any) => void, reject: (error: any) => void, _requests: TestRequest[] = []) {
     requests = [..._requests, ...getRequestsFromQueue(httpTestingController)];

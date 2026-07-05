@@ -5,6 +5,7 @@ import {
   predefinedHttpCallInstructions
 } from '../../../testing/src/predefined-http-call-instructions';
 import { EndpointPath, HttpCallInstruction } from '../../../testing/src/interfaces/http-call';
+import { CannotUsePromiseResponseWithinFakeAsync } from '../../../testing/src/errors/CannotUsePromiseResponseWithinFakeAsync';
 
 describe('predefinedHttpCallInstructions', () => {
   describe('getPredefinedResponseGetter', () => {
@@ -54,6 +55,13 @@ describe('predefinedHttpCallInstructions', () => {
         expect(response.statusText).toBe('OK');
         expect(response.body).toEqual(mockBody);
         expect(response.headers.get('Content-Type')).toBe('application/json');
+      });
+
+      it('should throw when the original response getter returns a Promise', () => {
+        const responseGetter = getPredefinedResponseGetter('success', async () => ({data: 'test data'}));
+
+        expect(() => responseGetter(mockRequest, mockSearchParams))
+          .toThrowError(CannotUsePromiseResponseWithinFakeAsync);
       });
     });
 

@@ -4,5 +4,5 @@
   "lib": {
     "entryFile": "src/lib/public_api.ts"
   },
-  "assets": ["CHANGELOG.md"]
+  "assets": ["CHANGELOG.md", "LICENSE.txt"]
 }
