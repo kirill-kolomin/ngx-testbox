@@ -1,3 +1,5 @@
+# ![ngx-testbox agent skill social card](./social-card.svg)
+
 # Ngx-Testbox
 
 [![npm version](https://img.shields.io/npm/v/ngx-testbox.svg)](https://www.npmjs.com/package/ngx-testbox)

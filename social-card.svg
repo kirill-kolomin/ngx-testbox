@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="hexgrid" x="0" y="0" width="70" height="81" patternUnits="userSpaceOnUse">
+      <polygon points="35,3 67,21 67,57 35,75 3,57 3,21" fill="none" stroke="#232323" stroke-width="0.9"/>
+    </pattern>
+    <clipPath id="card">
+      <rect x="0" y="0" width="1200" height="630" rx="0"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0f0f10"/>
+  <rect width="1200" height="630" fill="url(#hexgrid)"/>
+
+  <!-- Left red accent stripe -->
+  <rect x="0" y="0" width="7" height="630" fill="#DD0031"/>
+
+  <!-- Bottom divider -->
+  <line x1="0" y1="510" x2="1200" y2="510" stroke="#252525" stroke-width="1.2"/>
+
+  <!-- Subtle red glow top-left -->
+  <ellipse cx="100" cy="80" rx="200" ry="120" fill="#DD0031" opacity="0.04"/>
+
+  <!-- Logo icon group -->
+  <g transform="translate(90, 100)">
+    <!-- Hex cube faces -->
+    <polygon points="62,0 124,36 124,108 62,144 0,108 0,36" fill="#1c1c1c" stroke="#2d2d2d" stroke-width="1.2"/>
+    <polygon points="62,0 124,36 62,72 0,36" fill="#272727"/>
+    <polygon points="0,36 62,72 62,144 0,108" fill="#141414"/>
+    <polygon points="124,36 62,72 62,144 124,108" fill="#1f1f1f"/>
+    <line x1="62" y1="72" x2="62" y2="144" stroke="#333" stroke-width="0.9"/>
+    <line x1="0" y1="36" x2="62" y2="72" stroke="#333" stroke-width="0.9"/>
+    <line x1="124" y1="36" x2="62" y2="72" stroke="#3a3a3a" stroke-width="0.9"/>
+    <!-- Checkmark on top face: short leg down-right, long leg up-right -->
+  </g>
+
+  <!-- Title -->
+  <text x="268" y="162" font-family="'DM Mono', 'Courier New', monospace" font-size="64" font-weight="500" fill="#efefef" letter-spacing="-1">ngx-testbox</text>
+  <text x="270" y="202" font-family="'DM Mono', 'Courier New', monospace" font-size="22" fill="#DD0031" letter-spacing="5" font-weight="400">BLACK-BOX TESTING FOR ANGULAR</text>
+
+  <!-- Description -->
+  <text x="90" y="292" font-family="'DM Mono', 'Courier New', monospace" font-size="22" fill="#999">Write integration tests with minimal setup and maximum reliability.</text>
+  <text x="90" y="326" font-family="'DM Mono', 'Courier New', monospace" font-size="22" fill="#777">Focus on behavior, not implementation details.</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(90, 380)">
+    <rect x="0" y="0" width="280" height="54" rx="6" fill="#1a1a1a" stroke="#2d2d2d" stroke-width="1"/>
+    <text x="22" y="33" font-family="'DM Mono', 'Courier New', monospace" font-size="18" fill="#bbb">⚡  Deterministic async</text>
+  </g>
+  <g transform="translate(390, 380)">
+    <rect x="0" y="0" width="258" height="54" rx="6" fill="#1a1a1a" stroke="#2d2d2d" stroke-width="1"/>
+    <text x="22" y="33" font-family="'DM Mono', 'Courier New', monospace" font-size="18" fill="#bbb">🎯  UX-centric tests</text>
+  </g>
+  <g transform="translate(668, 380)">
+    <rect x="0" y="0" width="232" height="54" rx="6" fill="#1a1a1a" stroke="#2d2d2d" stroke-width="1"/>
+    <text x="22" y="33" font-family="'DM Mono', 'Courier New', monospace" font-size="18" fill="#bbb">🔧  TDD friendly</text>
+  </g>
+  <g transform="translate(920, 380)">
+    <rect x="0" y="0" width="260" height="54" rx="6" fill="#1a1a1a" stroke="#2d2d2d" stroke-width="1"/>
+    <text x="22" y="33" font-family="'DM Mono', 'Courier New', monospace" font-size="18" fill="#bbb">📦  Zero boilerplate</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="90" y="558" font-family="'DM Mono', 'Courier New', monospace" font-size="18" fill="#444">npm install ngx-testbox</text>
+  <text x="600" y="558" font-family="'DM Mono', 'Courier New', monospace" font-size="18" fill="#3a3a3a" text-anchor="middle">kirill-kolomin.github.io/ngx-testbox-docs</text>
+
+  <!-- MIT Badge -->
+  <rect x="1048" y="534" width="110" height="36" rx="4" fill="#DD0031" opacity="0.12" stroke="#DD0031" stroke-width="1"/>
+  <text x="1103" y="557" font-family="'DM Mono', 'Courier New', monospace" font-size="16" fill="#DD0031" text-anchor="middle">MIT · OSS</text>
+
+  <!-- npm badge area -->
+  <rect x="1048" y="476" width="110" height="36" rx="4" fill="#CB3837" opacity="0.12" stroke="#CB3837" stroke-width="1"/>
+  <text x="1103" y="499" font-family="'DM Mono', 'Courier New', monospace" font-size="16" fill="#CB3837" text-anchor="middle">npm ❤</text>
+</svg>
