@@ -1,30 +1,30 @@
-import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
-import {HeroDetailComponent} from './hero-detail.component';
-import {HeroDetailHarness} from './hero-detail.harness';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {HeroDetailComponent} from '../hero-detail.component';
+import {HeroDetailHarness} from '../hero-detail.harness';
 import {provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {HEROES_URL} from '../hero.service';
-import {HEROES} from '../mock-heroes';
+import {HEROES_URL} from '../../hero.service';
+import {HEROES} from '../../mock-heroes';
 import {ActivatedRoute, convertToParamMap, provideRouter} from '@angular/router';
 import {Location} from '@angular/common';
-import {HttpCallInstruction, predefinedHttpCallInstructions, runTasksUntilStable} from 'ngx-testbox/testing';
+import {HttpCallInstructionAsync, predefinedHttpCallInstructionsAsync, runTasksUntilStableAsync} from 'ngx-testbox/testing';
 
 const heroId = 12; // ID of the hero to test with
 const testHero = HEROES.find(h => h.id === heroId)!;
 
 const getHeroSuccessHttpCallInstruction = () =>
-  predefinedHttpCallInstructions.get.success(`${HEROES_URL}/${heroId}`, () => testHero);
+  predefinedHttpCallInstructionsAsync.get.success(`${HEROES_URL}/${heroId}`, () => testHero);
 
 const getHeroErrorHttpCallInstruction = () =>
-  predefinedHttpCallInstructions.get.error(`${HEROES_URL}/${heroId}`);
+  predefinedHttpCallInstructionsAsync.get.error(`${HEROES_URL}/${heroId}`);
 
 const updateHeroSuccessHttpCallInstruction = () =>
-  predefinedHttpCallInstructions.put.success(HEROES_URL);
+  predefinedHttpCallInstructionsAsync.put.success(HEROES_URL);
 
 const updateHeroErrorHttpCallInstruction = () =>
-  predefinedHttpCallInstructions.put.error(HEROES_URL);
+  predefinedHttpCallInstructionsAsync.put.error(HEROES_URL);
 
-const defaultHttpCallInstructions = [getHeroSuccessHttpCallInstruction()];
+const defaultHttpCallInstructions: HttpCallInstructionAsync[] = [getHeroSuccessHttpCallInstruction()];
 
 describe('HeroDetailComponent', () => {
   let fixture: ComponentFixture<HeroDetailComponent>;
@@ -55,18 +55,18 @@ describe('HeroDetailComponent', () => {
     }).compileComponents();
   });
 
-  it('should display hero details when hero is loaded', fakeAsync(() => {
-    initComponent();
+  it('should display hero details when hero is loaded', async () => {
+    await initComponent();
 
     expect(harness.getHeroId()).toBe(testHero.id.toString());
     expect(harness.getHeroName()).toBe(testHero.name);
     expect(harness.getHeroTitle()).toBe(testHero.name.toUpperCase() + ' Details');
     expect(harness.getHeroHp()).toBe(String(testHero.hp));
     expect(harness.getHeroAttack()).toBe(String(testHero.attack));
-  }));
+  });
 
-  it('should allow editing hp and attack and send numeric values on save', fakeAsync(() => {
-    initComponent();
+  it('should allow editing hp and attack and send numeric values on save', async () => {
+    await initComponent();
 
     const newHp = 150;
     const newAttack = 25;
@@ -76,9 +76,9 @@ describe('HeroDetailComponent', () => {
 
     harness.clickSaveButton();
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStableAsync(fixture, {
       httpCallInstructions: [
-        predefinedHttpCallInstructions.put.success(HEROES_URL, (httpRequest) => {
+        predefinedHttpCallInstructionsAsync.put.success(HEROES_URL, (httpRequest) => {
           const body: any = httpRequest.body;
           expect(body.hp).toBe(newHp);
           expect(typeof body.hp).toBe('number');
@@ -90,17 +90,17 @@ describe('HeroDetailComponent', () => {
     });
 
     expect(locationSpy.back).toHaveBeenCalled();
-  }));
+  });
 
-  it('should not display hero details when hero fails to load', fakeAsync(() => {
-    initComponent([getHeroErrorHttpCallInstruction()]);
+  it('should not display hero details when hero fails to load', async () => {
+    await initComponent([getHeroErrorHttpCallInstruction()]);
 
     // The hero detail container should not be present
     expect(harness.elements.heroDetail.queryAll().length).toBe(0);
-  }));
+  });
 
-  it('should allow editing the hero', fakeAsync(() => {
-    initComponent();
+  it('should allow editing the hero', async () => {
+    await initComponent();
 
     const newHp = 200;
     const newAttack = 300;
@@ -113,51 +113,51 @@ describe('HeroDetailComponent', () => {
     expect(harness.getHeroName()).toBe(newName);
     expect(harness.getHeroHp()).toBe(String(newHp));
     expect(harness.getHeroAttack()).toBe(String(newAttack));
-  }));
+  });
 
-  it('should save hero and navigate back when save button is clicked', fakeAsync(() => {
-    initComponent();
+  it('should save hero and navigate back when save button is clicked', async () => {
+    await initComponent();
 
     const newName = 'Updated Hero Name';
     harness.setHeroName(newName);
 
     harness.clickSaveButton();
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStableAsync(fixture, {
       httpCallInstructions: [updateHeroSuccessHttpCallInstruction()],
     });
 
     expect(locationSpy.back).toHaveBeenCalled();
-  }));
+  });
 
-  it('should not navigate back when save fails', fakeAsync(() => {
-    initComponent();
+  it('should not navigate back when save fails', async () => {
+    await initComponent();
 
     const newName = 'Updated Hero Name';
     harness.setHeroName(newName);
 
     harness.clickSaveButton();
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStableAsync(fixture, {
       httpCallInstructions: [updateHeroErrorHttpCallInstruction()],
     });
 
     expect(locationSpy.back).not.toHaveBeenCalled();
-  }));
+  });
 
-  it('should navigate back when go back button is clicked', fakeAsync(() => {
-    initComponent();
+  it('should navigate back when go back button is clicked', async () => {
+    await initComponent();
 
     harness.clickGoBackButton();
 
     expect(locationSpy.back).toHaveBeenCalled();
-  }));
+  });
 
-  function initComponent(httpCallInstructions: HttpCallInstruction[] = defaultHttpCallInstructions) {
+  async function initComponent(httpCallInstructions: HttpCallInstructionAsync[] = defaultHttpCallInstructions) {
     fixture = TestBed.createComponent(HeroDetailComponent);
     harness = new HeroDetailHarness(fixture.debugElement);
 
-    runTasksUntilStable(fixture, {
+    await runTasksUntilStableAsync(fixture, {
       httpCallInstructions,
     });
   }

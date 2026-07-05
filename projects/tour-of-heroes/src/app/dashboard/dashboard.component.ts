@@ -28,11 +28,16 @@ export class DashboardComponent implements OnInit {
   }
 
   getHeroes(): void {
-    this.heroService.getHeroes()
-      .subscribe(heroes => {
+    this.heroService.getHeroes().subscribe({
+      next: (heroes) => {
         this.heroes = heroes.slice(1, 5);
         this.cdr.markForCheck();
-      });
+      },
+      error: () => {
+        this.heroes = [];
+        this.cdr.markForCheck();
+      },
+    });
   }
 }
 

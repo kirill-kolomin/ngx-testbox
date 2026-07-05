@@ -44,8 +44,8 @@ export class HeroDetailComponent implements OnInit {
 
   getHero(): void {
     const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
-    this.heroService.getHero(id)
-      .subscribe(hero => {
+    this.heroService.getHero(id).subscribe({
+      next: (hero) => {
         this.hero = hero;
         // Patch form values with the loaded hero
         this.form.patchValue({
@@ -54,7 +54,12 @@ export class HeroDetailComponent implements OnInit {
           attack: hero.attack
         });
         this.cdr.markForCheck();
-      });
+      },
+      error: () => {
+        this.hero = undefined;
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   goBack(): void {
@@ -67,8 +72,10 @@ export class HeroDetailComponent implements OnInit {
         ...this.hero,
         ...this.form.value
       } as Hero;
-      this.heroService.updateHero(updated)
-        .subscribe(() => this.goBack());
+      this.heroService.updateHero(updated).subscribe({
+        next: () => this.goBack(),
+        error: () => undefined,
+      });
     }
   }
 }

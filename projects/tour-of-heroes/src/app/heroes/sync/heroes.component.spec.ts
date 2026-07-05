@@ -1,11 +1,11 @@
 import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
-import {HeroesComponent} from './heroes.component';
-import {HeroesHarness} from './heroes.harness';
+import {HeroesComponent} from '../heroes.component';
+import {HeroesHarness} from '../heroes.harness';
 import {provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpCallInstruction, predefinedHttpCallInstructions, runTasksUntilStable,} from 'ngx-testbox/testing';
-import {HEROES_URL} from '../hero.service';
-import {HEROES} from '../mock-heroes';
+import {HEROES_URL} from '../../hero.service';
+import {HEROES} from '../../mock-heroes';
 import {provideRouter} from '@angular/router';
 
 const getHeroesSuccessHttpCallInstruction = (amount: number) =>

@@ -27,11 +27,16 @@ export class HeroesComponent implements OnInit {
   }
 
   getHeroes(): void {
-    this.heroService.getHeroes()
-      .subscribe(heroes => {
+    this.heroService.getHeroes().subscribe({
+      next: (heroes) => {
         this.heroes = heroes;
         this.cdr.markForCheck();
-      });
+      },
+      error: () => {
+        this.heroes = [];
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   add(name: string): void {
@@ -39,17 +44,26 @@ export class HeroesComponent implements OnInit {
     if (!name) {
       return;
     }
-    this.heroService.addHero({name} as Hero)
-      .subscribe(hero => {
+    this.heroService.addHero({name} as Hero).subscribe({
+      next: (hero) => {
         this.heroes.push(hero);
         this.cdr.markForCheck();
-      });
+      },
+      error: () => {
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   delete(hero: Hero): void {
-    this.heroService.deleteHero(hero.id).subscribe(() => {
-      this.heroes = this.heroes.filter(h => h !== hero);
-      this.cdr.markForCheck();
+    this.heroService.deleteHero(hero.id).subscribe({
+      next: () => {
+        this.heroes = this.heroes.filter(h => h !== hero);
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.cdr.markForCheck();
+      },
     });
   }
 }
