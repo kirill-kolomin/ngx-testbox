@@ -4,3 +4,6 @@
 [submodule "ngx-testbox-docs-old"]
 	path = ngx-testbox-docs-old
 	url = git@github.com:kirill-kolomin/ngx-testbox-docs.git
+[submodule "ngx-testbox-agent-skill"]
+	path = ngx-testbox-agent-skill
+	url = git@github.com:kirill-kolomin/ngx-testbox-agent-skill.git
