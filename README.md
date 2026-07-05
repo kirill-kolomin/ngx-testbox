@@ -10,7 +10,7 @@
 Ngx-testbox empowers developers to write integration tests with **minimal setup** and **maximum reliability**.  
 Abstract away internal implementation details and focus on what actually matters—your feature's behavior as seen by the user.
 
-📚 Full documentation: [ngx-testbox docs](https://kirill-kolomin.github.io/ngx-testbox-docs/)
+📚 Full documentation: [ngx-testbox docs](https://kirill-kolomin.github.io/ngx-testbox-docs-v2/)
 
 ## Key Benefits
 
@@ -73,7 +73,7 @@ describe('MyComponent', () => {
 
 ## Documentation & Examples
 
-👉 Visit the full [documentation site](https://kirill-kolomin.github.io/ngx-testbox-docs/) to explore:
+👉 Visit the full [documentation site](https://kirill-kolomin.github.io/ngx-testbox-docs-v2/) to explore:
 - Concept overviews
 - Step-by-step tutorials
 - Full application examples (e.g., Todo flows)
