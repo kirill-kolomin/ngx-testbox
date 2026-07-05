@@ -6,6 +6,11 @@
       "sourceType": "github",
       "skillPath": "SKILL.md",
       "computedHash": "0590d5ac4c08224442453e4f2c5c348798ad9aa6ca7e43a42f02cd25d2267155"
+    },
+    "ngx-testbox": {
+      "source": "/home/user/development/ngx-testbox/node_modules/ngx-testbox-agent-skill/skills/ngx-testbox",
+      "sourceType": "local",
+      "computedHash": "039f54ba08098f18e99c97f69e5f82a6a064cd19db4232384af4e990c6094956"
     }
   }
 }
