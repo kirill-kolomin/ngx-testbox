@@ -1,7 +1,7 @@
 {
   "name": "ngx-testbox",
   "description": "Integration testing for Angular with black-box approach, async control, and user-centric testing concept.",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "author": {
     "email": "kkolomin.w@gmail.com",
     "name": "Kirill Kolomin"
@@ -17,5 +17,5 @@
     "type": "git",
     "url": "git+https://github.com/kirill-kolomin/ngx-testbox.git"
   },
-  "homepage": "https://kirill-kolomin.github.io/ngx-testbox-docs/"
+  "homepage": "https://kirill-kolomin.github.io/ngx-testbox-docs-v2/"
 }
