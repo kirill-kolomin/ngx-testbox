@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, PendingTasks} from '@angular/core';
 
 import { Observable, Subject } from 'rxjs';
 
 import {
-   debounceTime, distinctUntilChanged, switchMap
+   debounceTime, distinctUntilChanged, switchMap,
+   tap
  } from 'rxjs/operators';
 
 import { Hero } from '../hero';
@@ -29,7 +30,7 @@ export class HeroSearchComponent implements OnInit {
   private searchTerms = new Subject<string>();
   readonly testIds = testIdMap;
 
-  constructor(private heroService: HeroService) {}
+  constructor(private heroService: HeroService, private pendingTasks: PendingTasks) {}
 
   // Push a search term into the observable stream.
   search(term: string): void {
@@ -37,9 +38,17 @@ export class HeroSearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let taskCleanup = () => {};
     this.heroes$ = this.searchTerms.pipe(
+      tap(() => {
+        taskCleanup();
+        taskCleanup = this.pendingTasks.add();
+      }),
       debounceTime(300),
       distinctUntilChanged(),
+      tap(() => {
+        taskCleanup();
+      }),
       switchMap((term: string) => this.heroService.searchHeroes(term)),
     );
   }

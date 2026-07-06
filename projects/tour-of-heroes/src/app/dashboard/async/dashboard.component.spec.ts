@@ -1,4 +1,5 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {provideZonelessChangeDetection} from '@angular/core';
 import {DashboardComponent} from '../dashboard.component';
 import {DashboardHarness} from '../dashboard.harness';
 import {provideHttpClient} from '@angular/common/http';
@@ -26,6 +27,7 @@ describe('DashboardComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
+        provideZonelessChangeDetection(),
       ]
     }).compileComponents();
   })

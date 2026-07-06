@@ -1,4 +1,5 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {provideZonelessChangeDetection} from '@angular/core';
 import {HeroSearchComponent} from '../hero-search.component';
 import {HeroSearchHarness} from '../hero-search.harness';
 import {provideHttpClient} from '@angular/common/http';
@@ -39,6 +40,7 @@ describe('HeroSearchComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
+        provideZonelessChangeDetection(),
       ]
     }).compileComponents();
   })
@@ -80,7 +82,9 @@ describe('HeroSearchComponent', () => {
       await initComponent();
 
       harness.elements.searchBox.inputValue(searchTerm);
-      await runTasksUntilStableAsync(fixture, {httpCallInstructions: []});
+      await runTasksUntilStableAsync(fixture, {
+        httpCallInstructions: [],
+      });
 
       const results = harness.getHeroElements();
       expect(results.length).toBe(0);
@@ -122,7 +126,7 @@ describe('HeroSearchComponent', () => {
       await runTasksUntilStableAsync(fixture, {
         httpCallInstructions: [
           getHeroesSearchSuccessHttpCallInstruction(searchTerm)
-        ]
+        ],
       });
 
       const results = harness.getHeroElements();

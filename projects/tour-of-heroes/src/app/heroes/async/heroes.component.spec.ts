@@ -1,4 +1,5 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {provideZonelessChangeDetection} from '@angular/core';
 import {HeroesComponent} from '../heroes.component';
 import {HeroesHarness} from '../heroes.harness';
 import {provideHttpClient} from '@angular/common/http';
@@ -36,6 +37,7 @@ describe('HeroesComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
+        provideZonelessChangeDetection(),
       ]
     }).compileComponents();
   })

@@ -1,4 +1,5 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {provideZonelessChangeDetection} from '@angular/core';
 import {HeroDetailComponent} from '../hero-detail.component';
 import {HeroDetailHarness} from '../hero-detail.harness';
 import {provideHttpClient} from '@angular/common/http';
@@ -40,6 +41,7 @@ describe('HeroDetailComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
+        provideZonelessChangeDetection(),
         {
           provide: ActivatedRoute,
           useValue: {
