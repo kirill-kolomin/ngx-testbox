@@ -6,6 +6,7 @@ Added
 * `runTasksUntilStableAsync` for async/await stabilization, Promise response getters, and async timer advancement.
 * `predefinedHttpCallInstructionsAsync` for async HTTP instruction helpers.
 * Public error exports for stabilization, HTTP instruction, and harness failures.
+* Opportunity to run tests within zoneless environments.
 
 Breaking changes
 * The `ngx-testbox/testing` public API was narrowed to the supported black-box testing workflow.
