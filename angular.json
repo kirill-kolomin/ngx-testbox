@@ -6,7 +6,7 @@
     "ngx-testbox": {
       "projectType": "library",
       "root": "projects/ngx-testbox",
-      "sourceRoot": "projects/ngx-testbox/src",
+      "sourceRoot": "projects/ngx-testbox",
       "prefix": "lib",
       "architect": {
         "build": {
@@ -31,6 +31,9 @@
             "polyfills": [
               "zone.js",
               "zone.js/testing"
+            ],
+            "include": [
+              "src/__tests__/**/*.spec.ts"
             ]
           }
         }
