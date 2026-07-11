@@ -33,7 +33,8 @@
               "zone.js/testing"
             ],
             "include": [
-              "src/__tests__/**/*.spec.ts"
+              "src/__tests__/**/*.spec.ts",
+              "testing/__tests__/**/*.spec.ts"
             ]
           }
         }
