@@ -5,7 +5,7 @@ import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {HttpCallInstructionAsync} from '../../../testing/src/interfaces/http-call';
 import {runTasksUntilStableAsync} from '../../../testing/src/run-tasks-until-stable-async';
 import {DebugElementHarness} from '../../../testing/src/debug-element-harness';
-import {TestIdDirective} from 'src/lib/directives/test-id.directive';
+import {TestIdDirective} from '../../../src/lib/directives/test-id.directive';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 

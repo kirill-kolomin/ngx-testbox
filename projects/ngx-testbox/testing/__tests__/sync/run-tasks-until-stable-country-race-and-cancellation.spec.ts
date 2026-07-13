@@ -6,7 +6,7 @@ import {HttpClient, HttpResponse, provideHttpClient} from '@angular/common/http'
 import {HttpCallInstruction} from '../../../testing/src/interfaces/http-call';
 import {runTasksUntilStable} from '../../../testing/src/run-tasks-until-stable';
 import {DebugElementHarness} from '../../../testing/src/debug-element-harness';
-import {TestIdDirective} from '../../lib/directives/test-id.directive';
+import {TestIdDirective} from '../../../src/lib/directives/test-id.directive';
 import { Subscription } from 'rxjs';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
